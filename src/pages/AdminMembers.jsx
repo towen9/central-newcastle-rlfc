@@ -1,0 +1,294 @@
+import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { 
+  Search, Filter, Download, Plus, MoreVertical, 
+  Mail, CreditCard, CheckCircle, XCircle, Clock 
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import AdminLayout from '../components/admin/AdminLayout';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+
+export default function AdminMembers() {
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const queryClient = useQueryClient();
+
+  const { data: memberships = [], isLoading } = useQuery({
+    queryKey: ['allMemberships'],
+    queryFn: () => base44.entities.Membership.list('-created_date')
+  });
+
+  const { data: tiers = [] } = useQuery({
+    queryKey: ['tiers'],
+    queryFn: () => base44.entities.MembershipTier.filter({ is_active: true }, 'sort_order')
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Membership.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['allMemberships']);
+      toast.success('Membership updated');
+    }
+  });
+
+  const filteredMemberships = memberships.filter(m => {
+    const matchesSearch = 
+      m.user_name?.toLowerCase().includes(search.toLowerCase()) ||
+      m.user_email?.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || m.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const statusColors = {
+    active: 'bg-emerald-100 text-emerald-700',
+    expired: 'bg-red-100 text-red-700',
+    pending: 'bg-amber-100 text-amber-700',
+    cancelled: 'bg-gray-100 text-gray-700'
+  };
+
+  const exportCSV = () => {
+    const headers = ['Name', 'Email', 'Tier', 'Status', 'Start Date', 'Expiry Date', 'Stamps'];
+    const rows = filteredMemberships.map(m => [
+      m.user_name,
+      m.user_email,
+      m.tier_name,
+      m.status,
+      m.start_date,
+      m.expiry_date,
+      m.stamps
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `members-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+  };
+
+  return (
+    <AdminLayout title="Members" currentPage="AdminMembers">
+      {/* Filters */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" onClick={exportCSV}>
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Total</p>
+          <p className="text-2xl font-bold text-gray-900">{memberships.length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Active</p>
+          <p className="text-2xl font-bold text-emerald-600">{memberships.filter(m => m.status === 'active').length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Expired</p>
+          <p className="text-2xl font-bold text-red-600">{memberships.filter(m => m.status === 'expired').length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Pending</p>
+          <p className="text-2xl font-bold text-amber-600">{memberships.filter(m => m.status === 'pending').length}</p>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Member</TableHead>
+              <TableHead>Tier</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Expiry</TableHead>
+              <TableHead>Stamps</TableHead>
+              <TableHead>Check-ins</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredMemberships.map((membership) => (
+              <TableRow key={membership.id}>
+                <TableCell>
+                  <div>
+                    <p className="font-medium text-gray-900">{membership.user_name}</p>
+                    <p className="text-sm text-gray-500">{membership.user_email}</p>
+                  </div>
+                </TableCell>
+                <TableCell>{membership.tier_name}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[membership.status]}`}>
+                    {membership.status}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {membership.expiry_date ? format(new Date(membership.expiry_date), 'MMM d, yyyy') : '-'}
+                </TableCell>
+                <TableCell>
+                  <span className="font-semibold text-amber-600">{membership.stamps || 0}</span>
+                </TableCell>
+                <TableCell>{membership.total_checkins || 0}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => setSelectedMember(membership)}>
+                        Edit Membership
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => updateMutation.mutate({ 
+                          id: membership.id, 
+                          data: { status: membership.status === 'active' ? 'cancelled' : 'active' }
+                        })}
+                      >
+                        {membership.status === 'active' ? 'Deactivate' : 'Activate'}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => updateMutation.mutate({ 
+                          id: membership.id, 
+                          data: { stamps: 0 }
+                        })}
+                      >
+                        Reset Stamps
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        
+        {filteredMemberships.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No members found</p>
+          </div>
+        )}
+      </div>
+
+      {/* Edit Modal */}
+      <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Membership</DialogTitle>
+          </DialogHeader>
+          {selectedMember && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Member</p>
+                <p className="font-medium">{selectedMember.user_name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Status</p>
+                <Select 
+                  value={selectedMember.status}
+                  onValueChange={(value) => {
+                    updateMutation.mutate({ id: selectedMember.id, data: { status: value } });
+                    setSelectedMember(null);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="expired">Expired</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Tier</p>
+                <Select 
+                  value={selectedMember.tier_id}
+                  onValueChange={(value) => {
+                    const tier = tiers.find(t => t.id === value);
+                    updateMutation.mutate({ 
+                      id: selectedMember.id, 
+                      data: { tier_id: value, tier_name: tier?.name }
+                    });
+                    setSelectedMember(null);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tiers.map(tier => (
+                      <SelectItem key={tier.id} value={tier.id}>{tier.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </AdminLayout>
+  );
+}
