@@ -11,6 +11,10 @@ import AdminMembers from './pages/AdminMembers';
 import AdminRewards from './pages/AdminRewards';
 import AdminOffers from './pages/AdminOffers';
 import AdminSponsors from './pages/AdminSponsors';
+import AdminQRCodes from './pages/AdminQRCodes';
+import AdminNews from './pages/AdminNews';
+import AdminFixtures from './pages/AdminFixtures';
+import AdminEvents from './pages/AdminEvents';
 import __Layout from './Layout.jsx';
 
 
@@ -28,6 +32,10 @@ export const PAGES = {
     "AdminRewards": AdminRewards,
     "AdminOffers": AdminOffers,
     "AdminSponsors": AdminSponsors,
+    "AdminQRCodes": AdminQRCodes,
+    "AdminNews": AdminNews,
+    "AdminFixtures": AdminFixtures,
+    "AdminEvents": AdminEvents,
 }
 
 export const pagesConfig = {
