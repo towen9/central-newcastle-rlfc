@@ -44,7 +44,7 @@ export default function QRModal({ isOpen, onClose, membership, user }) {
                 <Shield className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Charlestown RLC</h3>
+                <h3 className="font-bold text-gray-900">Central Newcastle RLFC</h3>
                 <p className="text-xs text-gray-500">Digital Membership Pass</p>
               </div>
             </div>

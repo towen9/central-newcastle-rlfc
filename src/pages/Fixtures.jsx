@@ -121,7 +121,7 @@ export default function Fixtures() {
 
                         <div className="flex items-center justify-center gap-4 py-3">
                           <div className="text-center flex-1">
-                            <p className="font-bold text-lg text-gray-900">Charlestown</p>
+                            <p className="font-bold text-lg text-gray-900">Central Newcastle</p>
                             <p className="text-xs text-gray-500 uppercase">{fixture.fixture_type === 'home' ? 'Home' : ''}</p>
                           </div>
                           <div className="text-center">

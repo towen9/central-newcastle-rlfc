@@ -209,7 +209,7 @@ export default function Profile() {
 
         {/* App Version */}
         <p className="text-center text-xs text-gray-400">
-          Charlestown RLC App v1.0.0
+          Central Newcastle RLFC App v1.0.0
         </p>
       </div>
     </div>

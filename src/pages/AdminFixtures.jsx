@@ -157,7 +157,7 @@ export default function AdminFixtures() {
                 <td className="px-4 py-3">
                   <div>
                     <p className="font-medium text-gray-900">
-                      Charlestown vs {fixture.opponent}
+                      Central Newcastle vs {fixture.opponent}
                     </p>
                     <p className="text-sm text-gray-500">
                       {fixture.team_grade} • {fixture.competition}
@@ -347,11 +347,11 @@ export default function AdminFixtures() {
           {resultFixture && (
             <div className="space-y-4">
               <p className="text-center text-gray-600">
-                Charlestown vs {resultFixture.opponent}
+                Central Newcastle vs {resultFixture.opponent}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Charlestown</Label>
+                  <Label>Central Newcastle</Label>
                   <Input
                     type="number"
                     min="0"

@@ -133,7 +133,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-4">
               <Shield className="w-8 h-8" />
               <div>
-                <h1 className="font-bold text-lg">Charlestown RLC</h1>
+                <h1 className="font-bold text-lg">Central Newcastle RLFC</h1>
                 <p className="text-blue-200 text-xs">Admin Dashboard</p>
               </div>
             </div>

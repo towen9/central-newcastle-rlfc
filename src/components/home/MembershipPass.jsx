@@ -32,8 +32,8 @@ export default function MembershipPass({ membership, user, onShowQR }) {
               <Shield className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg tracking-wide">CHARLESTOWN</h3>
-              <p className="text-white/70 text-xs tracking-widest">RUGBY LEAGUE CLUB</p>
+              <h3 className="text-white font-bold text-lg tracking-wide">CENTRAL NEWCASTLE</h3>
+              <p className="text-white/70 text-xs tracking-widest">RLFC</p>
             </div>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-semibold ${

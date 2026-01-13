@@ -87,7 +87,7 @@ export default function Membership() {
                     <Shield className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg">CHARLESTOWN RLC</h3>
+                    <h3 className="font-bold text-lg">CENTRAL NEWCASTLE RLFC</h3>
                     <p className="text-white/70 text-sm">{currentTier?.name || membership.tier_name}</p>
                   </div>
                 </div>
@@ -205,7 +205,7 @@ export default function Membership() {
               <CreditCard className="w-10 h-10 text-gray-400" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">No Active Membership</h2>
-            <p className="text-gray-500 mb-6">Join Charlestown RLC to access exclusive benefits</p>
+            <p className="text-gray-500 mb-6">Join Central Newcastle RLFC to access exclusive benefits</p>
             
             <div className="space-y-4">
               {tiers.filter(t => !t.is_admin_only).map((tier) => (
