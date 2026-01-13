@@ -55,10 +55,17 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
-        <div className="px-5 py-4 flex items-center justify-between">
-          <div>
-            <p className="text-blue-200 text-sm">Welcome back</p>
-            <h1 className="text-white text-xl font-bold">{user?.full_name || 'Member'}</h1>
+        <div className="px-5 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
+              alt="Central Newcastle RLFC"
+              className="w-14 h-14 object-contain bg-white rounded-full p-1"
+            />
+            <div>
+              <p className="text-blue-200 text-sm">Welcome back</p>
+              <h1 className="text-white text-xl font-bold">{user?.full_name || 'Member'}</h1>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">

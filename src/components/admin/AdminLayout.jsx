@@ -28,7 +28,11 @@ export default function AdminLayout({ children, title, currentPage }) {
             <div className="flex items-center gap-4">
               <Link to={createPageUrl('AdminDashboard')}>
                 <div className="flex items-center gap-3">
-                  <Shield className="w-8 h-8" />
+                  <img 
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
+                    alt="Central Newcastle RLFC"
+                    className="w-12 h-12 object-contain bg-white rounded-full p-1"
+                  />
                   <div>
                     <h1 className="font-bold text-lg">Central Newcastle RLFC</h1>
                     <p className="text-blue-200 text-xs">Admin</p>
