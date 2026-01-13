@@ -83,8 +83,12 @@ export default function Membership() {
             >
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <Shield className="w-6 h-6" />
+                  <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1">
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
+                      alt="Central Newcastle RLFC"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">CENTRAL NEWCASTLE RLFC</h3>

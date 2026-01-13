@@ -40,8 +40,12 @@ export default function QRModal({ isOpen, onClose, membership, user }) {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#1a365d] rounded-xl flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
+              <div className="w-12 h-12 bg-white rounded-xl border border-gray-200 flex items-center justify-center p-1">
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
+                  alt="Central Newcastle RLFC"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Central Newcastle RLFC</h3>
