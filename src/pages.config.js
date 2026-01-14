@@ -15,6 +15,8 @@ import News from './pages/News';
 import Offers from './pages/Offers';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
+import Benefits from './pages/Benefits';
+import Sponsors from './pages/Sponsors';
 import __Layout from './Layout.jsx';
 
 
@@ -36,6 +38,8 @@ export const PAGES = {
     "Offers": Offers,
     "Profile": Profile,
     "Rewards": Rewards,
+    "Benefits": Benefits,
+    "Sponsors": Sponsors,
 }
 
 export const pagesConfig = {

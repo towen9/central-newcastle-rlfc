@@ -1,14 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Home, CreditCard, Gift, Percent, User } from 'lucide-react';
+import { Home, CreditCard, Gift, Award, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 const navItems = [
   { icon: Home, label: 'Home', page: 'Home' },
   { icon: CreditCard, label: 'Pass', page: 'Membership' },
-  { icon: Gift, label: 'Rewards', page: 'Rewards' },
-  { icon: Percent, label: 'Offers', page: 'Offers' },
+  { icon: Gift, label: 'Benefits', page: 'Benefits' },
+  { icon: Award, label: 'Sponsors', page: 'Sponsors' },
   { icon: User, label: 'Profile', page: 'Profile' },
 ];
 
