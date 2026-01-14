@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trophy, Edit2, Trash2, MoreVertical, MapPin, Calendar } from 'lucide-react';
+import { Plus, Trophy, Edit2, Trash2, MoreVertical, MapPin, Calendar, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +38,9 @@ const defaultFixture = {
   venue: '',
   venue_address: '',
   status: 'upcoming',
-  ticket_url: ''
+  ticket_url: '',
+  entry_enabled: false,
+  entry_price: 0
 };
 
 export default function AdminFixtures() {
@@ -148,6 +151,7 @@ export default function AdminFixtures() {
               <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Venue</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Result</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Status</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Entry</th>
               <th className="w-[50px]"></th>
             </tr>
           </thead>
@@ -189,6 +193,16 @@ export default function AdminFixtures() {
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[fixture.status]}`}>
                     {fixture.status}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  {fixture.entry_enabled ? (
+                    <div className="flex items-center gap-1 text-emerald-600">
+                      <Ticket className="w-4 h-4" />
+                      <span className="text-sm font-medium">${fixture.entry_price?.toFixed(2)}</span>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400 text-sm">-</span>
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   <DropdownMenu>
@@ -326,6 +340,37 @@ export default function AdminFixtures() {
                 placeholder="https://..."
               />
             </div>
+            
+            <div className="border-t border-gray-200 pt-4 space-y-4">
+              <div className="flex items-center gap-3">
+                <Checkbox 
+                  id="entry_enabled"
+                  checked={formData.entry_enabled}
+                  onCheckedChange={(checked) => setFormData({ ...formData, entry_enabled: checked })}
+                />
+                <div>
+                  <label htmlFor="entry_enabled" className="text-sm font-medium text-gray-900">
+                    Enable Digital Entry
+                  </label>
+                  <p className="text-xs text-gray-500">Allow game day entry via QR code</p>
+                </div>
+              </div>
+              
+              {formData.entry_enabled && (
+                <div>
+                  <Label>Entry Price ($)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.50"
+                    value={formData.entry_price}
+                    onChange={(e) => setFormData({ ...formData, entry_price: parseFloat(e.target.value) || 0 })}
+                    placeholder="10.00"
+                  />
+                </div>
+              )}
+            </div>
+            
             <div className="flex gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="flex-1">
                 Cancel
