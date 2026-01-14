@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { 
   Shield, Users, Gift, Percent, QrCode, Newspaper, 
-  Calendar, LayoutDashboard, ArrowLeft, ChevronRight 
+  Calendar, LayoutDashboard, ArrowLeft, ChevronRight, Ticket 
 } from 'lucide-react';
 
 const menuItems = [
@@ -16,6 +16,7 @@ const menuItems = [
   { icon: Newspaper, label: 'News', page: 'AdminNews' },
   { icon: Calendar, label: 'Fixtures', page: 'AdminFixtures' },
   { icon: Calendar, label: 'Events', page: 'AdminEvents' },
+  { icon: Ticket, label: 'Game Day', page: 'AdminGameDay' },
 ];
 
 export default function AdminLayout({ children, title, currentPage }) {
