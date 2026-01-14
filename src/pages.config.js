@@ -17,6 +17,9 @@ import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Benefits from './pages/Benefits';
 import Sponsors from './pages/Sponsors';
+import GameDayCheckIn from './pages/GameDayCheckIn';
+import GameDayPass from './pages/GameDayPass';
+import AdminGameDay from './pages/AdminGameDay';
 import __Layout from './Layout.jsx';
 
 
@@ -40,6 +43,9 @@ export const PAGES = {
     "Rewards": Rewards,
     "Benefits": Benefits,
     "Sponsors": Sponsors,
+    "GameDayCheckIn": GameDayCheckIn,
+    "GameDayPass": GameDayPass,
+    "AdminGameDay": AdminGameDay,
 }
 
 export const pagesConfig = {
