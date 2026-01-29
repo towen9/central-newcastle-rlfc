@@ -69,6 +69,9 @@ import Offers from './pages/Offers';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
+import BarScan from './pages/BarScan';
+import AdminTransactions from './pages/AdminTransactions';
+import AdminLocationDiscounts from './pages/AdminLocationDiscounts';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +98,9 @@ export const PAGES = {
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
+    "BarScan": BarScan,
+    "AdminTransactions": AdminTransactions,
+    "AdminLocationDiscounts": AdminLocationDiscounts,
 }
 
 export const pagesConfig = {
