@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { 
   Shield, Users, Gift, Percent, QrCode, Newspaper, 
-  Calendar, LayoutDashboard, ArrowLeft, ChevronRight, Ticket 
+  Calendar, LayoutDashboard, ArrowLeft, ChevronRight, Ticket, ShoppingBag 
 } from 'lucide-react';
 
 const menuItems = [
@@ -17,6 +17,8 @@ const menuItems = [
   { icon: Calendar, label: 'Fixtures', page: 'AdminFixtures' },
   { icon: Calendar, label: 'Events', page: 'AdminEvents' },
   { icon: Ticket, label: 'Game Day', page: 'AdminGameDay' },
+  { icon: ShoppingBag, label: 'Transactions', page: 'AdminTransactions' },
+  { icon: Percent, label: 'Discounts', page: 'AdminLocationDiscounts' },
 ];
 
 export default function AdminLayout({ children, title, currentPage }) {
