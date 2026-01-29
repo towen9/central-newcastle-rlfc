@@ -6,30 +6,16 @@ import { ArrowLeft, ExternalLink, Mail, Phone, Globe, Percent } from 'lucide-rea
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
-const tierConfig = {
-  platinum: { color: 'bg-gradient-to-r from-slate-400 to-slate-600', label: 'Platinum', ring: 'ring-slate-400' },
-  gold: { color: 'bg-gradient-to-r from-yellow-400 to-yellow-600', label: 'Gold', ring: 'ring-yellow-400' },
-  silver: { color: 'bg-gradient-to-r from-gray-300 to-gray-500', label: 'Silver', ring: 'ring-gray-400' },
-  bronze: { color: 'bg-gradient-to-r from-amber-600 to-amber-800', label: 'Bronze', ring: 'ring-amber-600' },
-  community: { color: 'bg-gradient-to-r from-blue-400 to-blue-600', label: 'Community', ring: 'ring-blue-400' }
-};
-
 export default function Sponsors() {
-  const [selectedTier, setSelectedTier] = useState('all');
-
   const { data: sponsors = [] } = useQuery({
     queryKey: ['sponsors'],
-    queryFn: () => base44.entities.Sponsor.filter({ is_active: true }, '-tier')
+    queryFn: () => base44.entities.Sponsor.filter({ is_active: true })
   });
 
   const { data: offers = [] } = useQuery({
     queryKey: ['offers'],
     queryFn: () => base44.entities.Offer.filter({ is_active: true })
   });
-
-  const filteredSponsors = selectedTier === 'all' 
-    ? sponsors 
-    : sponsors.filter(s => s.tier === selectedTier);
 
   const getOffersForSponsor = (sponsorId) => {
     return offers.filter(o => o.sponsor_id === sponsorId);
@@ -60,37 +46,9 @@ export default function Sponsors() {
       </div>
 
       <div className="px-5 py-6">
-        {/* Tier Filter */}
-        <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide mb-6">
-          <button
-            onClick={() => setSelectedTier('all')}
-            className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${
-              selectedTier === 'all' 
-                ? 'bg-[#1a365d] text-white' 
-                : 'bg-white text-gray-600 border border-gray-200'
-            }`}
-          >
-            All Sponsors
-          </button>
-          {Object.entries(tierConfig).map(([tier, config]) => (
-            <button
-              key={tier}
-              onClick={() => setSelectedTier(tier)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${
-                selectedTier === tier 
-                  ? 'bg-[#1a365d] text-white' 
-                  : 'bg-white text-gray-600 border border-gray-200'
-              }`}
-            >
-              {config.label}
-            </button>
-          ))}
-        </div>
-
         {/* Sponsors List */}
         <div className="space-y-4">
-          {filteredSponsors.map((sponsor, idx) => {
-            const tierStyle = tierConfig[sponsor.tier] || tierConfig.community;
+          {sponsors.map((sponsor, idx) => {
             const sponsorOffers = getOffersForSponsor(sponsor.id);
             
             return (
@@ -101,17 +59,6 @@ export default function Sponsors() {
                 transition={{ delay: idx * 0.05 }}
                 className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
               >
-                {/* Tier Badge */}
-                <div className={`${tierStyle.color} px-4 py-2 flex items-center justify-between`}>
-                  <span className="text-white font-semibold text-sm">{tierStyle.label} Sponsor</span>
-                  {sponsorOffers.length > 0 && (
-                    <span className="bg-white/20 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                      <Percent className="w-3 h-3" />
-                      {sponsorOffers.length} {sponsorOffers.length === 1 ? 'Offer' : 'Offers'}
-                    </span>
-                  )}
-                </div>
-
                 <div className="p-5">
                   {/* Logo & Name */}
                   <div className="flex items-start gap-4 mb-4">
@@ -119,15 +66,23 @@ export default function Sponsors() {
                       <img 
                         src={sponsor.logo_url} 
                         alt={sponsor.name}
-                        className={`w-16 h-16 object-contain rounded-xl border-2 ${tierStyle.ring} p-2`}
+                        className="w-16 h-16 object-contain rounded-xl border-2 border-gray-200 p-2"
                       />
                     ) : (
-                      <div className={`w-16 h-16 ${tierStyle.color} rounded-xl flex items-center justify-center text-white font-bold text-xl`}>
+                      <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
                         {sponsor.name.charAt(0)}
                       </div>
                     )}
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 text-lg mb-1">{sponsor.name}</h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-gray-900 text-lg">{sponsor.name}</h3>
+                        {sponsorOffers.length > 0 && (
+                          <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
+                            <Percent className="w-3 h-3" />
+                            {sponsorOffers.length}
+                          </span>
+                        )}
+                      </div>
                       {sponsor.description && (
                         <p className="text-sm text-gray-500">{sponsor.description}</p>
                       )}
@@ -197,9 +152,9 @@ export default function Sponsors() {
           })}
         </div>
 
-        {filteredSponsors.length === 0 && (
+        {sponsors.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No sponsors in this tier</p>
+            <p className="text-gray-500">No sponsors yet</p>
           </div>
         )}
       </div>

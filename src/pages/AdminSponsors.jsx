@@ -29,21 +29,12 @@ import {
 import AdminLayout from '../components/admin/AdminLayout';
 import { toast } from 'sonner';
 
-const tierColors = {
-  platinum: 'bg-gray-800 text-white',
-  gold: 'bg-amber-500 text-white',
-  silver: 'bg-gray-400 text-white',
-  bronze: 'bg-orange-700 text-white',
-  community: 'bg-blue-500 text-white'
-};
-
 const defaultSponsor = {
   name: '',
   description: '',
   website: '',
   contact_email: '',
   contact_phone: '',
-  tier: 'community',
   is_active: true
 };
 
@@ -147,9 +138,6 @@ export default function AdminSponsors() {
                 )}
                 <div>
                   <h3 className="font-semibold text-gray-900">{sponsor.name}</h3>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tierColors[sponsor.tier]}`}>
-                    {sponsor.tier}
-                  </span>
                 </div>
               </div>
               <DropdownMenu>
@@ -251,24 +239,6 @@ export default function AdminSponsors() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="About the sponsor..."
               />
-            </div>
-            <div>
-              <Label>Tier</Label>
-              <Select 
-                value={formData.tier}
-                onValueChange={(value) => setFormData({ ...formData, tier: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="platinum">Platinum</SelectItem>
-                  <SelectItem value="gold">Gold</SelectItem>
-                  <SelectItem value="silver">Silver</SelectItem>
-                  <SelectItem value="bronze">Bronze</SelectItem>
-                  <SelectItem value="community">Community</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             <div>
               <Label>Website</Label>
