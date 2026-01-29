@@ -2,38 +2,95 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Ticket, Calendar, MapPin, CheckCircle, XCircle, Clock, Percent } from 'lucide-react';
+import { Ticket, Calendar, MapPin, CheckCircle, XCircle, Clock, Percent, WifiOff } from 'lucide-react';
 import { format, isPast, isToday } from 'date-fns';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
+import { OfflineCache } from '../components/offline/OfflineCache';
 
 export default function GameDayPass() {
   const [entryId, setEntryId] = useState(null);
+  const [cachedQR, setCachedQR] = useState(null);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('entryId');
     if (id) setEntryId(id);
+
+    // Monitor online/offline status
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Cleanup expired passes
+    OfflineCache.clearExpiredPasses();
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   const { data: entry } = useQuery({
     queryKey: ['gameEntry', entryId],
     queryFn: async () => {
       if (!entryId) return null;
+      
+      // Try cache first if offline
+      if (!navigator.onLine) {
+        const cached = OfflineCache.getCachedGameDayPass(entryId);
+        if (cached) return cached.entry;
+      }
+      
       const entries = await base44.entities.GameDayEntry.filter({ id: entryId });
       return entries[0] || null;
     },
-    enabled: !!entryId
+    enabled: !!entryId,
+    initialData: () => {
+      if (entryId) {
+        const cached = OfflineCache.getCachedGameDayPass(entryId);
+        return cached?.entry || undefined;
+      }
+    }
   });
 
   const { data: event } = useQuery({
     queryKey: ['fixture', entry?.event_id],
     queryFn: async () => {
+      // Try cache first if offline
+      if (!navigator.onLine && entryId) {
+        const cached = OfflineCache.getCachedGameDayPass(entryId);
+        if (cached) return cached.event;
+      }
+      
       const fixtures = await base44.entities.Fixture.filter({ id: entry.event_id });
       return fixtures[0] || null;
     },
-    enabled: !!entry?.event_id
+    enabled: !!entry?.event_id,
+    initialData: () => {
+      if (entryId) {
+        const cached = OfflineCache.getCachedGameDayPass(entryId);
+        return cached?.event || undefined;
+      }
+    }
   });
+
+  // Cache data when loaded
+  useEffect(() => {
+    if (entry && event && entryId) {
+      OfflineCache.cacheGameDayPass(entryId, entry, event);
+    }
+  }, [entry, event, entryId]);
+
+  // Load cached QR
+  useEffect(() => {
+    if (entryId) {
+      const qr = OfflineCache.getCachedQR(entryId);
+      if (qr) setCachedQR(qr);
+    }
+  }, [entryId]);
 
   const { data: offers = [] } = useQuery({
     queryKey: ['casualOffers'],
@@ -65,6 +122,14 @@ export default function GameDayPass() {
           />
           <h1 className="text-white text-2xl font-bold mb-1">Game Day Entry Pass</h1>
           <p className="text-blue-200 text-sm">Central Newcastle RLFC</p>
+          
+          {/* Offline Indicator */}
+          {isOffline && (
+            <div className="mt-3 flex items-center justify-center gap-2 bg-white/20 backdrop-blur rounded-full px-4 py-2 text-white text-xs">
+              <WifiOff className="w-3 h-3" />
+              Offline Mode - Pass cached locally
+            </div>
+          )}
         </div>
       </div>
 
@@ -98,7 +163,7 @@ export default function GameDayPass() {
           <div className="px-6 pb-6">
             <div className="bg-white rounded-2xl p-6 text-center">
               <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${entry.pass_qr_code}`}
+                src={cachedQR || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${entry.pass_qr_code}`}
                 alt="Entry Pass QR"
                 className="w-48 h-48 mx-auto mb-4"
               />

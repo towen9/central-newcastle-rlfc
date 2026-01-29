@@ -1,23 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, Download } from 'lucide-react';
+import { X, Shield, Download, WifiOff } from 'lucide-react';
 import { format } from 'date-fns';
+import { OfflineCache } from '../offline/OfflineCache';
 
 export default function QRModal({ isOpen, onClose, membership, user }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
-    if (isOpen && membership?.qr_code_id) {
-      // Generate QR code URL using a QR code API
+    if (isOpen && membership?.qr_code_id && user?.id) {
+      // Try to load cached QR first
+      const cached = OfflineCache.getCachedMembershipQR(user.id);
+      if (cached) {
+        setQrDataUrl(cached);
+      }
+      
+      // Generate QR code URL
       const qrData = JSON.stringify({
         type: 'membership',
         id: membership.qr_code_id,
         user_id: membership.user_id
       });
       const encodedData = encodeURIComponent(qrData);
-      setQrDataUrl(`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodedData}`);
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodedData}`;
+      
+      if (!cached) {
+        setQrDataUrl(qrUrl);
+      }
+      
+      // Cache membership data for offline use
+      OfflineCache.cacheMembership(user.id, membership, user);
     }
-  }, [isOpen, membership]);
+
+    // Monitor online/offline status
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [isOpen, membership, user]);
 
   if (!isOpen) return null;
 
@@ -64,6 +90,14 @@ export default function QRModal({ isOpen, onClose, membership, user }) {
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">{user?.full_name}</h2>
             <p className="text-gray-500">{membership?.tier_name}</p>
+            
+            {/* Offline Indicator */}
+            {isOffline && (
+              <div className="mt-2 flex items-center justify-center gap-2 bg-blue-50 text-blue-700 rounded-full px-3 py-1 text-xs">
+                <WifiOff className="w-3 h-3" />
+                Offline Mode
+              </div>
+            )}
           </div>
 
           {/* QR Code */}
