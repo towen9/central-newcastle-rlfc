@@ -31,6 +31,7 @@ import { toast } from 'sonner';
 
 const defaultSponsor = {
   name: '',
+  logo_url: '',
   description: '',
   website: '',
   contact_email: '',
@@ -42,6 +43,7 @@ export default function AdminSponsors() {
   const [showModal, setShowModal] = useState(false);
   const [editingSponsor, setEditingSponsor] = useState(null);
   const [formData, setFormData] = useState(defaultSponsor);
+  const [uploading, setUploading] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: sponsors = [] } = useQuery({
@@ -106,6 +108,27 @@ export default function AdminSponsors() {
     return offers
       .filter(o => o.sponsor_id === sponsorId)
       .reduce((sum, o) => sum + (o.redemptions_count || 0), 0);
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, logo_url: file_url });
+      toast.success('Logo uploaded');
+    } catch (error) {
+      toast.error('Failed to upload logo');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -231,6 +254,30 @@ export default function AdminSponsors() {
                 placeholder="Sponsor name"
                 required
               />
+            </div>
+            <div>
+              <Label>Logo</Label>
+              <div className="space-y-3">
+                {formData.logo_url && (
+                  <div className="relative w-32 h-32 border rounded-lg overflow-hidden">
+                    <img src={formData.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, logo_url: '' })}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  disabled={uploading}
+                />
+                {uploading && <p className="text-sm text-gray-500">Uploading...</p>}
+              </div>
             </div>
             <div>
               <Label>Description</Label>
