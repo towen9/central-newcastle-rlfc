@@ -18,8 +18,8 @@ export default function GameDayCheckIn() {
     email: '',
     mobile: '',
     postcode: '',
-    opt_in_club: false,
-    opt_in_partners: false,
+    opt_in_club: true,
+    opt_in_partners: true,
     accept_terms: false
   });
   const [entryId, setEntryId] = useState(null);
