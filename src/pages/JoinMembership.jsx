@@ -28,10 +28,9 @@ export default function JoinMembership() {
 
   // Stripe price IDs (from setup)
   const stripePriceMap = {
-    'Junior Player': 'price_1SzTLGLgCWdDbHylLsK4GBqn',
-    'Senior Player': 'price_1SzTLGLgCWdDbHylxb9IjKYw',
-    'Adult Supporter': 'price_1SzTLGLgCWdDbHyljJy4zwQK',
-    'Family Membership': 'price_1SzTLGLgCWdDbHylVwULN89v'
+    'Central ~ Charlestown Member': 'price_1SzmSnLgCWdDbHyljAjksGY9',
+    'Family Season Pass': 'price_1SzmSnLgCWdDbHylNiYsILRQ',
+    'Supporter Pack': 'price_1SzmSnLgCWdDbHylFLsGSW4g'
   };
 
   const handlePurchase = async (tier) => {
