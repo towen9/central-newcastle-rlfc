@@ -144,7 +144,7 @@ export default function Fixtures() {
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center justify-between mb-2">
                           <div>
                             <p className="text-xs text-gray-500 mb-1">{fixture.competition}</p>
                             <p className="text-sm font-medium text-gray-600">{fixture.team_grade}</p>
@@ -153,6 +153,11 @@ export default function Fixtures() {
                             <p className="font-semibold text-gray-900">{format(fixtureDate, 'MMM d')}</p>
                             <p className="text-sm text-gray-500">{format(fixtureDate, 'h:mm a')}</p>
                           </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3 bg-gray-50 rounded-lg px-3 py-2">
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                          <span className="font-medium">{fixture.venue}</span>
                         </div>
 
                         <div className="flex items-center justify-center gap-4 py-3">
@@ -181,23 +186,19 @@ export default function Fixtures() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <MapPin className="w-4 h-4" />
-                            {fixture.venue}
-                          </div>
-                          {fixture.ticket_url && (
+                        {fixture.ticket_url && (
+                          <div className="pt-3 border-t border-gray-100">
                             <a 
                               href={fixture.ticket_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-sm text-blue-600 font-medium"
+                              className="flex items-center justify-center gap-2 text-sm text-blue-600 font-medium"
                             >
                               <Ticket className="w-4 h-4" />
-                              Tickets
+                              Get Tickets
                             </a>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </motion.div>
                     );
                   })
