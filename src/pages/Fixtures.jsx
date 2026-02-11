@@ -7,10 +7,24 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, isAfter, isBefore, isToday } from 'date-fns';
+
+const teamLogos = {
+  'Kurri Kurri Bulldogs': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251954.jpg?1576033278946',
+  'Maitland Pickers': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251957.png?1643870767120',
+  'Macquarie Scorpions': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251956.png?1734484082186',
+  'Western Suburbs Rosellas': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251959.jpg?1576112582264',
+  'Cessnock Goannas': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251953.png?1576112376038',
+  'The Entrance Tigers': 'https://mysideline-prod.s3.amazonaws.com/logos/resize/12224.png?1572589619112',
+  'Northern Hawks': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/344002.JPG?1646219499038',
+  'South Newcastle Lions': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251958.png?1576112564731',
+  'Lakes United Seagulls': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251955.png'
+};
 
 export default function Fixtures() {
   const [activeTab, setActiveTab] = useState('fixtures');
+  const [selectedGrade, setSelectedGrade] = useState('all');
 
   const { data: fixtures = [] } = useQuery({
     queryKey: ['fixtures'],
@@ -22,13 +36,19 @@ export default function Fixtures() {
     queryFn: () => base44.entities.Event.filter({ is_active: true }, 'date_time')
   });
 
-  const upcomingFixtures = fixtures.filter(f => 
+  const filteredFixtures = selectedGrade === 'all' 
+    ? fixtures 
+    : fixtures.filter(f => f.team_grade === selectedGrade);
+
+  const upcomingFixtures = filteredFixtures.filter(f => 
     f.status === 'upcoming' || f.status === 'live' || isAfter(new Date(f.date_time), new Date())
   );
 
-  const pastFixtures = fixtures.filter(f => 
+  const pastFixtures = filteredFixtures.filter(f => 
     f.status === 'completed' && isBefore(new Date(f.date_time), new Date())
   ).reverse();
+
+  const availableGrades = [...new Set(fixtures.map(f => f.team_grade).filter(Boolean))].sort();
 
   const upcomingEvents = events.filter(e => isAfter(new Date(e.date_time), new Date()));
 
@@ -66,6 +86,22 @@ export default function Fixtures() {
 
         {activeTab === 'fixtures' && (
           <div className="space-y-6">
+            {/* Grade Filter */}
+            <div className="bg-white rounded-xl p-4 border border-gray-100">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Grade</label>
+              <Select value={selectedGrade} onValueChange={setSelectedGrade}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Grades</SelectItem>
+                  {availableGrades.map(grade => (
+                    <SelectItem key={grade} value={grade}>{grade}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Upcoming Fixtures */}
             <div>
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
@@ -120,15 +156,27 @@ export default function Fixtures() {
                         </div>
 
                         <div className="flex items-center justify-center gap-4 py-3">
-                          <div className="text-center flex-1">
-                            <p className="font-bold text-lg text-gray-900">Central Newcastle</p>
+                          <div className="text-center flex-1 flex flex-col items-center">
+                            <img 
+                              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
+                              alt="Central Newcastle"
+                              className="w-12 h-12 object-contain mb-2 rounded-full bg-white p-1 border border-gray-200"
+                            />
+                            <p className="font-bold text-sm text-gray-900">Central Newcastle</p>
                             <p className="text-xs text-gray-500 uppercase">{fixture.fixture_type === 'home' ? 'Home' : ''}</p>
                           </div>
                           <div className="text-center">
                             <span className="text-gray-400 font-medium">vs</span>
                           </div>
-                          <div className="text-center flex-1">
-                            <p className="font-bold text-lg text-gray-900">{fixture.opponent}</p>
+                          <div className="text-center flex-1 flex flex-col items-center">
+                            {teamLogos[fixture.opponent] && (
+                              <img 
+                                src={teamLogos[fixture.opponent]}
+                                alt={fixture.opponent}
+                                className="w-12 h-12 object-contain mb-2 rounded-full bg-white p-1 border border-gray-200"
+                              />
+                            )}
+                            <p className="font-bold text-sm text-gray-900">{fixture.opponent}</p>
                             <p className="text-xs text-gray-500 uppercase">{fixture.fixture_type === 'away' ? 'Away' : ''}</p>
                           </div>
                         </div>

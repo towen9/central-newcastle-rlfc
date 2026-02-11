@@ -65,15 +65,15 @@ import CheckIn from './pages/CheckIn';
 import Fixtures from './pages/Fixtures';
 import GameDayCheckIn from './pages/GameDayCheckIn';
 import GameDayPass from './pages/GameDayPass';
+import GateScan from './pages/GateScan';
 import Home from './pages/Home';
+import JoinMembership from './pages/JoinMembership';
 import Membership from './pages/Membership';
 import News from './pages/News';
 import Offers from './pages/Offers';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
-import GateScan from './pages/GateScan';
-import JoinMembership from './pages/JoinMembership';
 import __Layout from './Layout.jsx';
 
 
@@ -96,15 +96,15 @@ export const PAGES = {
     "Fixtures": Fixtures,
     "GameDayCheckIn": GameDayCheckIn,
     "GameDayPass": GameDayPass,
+    "GateScan": GateScan,
     "Home": Home,
+    "JoinMembership": JoinMembership,
     "Membership": Membership,
     "News": News,
     "Offers": Offers,
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
-    "GateScan": GateScan,
-    "JoinMembership": JoinMembership,
 }
 
 export const pagesConfig = {
