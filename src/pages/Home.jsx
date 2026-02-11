@@ -8,7 +8,6 @@ import MembershipPass from '../components/home/MembershipPass';
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';
 import FeaturedOffer from '../components/home/FeaturedOffer';
-import LatestNews from '../components/home/LatestNews';
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
 
@@ -48,17 +47,11 @@ export default function Home() {
     }
   });
 
-  const { data: news = [] } = useQuery({
-    queryKey: ['news'],
-    queryFn: () => base44.entities.News.filter({ is_published: true }, '-publish_date', 2)
-  });
-
   const handleRefresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries(['membership']),
       queryClient.invalidateQueries(['rewards']),
-      queryClient.invalidateQueries(['featuredOffer']),
-      queryClient.invalidateQueries(['news'])
+      queryClient.invalidateQueries(['featuredOffer'])
     ]);
   };
 
@@ -119,9 +112,6 @@ export default function Home() {
             <FeaturedOffer offer={featuredOffer} />
           </div>
         )}
-
-        {/* Latest News */}
-        <LatestNews news={news} />
         </div>
       </PullToRefresh>
 
