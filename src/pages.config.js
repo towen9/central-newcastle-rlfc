@@ -51,12 +51,15 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminEvents from './pages/AdminEvents';
 import AdminFixtures from './pages/AdminFixtures';
 import AdminGameDay from './pages/AdminGameDay';
+import AdminLocationDiscounts from './pages/AdminLocationDiscounts';
 import AdminMembers from './pages/AdminMembers';
 import AdminNews from './pages/AdminNews';
 import AdminOffers from './pages/AdminOffers';
 import AdminQRCodes from './pages/AdminQRCodes';
 import AdminRewards from './pages/AdminRewards';
 import AdminSponsors from './pages/AdminSponsors';
+import AdminTransactions from './pages/AdminTransactions';
+import BarScan from './pages/BarScan';
 import Benefits from './pages/Benefits';
 import CheckIn from './pages/CheckIn';
 import Fixtures from './pages/Fixtures';
@@ -69,9 +72,7 @@ import Offers from './pages/Offers';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
-import BarScan from './pages/BarScan';
-import AdminTransactions from './pages/AdminTransactions';
-import AdminLocationDiscounts from './pages/AdminLocationDiscounts';
+import GateScan from './pages/GateScan';
 import __Layout from './Layout.jsx';
 
 
@@ -80,12 +81,15 @@ export const PAGES = {
     "AdminEvents": AdminEvents,
     "AdminFixtures": AdminFixtures,
     "AdminGameDay": AdminGameDay,
+    "AdminLocationDiscounts": AdminLocationDiscounts,
     "AdminMembers": AdminMembers,
     "AdminNews": AdminNews,
     "AdminOffers": AdminOffers,
     "AdminQRCodes": AdminQRCodes,
     "AdminRewards": AdminRewards,
     "AdminSponsors": AdminSponsors,
+    "AdminTransactions": AdminTransactions,
+    "BarScan": BarScan,
     "Benefits": Benefits,
     "CheckIn": CheckIn,
     "Fixtures": Fixtures,
@@ -98,9 +102,7 @@ export const PAGES = {
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
-    "BarScan": BarScan,
-    "AdminTransactions": AdminTransactions,
-    "AdminLocationDiscounts": AdminLocationDiscounts,
+    "GateScan": GateScan,
 }
 
 export const pagesConfig = {

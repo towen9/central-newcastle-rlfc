@@ -1,25 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Users, Calendar, Shield, ChevronRight, RefreshCcw, Plus } from 'lucide-react';
+import { ArrowLeft, CreditCard, Users, Calendar, Shield, ChevronRight, RefreshCcw, Plus, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
 import QRModal from '../components/shared/QRModal';
+import PhotoUpload from '../components/membership/PhotoUpload';
+import { toast } from 'sonner';
 
 export default function Membership() {
   const [showQR, setShowQR] = useState(false);
   const [user, setUser] = useState(null);
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const loadUser = async () => {
       const userData = await base44.auth.me();
       setUser(userData);
+      if (!userData.photo_url) {
+        setShowPhotoUpload(true);
+      }
     };
     loadUser();
   }, []);
+
+  const updatePhotoMutation = useMutation({
+    mutationFn: async (photoUrl) => {
+      await base44.auth.updateMe({ photo_url: photoUrl });
+    },
+    onSuccess: async () => {
+      const userData = await base44.auth.me();
+      setUser(userData);
+      setShowPhotoUpload(false);
+      toast.success('Photo updated');
+      queryClient.invalidateQueries(['membership']);
+    }
+  });
 
   const { data: membership } = useQuery({
     queryKey: ['membership', user?.id],
@@ -69,6 +89,27 @@ export default function Membership() {
       </div>
 
       <div className="px-5 py-6">
+        {/* Photo Upload Required */}
+        {showPhotoUpload && (
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Camera className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-amber-900 mb-1">Photo ID Required</h3>
+                <p className="text-sm text-amber-700">
+                  Upload your photo for gate verification at matches
+                </p>
+              </div>
+            </div>
+            <PhotoUpload 
+              currentPhotoUrl={user?.photo_url}
+              onPhotoUploaded={(url) => updatePhotoMutation.mutate(url)}
+            />
+          </div>
+        )}
+
         {membership ? (
           <>
             {/* Current Membership Card */}
@@ -186,6 +227,20 @@ export default function Membership() {
 
             {/* Actions */}
             <div className="space-y-3">
+              {user?.photo_url && (
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between" 
+                  size="lg"
+                  onClick={() => setShowPhotoUpload(!showPhotoUpload)}
+                >
+                  <span className="flex items-center gap-2">
+                    <Camera className="w-5 h-5" />
+                    Update Photo ID
+                  </span>
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
+              )}
               <Button variant="outline" className="w-full justify-between" size="lg">
                 <span className="flex items-center gap-2">
                   <RefreshCcw className="w-5 h-5" />
