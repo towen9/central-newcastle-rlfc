@@ -285,6 +285,16 @@ export default function BarScan() {
                     </div>
                   )}
 
+                  {/* Payment Instructions */}
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    <p className="font-semibold text-blue-900 mb-2">Next Steps:</p>
+                    <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                      <li>Ring up ${discount.final.toFixed(2)} in Square POS</li>
+                      <li>Member pays via Square terminal or cash</li>
+                      <li>Click "Log Transaction" below to award stamps</li>
+                    </ol>
+                  </div>
+
                   <div className="flex gap-3 pt-4">
                     <Button 
                       variant="outline" 
@@ -301,7 +311,7 @@ export default function BarScan() {
                       disabled={!purchaseData.item_description || !purchaseData.original_amount}
                       className="flex-1 bg-emerald-600 hover:bg-emerald-700"
                     >
-                      Complete Sale
+                      Log Transaction
                     </Button>
                   </div>
                 </div>

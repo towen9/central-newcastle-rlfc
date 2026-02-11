@@ -73,6 +73,7 @@ import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
 import GateScan from './pages/GateScan';
+import JoinMembership from './pages/JoinMembership';
 import __Layout from './Layout.jsx';
 
 
@@ -103,6 +104,7 @@ export const PAGES = {
     "Rewards": Rewards,
     "Sponsors": Sponsors,
     "GateScan": GateScan,
+    "JoinMembership": JoinMembership,
 }
 
 export const pagesConfig = {
