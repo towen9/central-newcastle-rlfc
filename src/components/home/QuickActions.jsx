@@ -1,15 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { QrCode, Gift, Percent, Calendar, Globe } from 'lucide-react';
+import { QrCode, Gift, Percent, Calendar, Globe, Ticket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 const actions = [
   { icon: QrCode, label: 'Check In', page: 'CheckIn', color: 'bg-blue-500' },
+  { icon: Ticket, label: 'Day Pass', page: 'DayPass', color: 'bg-indigo-600' },
   { icon: Gift, label: 'Rewards', page: 'Rewards', color: 'bg-amber-500' },
   { icon: Percent, label: 'Offers', page: 'Offers', color: 'bg-emerald-500' },
   { icon: Calendar, label: 'Fixtures', page: 'Fixtures', color: 'bg-purple-500' },
-  { icon: Globe, label: 'Website', url: 'https://centralnewcastlerlfc.com.au/', color: 'bg-[#1a365d]', external: true },
 ];
 
 export default function QuickActions() {
