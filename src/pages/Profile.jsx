@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, Mail, Phone, MapPin, Bell, LogOut, ChevronRight, Shield, Edit2, Check, X } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, MapPin, Bell, LogOut, ChevronRight, Shield, Edit2, Check, X, Trash2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({});
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -40,6 +43,8 @@ export default function Profile() {
 
   const updateMutation = useMutation({
     mutationFn: async (data) => {
+      // Optimistic update
+      setUser(prev => ({ ...prev, ...data }));
       await base44.auth.updateMe(data);
     },
     onSuccess: async () => {
@@ -47,6 +52,36 @@ export default function Profile() {
       setUser(userData);
       setEditing(false);
       toast.success('Profile updated');
+    },
+    onError: async () => {
+      // Revert on error
+      const userData = await base44.auth.me();
+      setUser(userData);
+      toast.error('Failed to update profile');
+    }
+  });
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id) return;
+      // Delete all user's data
+      const memberships = await base44.entities.Membership.filter({ user_id: user.id });
+      for (const m of memberships) {
+        await base44.entities.Membership.delete(m.id);
+      }
+      const checkIns = await base44.entities.CheckIn.filter({ user_id: user.id });
+      for (const c of checkIns) {
+        await base44.entities.CheckIn.delete(c.id);
+      }
+      const redemptions = await base44.entities.RewardRedemption.filter({ user_id: user.id });
+      for (const r of redemptions) {
+        await base44.entities.RewardRedemption.delete(r.id);
+      }
+      // Logout after deletion
+      base44.auth.logout();
+    },
+    onSuccess: () => {
+      toast.success('Account deleted successfully');
     }
   });
 
@@ -201,17 +236,75 @@ export default function Profile() {
         <Button
           variant="outline"
           onClick={handleLogout}
-          className="w-full border-red-200 text-red-600 hover:bg-red-50"
+          className="w-full border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
         >
           <LogOut className="w-5 h-5 mr-2" />
           Sign Out
         </Button>
 
+        {/* Delete Account */}
+        <Button
+          variant="outline"
+          onClick={() => setShowDeleteDialog(true)}
+          className="w-full border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-950"
+        >
+          <Trash2 className="w-5 h-5 mr-2" />
+          Delete Account
+        </Button>
+
         {/* App Version */}
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs text-gray-400 dark:text-gray-500">
           Central Newcastle RLFC App v1.0.0
         </p>
       </div>
+
+      {/* Delete Account Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Account?</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              This will permanently delete your account and all associated data including memberships, check-ins, and rewards. This action cannot be undone.
+            </p>
+            
+            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 mb-6">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Type <span className="font-bold">DELETE</span> to confirm
+              </p>
+            </div>
+            
+            <Input
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type DELETE"
+              className="mb-4 dark:bg-gray-800 dark:text-white"
+            />
+            
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowDeleteDialog(false);
+                  setDeleteConfirmText('');
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => deleteAccountMutation.mutate()}
+                disabled={deleteConfirmText !== 'DELETE' || deleteAccountMutation.isPending}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              >
+                {deleteAccountMutation.isPending ? 'Deleting...' : 'Delete Account'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

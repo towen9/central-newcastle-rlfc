@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Newspaper, X, Calendar, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
+import PullToRefresh from '../components/shared/PullToRefresh';
 
 const categoryColors = {
   announcement: 'bg-blue-100 text-blue-700',
@@ -19,11 +20,16 @@ const categoryColors = {
 
 export default function News() {
   const [selectedNews, setSelectedNews] = useState(null);
+  const queryClient = useQueryClient();
 
   const { data: news = [] } = useQuery({
     queryKey: ['news'],
     queryFn: () => base44.entities.News.filter({ is_published: true }, '-publish_date')
   });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries(['news']);
+  };
 
   // Check URL for newsId
   useEffect(() => {
@@ -36,23 +42,24 @@ export default function News() {
   }, [news]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
       {/* Header */}
-      <div className="bg-[#1a365d] pt-safe">
+      <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe">
         <div className="px-5 py-4 flex items-center gap-4">
           <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/10 dark:bg-white/5 rounded-full flex items-center justify-center">
               <ArrowLeft className="w-5 h-5 text-white" />
             </div>
           </Link>
           <div>
             <h1 className="text-white text-xl font-bold">Club News</h1>
-            <p className="text-blue-200 text-sm">Latest updates from Charlestown RLC</p>
+            <p className="text-blue-200 dark:text-gray-400 text-sm">Latest updates from Charlestown RLC</p>
           </div>
         </div>
       </div>
 
-      <div className="px-5 py-6">
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="px-5 py-6">
         {news.length === 0 ? (
           <div className="text-center py-12">
             <Newspaper className="w-12 h-12 mx-auto text-gray-300 mb-3" />
@@ -128,7 +135,8 @@ export default function News() {
             ))}
           </div>
         )}
-      </div>
+        </div>
+      </PullToRefresh>
 
       {/* News Detail Modal */}
       <AnimatePresence>

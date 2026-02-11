@@ -9,12 +9,18 @@ export default function Layout({ children, currentPageName }) {
   const showBottomNav = memberPages.includes(currentPageName);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <style>{`
         :root {
           --color-primary: #1a365d;
           --color-primary-light: #2c5282;
           --color-accent: #2b6cb0;
+        }
+        
+        .dark {
+          --color-primary: #2c5282;
+          --color-primary-light: #3b82f6;
+          --color-accent: #60a5fa;
         }
         
         .pb-safe {
@@ -32,6 +38,22 @@ export default function Layout({ children, currentPageName }) {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        
+        /* Native UX */
+        body {
+          overscroll-behavior: none;
+          -webkit-user-select: none;
+          user-select: none;
+        }
+        
+        input, textarea {
+          -webkit-user-select: text;
+          user-select: text;
+        }
+        
+        button, a, [role="button"] {
+          -webkit-tap-highlight-color: transparent;
         }
       `}</style>
       

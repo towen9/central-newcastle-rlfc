@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
+import PullToRefresh from '../components/shared/PullToRefresh';
 
 const categoryConfig = {
   food_drink: { icon: Utensils, label: 'Food & Drink', color: 'bg-orange-500' },
@@ -96,6 +97,15 @@ export default function Benefits() {
         ? addDays(new Date(), reward.expiry_days).toISOString() 
         : null;
 
+      // Optimistic update for stamps
+      queryClient.setQueryData(['membership', user.id], (old) => {
+        if (!old || !old[0]) return old;
+        return [{
+          ...old[0],
+          stamps: Math.max(0, (old[0].stamps || 0) - reward.stamps_required)
+        }];
+      });
+
       await base44.entities.RewardRedemption.create({
         user_id: user.id,
         membership_id: membership.id,
@@ -117,8 +127,22 @@ export default function Benefits() {
       queryClient.invalidateQueries(['membership']);
       queryClient.invalidateQueries(['myRedemptions']);
       setSelectedReward(null);
+      toast.success('Reward claimed!');
+    },
+    onError: () => {
+      queryClient.invalidateQueries(['membership']);
+      toast.error('Failed to claim reward');
     }
   });
+
+  const handleRefresh = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries(['offers']),
+      queryClient.invalidateQueries(['rewards']),
+      queryClient.invalidateQueries(['myRedemptions']),
+      queryClient.invalidateQueries(['membership'])
+    ]);
+  };
 
   const stamps = membership?.stamps || 0;
   const availableRedemptions = redemptions.filter(r => r.status === 'available');
@@ -136,29 +160,30 @@ export default function Benefits() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-500 to-teal-500 pt-safe">
+      <div className="bg-gradient-to-br from-emerald-500 to-teal-500 dark:from-emerald-700 dark:to-teal-700 pt-safe">
         <div className="px-5 py-4 flex items-center gap-4">
           <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/20 dark:bg-white/10 rounded-full flex items-center justify-center">
               <ArrowLeft className="w-5 h-5 text-white" />
             </div>
           </Link>
           <div className="flex-1">
             <h1 className="text-white text-xl font-bold">Benefits</h1>
-            <p className="text-white/80 text-sm">Offers & rewards for members</p>
+            <p className="text-white/80 dark:text-white/70 text-sm">Offers & rewards for members</p>
           </div>
           {activeTab === 'rewards' && (
             <div className="text-right">
-              <p className="text-white/80 text-xs">Stamps</p>
+              <p className="text-white/80 dark:text-white/70 text-xs">Stamps</p>
               <p className="text-white text-2xl font-bold">{stamps}</p>
             </div>
           )}
         </div>
       </div>
 
-      <div className="px-5 py-6">
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="px-5 py-6">
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="w-full bg-white border border-gray-200">
@@ -429,7 +454,8 @@ export default function Benefits() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+        </div>
+      </PullToRefresh>
 
       {/* Offer Detail Modal */}
       <AnimatePresence>
