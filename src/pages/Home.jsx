@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -10,10 +10,12 @@ import QuickActions from '../components/home/QuickActions';
 import FeaturedOffer from '../components/home/FeaturedOffer';
 import LatestNews from '../components/home/LatestNews';
 import QRModal from '../components/shared/QRModal';
+import PullToRefresh from '../components/shared/PullToRefresh';
 
 export default function Home() {
   const [showQR, setShowQR] = useState(false);
   const [user, setUser] = useState(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -51,10 +53,19 @@ export default function Home() {
     queryFn: () => base44.entities.News.filter({ is_published: true }, '-publish_date', 2)
   });
 
+  const handleRefresh = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries(['membership']),
+      queryClient.invalidateQueries(['rewards']),
+      queryClient.invalidateQueries(['featuredOffer']),
+      queryClient.invalidateQueries(['news'])
+    ]);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
       {/* Header */}
-      <div className="bg-[#1a365d] pt-safe">
+      <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe">
         <div className="px-5 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
@@ -63,16 +74,16 @@ export default function Home() {
               className="w-14 h-14 object-contain bg-white rounded-full p-1"
             />
             <div>
-              <p className="text-blue-200 text-sm">Welcome back</p>
+              <p className="text-blue-200 dark:text-gray-400 text-sm">Welcome back</p>
               <h1 className="text-white text-xl font-bold">{user?.full_name || 'Member'}</h1>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+            <button className="w-10 h-10 bg-white/10 dark:bg-white/5 rounded-full flex items-center justify-center">
               <Bell className="w-5 h-5 text-white" />
             </button>
             <Link to={createPageUrl('Profile')}>
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/20 dark:bg-white/10 rounded-full flex items-center justify-center">
                 <Settings className="w-5 h-5 text-white" />
               </div>
             </Link>
@@ -80,8 +91,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-5 -mt-2">
+      {/* Content with Pull to Refresh */}
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="px-5 -mt-2">
         {/* Membership Pass */}
         <div className="relative z-10 mb-6">
           <MembershipPass 
@@ -110,7 +122,8 @@ export default function Home() {
 
         {/* Latest News */}
         <LatestNews news={news} />
-      </div>
+        </div>
+      </PullToRefresh>
 
       {/* QR Modal */}
       <QRModal 
