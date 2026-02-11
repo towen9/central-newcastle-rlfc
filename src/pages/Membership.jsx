@@ -276,9 +276,11 @@ export default function Membership() {
                     </p>
                   </div>
                   <p className="text-sm text-gray-500 mb-3">{tier.description}</p>
-                  <Button className="w-full bg-[#1a365d] hover:bg-[#2c5282]">
-                    Join Now
-                  </Button>
+                  <Link to={createPageUrl('JoinMembership')}>
+                    <Button className="w-full bg-[#1a365d] hover:bg-[#2c5282]">
+                      Join Now
+                    </Button>
+                  </Link>
                 </div>
               ))}
             </div>
