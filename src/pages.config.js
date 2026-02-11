@@ -74,6 +74,9 @@ import Offers from './pages/Offers';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
+import DayPass from './pages/DayPass';
+import PhotoCapture from './pages/PhotoCapture';
+import MyDayPass from './pages/MyDayPass';
 import __Layout from './Layout.jsx';
 
 
@@ -105,6 +108,9 @@ export const PAGES = {
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
+    "DayPass": DayPass,
+    "PhotoCapture": PhotoCapture,
+    "MyDayPass": MyDayPass,
 }
 
 export const pagesConfig = {
