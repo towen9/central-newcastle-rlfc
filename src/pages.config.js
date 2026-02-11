@@ -62,6 +62,7 @@ import AdminTransactions from './pages/AdminTransactions';
 import BarScan from './pages/BarScan';
 import Benefits from './pages/Benefits';
 import CheckIn from './pages/CheckIn';
+import DayPass from './pages/DayPass';
 import Fixtures from './pages/Fixtures';
 import GameDayCheckIn from './pages/GameDayCheckIn';
 import GameDayPass from './pages/GameDayPass';
@@ -69,14 +70,14 @@ import GateScan from './pages/GateScan';
 import Home from './pages/Home';
 import JoinMembership from './pages/JoinMembership';
 import Membership from './pages/Membership';
+import MyDayPass from './pages/MyDayPass';
 import News from './pages/News';
 import Offers from './pages/Offers';
+import PhotoCapture from './pages/PhotoCapture';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
-import DayPass from './pages/DayPass';
-import PhotoCapture from './pages/PhotoCapture';
-import MyDayPass from './pages/MyDayPass';
+import DayPassQR from './pages/DayPassQR';
 import __Layout from './Layout.jsx';
 
 
@@ -96,6 +97,7 @@ export const PAGES = {
     "BarScan": BarScan,
     "Benefits": Benefits,
     "CheckIn": CheckIn,
+    "DayPass": DayPass,
     "Fixtures": Fixtures,
     "GameDayCheckIn": GameDayCheckIn,
     "GameDayPass": GameDayPass,
@@ -103,14 +105,14 @@ export const PAGES = {
     "Home": Home,
     "JoinMembership": JoinMembership,
     "Membership": Membership,
+    "MyDayPass": MyDayPass,
     "News": News,
     "Offers": Offers,
+    "PhotoCapture": PhotoCapture,
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
-    "DayPass": DayPass,
-    "PhotoCapture": PhotoCapture,
-    "MyDayPass": MyDayPass,
+    "DayPassQR": DayPassQR,
 }
 
 export const pagesConfig = {
