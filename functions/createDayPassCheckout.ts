@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
-        price: 'price_1SzmSnLgCWdDbHylRiRAkL8h', // Day Pass price
+        price: 'price_1SzmZiLgCWdDbHyl1uWi28OK', // Day Pass price
         quantity: 1,
       }],
       mode: 'payment',

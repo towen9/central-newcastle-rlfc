@@ -22,7 +22,13 @@ Deno.serve(async (req) => {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const { user_id, tier_id, user_email, user_name } = session.metadata;
+      const { user_id, tier_id, user_email, user_name, product_type, fixture_id } = session.metadata;
+
+      // Handle Day Pass purchases
+      if (product_type === 'day_pass') {
+        console.log('Day Pass purchase - redirect to photo capture');
+        return Response.json({ received: true });
+      }
 
       // Initialize SDK with service role
       const base44 = createClientFromRequest(req);
