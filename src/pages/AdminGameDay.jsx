@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import AdminLayout from '../components/admin/AdminLayout';
-import { Ticket, Download, TrendingUp, Users, DollarSign, Calendar } from 'lucide-react';
+import { Ticket, Download, TrendingUp, Users, DollarSign, Calendar, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function AdminGameDay() {
   const [selectedEvent, setSelectedEvent] = useState('all');
@@ -114,10 +116,18 @@ export default function AdminGameDay() {
             </Select>
           </div>
 
-          <Button onClick={exportCSV} variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Export CSV
-          </Button>
+          <div className="flex gap-3">
+            <Link to={createPageUrl('DayPassQR')}>
+              <Button variant="outline">
+                <QrCode className="w-4 h-4 mr-2" />
+                Entry QR Code
+              </Button>
+            </Link>
+            <Button onClick={exportCSV} variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
+          </div>
         </div>
       </div>
 
