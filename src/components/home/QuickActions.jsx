@@ -14,7 +14,7 @@ const actions = [
 
 export default function QuickActions() {
   return (
-    <div className="grid grid-cols-5 gap-3">
+    <div className="grid grid-cols-5 gap-2">
       {actions.map((action, idx) => {
         const content = (
           <motion.div
