@@ -56,7 +56,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-32">
       {/* Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe">
         <div className="px-5 py-6 flex items-center justify-between">
