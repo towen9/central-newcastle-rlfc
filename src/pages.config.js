@@ -62,6 +62,7 @@ import AdminSponsors from './pages/AdminSponsors';
 import AdminTransactions from './pages/AdminTransactions';
 import BarScan from './pages/BarScan';
 import Benefits from './pages/Benefits';
+import CanteenStaffLogin from './pages/CanteenStaffLogin';
 import CheckIn from './pages/CheckIn';
 import DayPass from './pages/DayPass';
 import DayPassQR from './pages/DayPassQR';
@@ -69,6 +70,7 @@ import Fixtures from './pages/Fixtures';
 import GameDayCheckIn from './pages/GameDayCheckIn';
 import GameDayPass from './pages/GameDayPass';
 import GateScan from './pages/GateScan';
+import GateStaffLogin from './pages/GateStaffLogin';
 import Home from './pages/Home';
 import HowPointsWork from './pages/HowPointsWork';
 import JoinMembership from './pages/JoinMembership';
@@ -81,10 +83,8 @@ import PhotoCapture from './pages/PhotoCapture';
 import PointsRewards from './pages/PointsRewards';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
-import Sponsors from './pages/Sponsors';
-import GateStaffLogin from './pages/GateStaffLogin';
-import CanteenStaffLogin from './pages/CanteenStaffLogin';
 import ScanForPoints from './pages/ScanForPoints';
+import Sponsors from './pages/Sponsors';
 import __Layout from './Layout.jsx';
 
 
@@ -104,6 +104,7 @@ export const PAGES = {
     "AdminTransactions": AdminTransactions,
     "BarScan": BarScan,
     "Benefits": Benefits,
+    "CanteenStaffLogin": CanteenStaffLogin,
     "CheckIn": CheckIn,
     "DayPass": DayPass,
     "DayPassQR": DayPassQR,
@@ -111,6 +112,7 @@ export const PAGES = {
     "GameDayCheckIn": GameDayCheckIn,
     "GameDayPass": GameDayPass,
     "GateScan": GateScan,
+    "GateStaffLogin": GateStaffLogin,
     "Home": Home,
     "HowPointsWork": HowPointsWork,
     "JoinMembership": JoinMembership,
@@ -123,10 +125,8 @@ export const PAGES = {
     "PointsRewards": PointsRewards,
     "Profile": Profile,
     "Rewards": Rewards,
-    "Sponsors": Sponsors,
-    "GateStaffLogin": GateStaffLogin,
-    "CanteenStaffLogin": CanteenStaffLogin,
     "ScanForPoints": ScanForPoints,
+    "Sponsors": Sponsors,
 }
 
 export const pagesConfig = {

@@ -35,7 +35,7 @@ export default function Rewards() {
 
   const { data: rewards = [] } = useQuery({
     queryKey: ['rewards'],
-    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'stamps_required')
+    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required')
   });
 
   const { data: redemptions = [] } = useQuery({
@@ -62,9 +62,20 @@ export default function Rewards() {
         redemption_code: code
       });
 
-      // Deduct stamps
+      // Deduct points
       await base44.entities.Membership.update(membership.id, {
-        stamps: Math.max(0, (membership.stamps || 0) - reward.stamps_required)
+        points: Math.max(0, (membership.points || 0) - reward.points_required)
+      });
+
+      // Create points transaction
+      await base44.entities.PointsTransaction.create({
+        user_id: user.id,
+        membership_id: membership.id,
+        points: -reward.points_required,
+        transaction_type: 'redemption',
+        description: `Redeemed: ${reward.title}`,
+        related_id: reward.id,
+        timestamp: new Date().toISOString()
       });
 
       return code;
@@ -76,7 +87,7 @@ export default function Rewards() {
     }
   });
 
-  const stamps = membership?.stamps || 0;
+  const points = membership?.points || 0;
   
   const availableRedemptions = redemptions.filter(r => r.status === 'available');
   const redeemedRedemptions = redemptions.filter(r => r.status === 'redeemed');
@@ -93,11 +104,11 @@ export default function Rewards() {
           </Link>
           <div className="flex-1">
             <h1 className="text-white text-xl font-bold">Rewards</h1>
-            <p className="text-white/80 text-sm">Earn stamps, unlock rewards</p>
+            <p className="text-white/80 text-sm">Earn points, unlock rewards</p>
           </div>
           <div className="text-right">
-            <p className="text-white/80 text-xs">Your Stamps</p>
-            <p className="text-white text-2xl font-bold">{stamps}</p>
+            <p className="text-white/80 text-xs">Your Points</p>
+            <p className="text-white text-2xl font-bold">{points}</p>
           </div>
         </div>
       </div>
@@ -124,8 +135,8 @@ export default function Rewards() {
               className="space-y-4"
             >
               {rewards.map((reward, idx) => {
-                const canClaim = stamps >= reward.stamps_required;
-                const progress = Math.min((stamps / reward.stamps_required) * 100, 100);
+                const canClaim = points >= reward.points_required;
+                const progress = Math.min((points / reward.points_required) * 100, 100);
                 
                 return (
                   <motion.div
@@ -156,7 +167,7 @@ export default function Rewards() {
                           <div className={`px-2 py-1 rounded-lg text-xs font-bold ${
                             canClaim ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
                           }`}>
-                            {reward.stamps_required} stamps
+                            {reward.points_required} pts
                           </div>
                         </div>
                         
@@ -180,7 +191,7 @@ export default function Rewards() {
                           </Button>
                         ) : (
                           <p className="text-sm text-gray-500">
-                            {reward.stamps_required - stamps} more stamps needed
+                            {reward.points_required - points} more points needed
                           </p>
                         )}
                       </div>
@@ -205,7 +216,7 @@ export default function Rewards() {
                     <Ticket className="w-8 h-8 text-gray-400" />
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-1">No rewards yet</h3>
-                  <p className="text-sm text-gray-500">Earn stamps to unlock rewards</p>
+                  <p className="text-sm text-gray-500">Earn points to unlock rewards</p>
                 </div>
               ) : (
                 availableRedemptions.map((redemption) => (
@@ -315,11 +326,11 @@ export default function Rewards() {
               <div className="bg-amber-50 rounded-xl p-4 mb-6">
                 <div className="flex items-center justify-between">
                   <span className="text-amber-700">Cost</span>
-                  <span className="font-bold text-amber-700">{selectedReward.stamps_required} stamps</span>
+                  <span className="font-bold text-amber-700">{selectedReward.points_required} points</span>
                 </div>
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-amber-700">Your stamps after</span>
-                  <span className="font-bold text-amber-700">{stamps - selectedReward.stamps_required}</span>
+                  <span className="text-amber-700">Your points after</span>
+                  <span className="font-bold text-amber-700">{points - selectedReward.points_required}</span>
                 </div>
               </div>
 

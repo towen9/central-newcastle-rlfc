@@ -79,10 +79,23 @@ export default function CheckIn() {
         timestamp: new Date().toISOString()
       });
 
-      // Update stamps
+      // Award points for check-in (10 points)
+      const pointsEarned = 10;
       await base44.entities.Membership.update(membership.id, {
-        stamps: (membership.stamps || 0) + 1,
+        points: (membership.points || 0) + pointsEarned,
         total_checkins: (membership.total_checkins || 0) + 1
+      });
+
+      // Create points transaction
+      await base44.entities.PointsTransaction.create({
+        user_id: user.id,
+        membership_id: membership.id,
+        points: pointsEarned,
+        transaction_type: 'attendance',
+        description: `Check-in at ${clubQRs[0].name}`,
+        location: clubQRs[0].name,
+        location_qr_id: parsed.id,
+        timestamp: new Date().toISOString()
       });
 
       return clubQRs[0].name;
@@ -176,7 +189,7 @@ export default function CheckIn() {
               <p className={`text-sm ${hasCheckedInToday ? 'text-emerald-600' : 'text-gray-500'}`}>
                 {hasCheckedInToday 
                   ? `${todayCheckins.length} check-in${todayCheckins.length > 1 ? 's' : ''} recorded`
-                  : 'Scan a club QR code to earn a stamp'
+                  : 'Scan a club QR code to earn points'
                 }
               </p>
             </div>
@@ -207,7 +220,7 @@ export default function CheckIn() {
               </h2>
               <p className="text-white/80 mb-6">
                 {result === 'success' 
-                  ? 'You earned 1 stamp. Keep collecting for rewards!'
+                  ? 'You earned 10 points. Keep collecting for rewards!'
                   : errorMessage
                 }
               </p>
@@ -269,7 +282,7 @@ export default function CheckIn() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Ready to Check In?</h2>
               <p className="text-gray-500 mb-6">
-                Point your camera at the club's QR code to check in and earn a stamp
+                Point your camera at the club's QR code to check in and earn 10 points
               </p>
               <div className="space-y-3">
                 <Button
@@ -295,17 +308,17 @@ export default function CheckIn() {
           )}
         </AnimatePresence>
 
-        {/* Current Stamps */}
+        {/* Current Points */}
         {membership && (
           <div className="mt-6 bg-amber-50 rounded-2xl p-4 border border-amber-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-amber-800 font-semibold">Your Stamps</p>
+                <p className="text-amber-800 font-semibold">Your Points</p>
                 <p className="text-amber-600 text-sm">Keep checking in for rewards</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-amber-600">{membership.stamps || 0}</p>
-                <p className="text-xs text-amber-500">stamps</p>
+                <p className="text-3xl font-bold text-amber-600">{membership.points || 0}</p>
+                <p className="text-xs text-amber-500">points</p>
               </div>
             </div>
           </div>
