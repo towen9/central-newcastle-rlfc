@@ -160,9 +160,9 @@ export default function Benefits() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-500 to-teal-500 dark:from-emerald-700 dark:to-teal-700 pt-safe">
+      <div className="bg-gradient-to-br from-emerald-500 to-teal-500 dark:from-emerald-700 dark:to-teal-700 pt-safe sticky top-0 z-30">
         <div className="px-5 py-4 flex items-center gap-4">
           <Link to={createPageUrl('Home')}>
             <div className="w-10 h-10 bg-white/20 dark:bg-white/10 rounded-full flex items-center justify-center">
@@ -183,7 +183,7 @@ export default function Benefits() {
       </div>
 
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="px-5 py-6">
+        <div className="px-5 pt-6 pb-32">
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="w-full bg-white border border-gray-200">
