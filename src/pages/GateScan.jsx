@@ -37,16 +37,39 @@ export default function GateScan() {
   }, []);
 
   const checkInMutation = useMutation({
-    mutationFn: async ({ membershipId, userId }) => {
-      return await base44.entities.CheckIn.create({
+    mutationFn: async ({ membershipId, userId, membership }) => {
+      const checkIn = await base44.entities.CheckIn.create({
         user_id: userId,
         membership_id: membershipId,
         location: 'Main Gate',
         timestamp: new Date().toISOString()
       });
+
+      // Award 10 points for attendance
+      const pointsEarned = 10;
+      
+      await base44.entities.Membership.update(membership.id, {
+        stamps: (membership.stamps || 0) + 1,
+        points: (membership.points || 0) + pointsEarned,
+        total_checkins: (membership.total_checkins || 0) + 1
+      });
+
+      // Record points transaction
+      await base44.entities.PointsTransaction.create({
+        user_id: membership.user_id,
+        membership_id: membership.id,
+        points: pointsEarned,
+        transaction_type: 'attendance',
+        description: 'Game attendance',
+        location: 'Gate',
+        related_id: checkIn.id,
+        timestamp: new Date().toISOString()
+      });
+
+      return checkIn;
     },
     onSuccess: () => {
-      toast.success('Member checked in successfully');
+      toast.success('Member checked in! +10 points awarded');
       queryClient.invalidateQueries(['checkins']);
       setTimeout(() => {
         setScannedMember(null);
@@ -137,7 +160,8 @@ export default function GateScan() {
     if (membershipData && scannedMember) {
       checkInMutation.mutate({
         membershipId: membershipData.id,
-        userId: scannedMember.id
+        userId: scannedMember.id,
+        membership: membershipData
       });
     }
   };

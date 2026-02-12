@@ -1,7 +1,7 @@
 import React from 'react';
 import BottomNav from './components/shared/BottomNav';
 
-const memberPages = ['Home', 'Membership', 'Benefits', 'Sponsors', 'Profile', 'CheckIn', 'Fixtures', 'News'];
+const memberPages = ['Home', 'Membership', 'Benefits', 'Sponsors', 'Profile', 'CheckIn', 'Fixtures', 'News', 'PointsRewards'];
 const adminPages = ['AdminDashboard', 'AdminMembers', 'AdminOffers', 'AdminRewards', 'AdminNews', 'AdminQRCodes', 'AdminSponsors', 'AdminFixtures', 'AdminEvents', 'AdminGameDay', 'AdminTransactions', 'AdminLocationDiscounts'];
 
 export default function Layout({ children, currentPageName }) {
