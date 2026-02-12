@@ -1,15 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { QrCode, Gift, Percent, Calendar, Globe, Ticket } from 'lucide-react';
+import { QrCode, Gift, Percent, Calendar, Zap, Ticket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 const actions = [
-  { icon: QrCode, label: 'Check In', page: 'CheckIn', color: 'bg-blue-500' },
-  { icon: Ticket, label: 'Day Pass', page: 'DayPass', color: 'bg-indigo-600' },
-  { icon: Gift, label: 'Rewards', page: 'Rewards', color: 'bg-amber-500' },
-  { icon: Percent, label: 'Offers', page: 'Offers', color: 'bg-emerald-500' },
-  { icon: Calendar, label: 'Fixtures', page: 'Fixtures', color: 'bg-purple-500' },
+  { icon: QrCode, label: 'Check In', page: 'CheckIn', color: 'bg-blue-500 dark:bg-blue-600' },
+  { icon: Zap, label: 'Scan Bar', page: 'ScanForPoints', color: 'bg-amber-500 dark:bg-amber-600' },
+  { icon: Gift, label: 'Rewards', page: 'Rewards', color: 'bg-emerald-500 dark:bg-emerald-600' },
+  { icon: Percent, label: 'Offers', page: 'Offers', color: 'bg-pink-500 dark:bg-pink-600' },
+  { icon: Calendar, label: 'Fixtures', page: 'Fixtures', color: 'bg-purple-500 dark:bg-purple-600' },
 ];
 
 export default function QuickActions() {
@@ -25,7 +25,7 @@ export default function QuickActions() {
             <div className={`w-11 h-11 ${action.color} rounded-xl flex items-center justify-center shadow-md`}>
               <action.icon className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xs font-medium text-gray-700">{action.label}</span>
+            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{action.label}</span>
           </motion.div>
         );
 
