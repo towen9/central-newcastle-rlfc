@@ -56,7 +56,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
         <div className="px-4 py-3 flex items-center justify-between">

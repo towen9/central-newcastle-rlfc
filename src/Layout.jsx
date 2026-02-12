@@ -42,9 +42,16 @@ export default function Layout({ children, currentPageName }) {
         
         /* Native UX */
         body {
-          overscroll-behavior: none;
+          overscroll-behavior-x: none;
+          overscroll-behavior-y: auto;
           -webkit-user-select: none;
           user-select: none;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        html, body {
+          height: 100%;
+          overflow-x: hidden;
         }
         
         input, textarea {
