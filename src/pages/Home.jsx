@@ -56,7 +56,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe">
         <div className="px-4 py-3 flex items-center justify-between">
