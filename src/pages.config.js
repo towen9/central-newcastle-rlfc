@@ -85,6 +85,7 @@ import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
+import AdminSMSNotifications from './pages/AdminSMSNotifications';
 import __Layout from './Layout.jsx';
 
 
@@ -127,6 +128,7 @@ export const PAGES = {
     "Rewards": Rewards,
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
+    "AdminSMSNotifications": AdminSMSNotifications,
 }
 
 export const pagesConfig = {
