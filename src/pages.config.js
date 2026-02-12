@@ -82,6 +82,8 @@ import PointsRewards from './pages/PointsRewards';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
+import GateStaffLogin from './pages/GateStaffLogin';
+import CanteenStaffLogin from './pages/CanteenStaffLogin';
 import __Layout from './Layout.jsx';
 
 
@@ -121,6 +123,8 @@ export const PAGES = {
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
+    "GateStaffLogin": GateStaffLogin,
+    "CanteenStaffLogin": CanteenStaffLogin,
 }
 
 export const pagesConfig = {

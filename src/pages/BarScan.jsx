@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Beer, CheckCircle, XCircle, Scan } from 'lucide-react';
+import { Beer, CheckCircle, XCircle, Scan, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import jsQR from 'jsqr';
 
@@ -12,12 +12,16 @@ export default function BarScan() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await base44.auth.me();
-      if (!userData || userData.role !== 'admin') {
-        window.location.href = '/';
-        return;
+      try {
+        const userData = await base44.auth.me();
+        if (!userData || (userData.role !== 'admin' && userData.role !== 'canteen_staff')) {
+          window.location.href = '/CanteenStaffLogin';
+          return;
+        }
+        setUser(userData);
+      } catch (error) {
+        window.location.href = '/CanteenStaffLogin';
       }
-      setUser(userData);
     };
     loadUser();
   }, []);
@@ -118,17 +122,32 @@ export default function BarScan() {
     }
   };
 
-  if (!user) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  const handleLogout = () => {
+    base44.auth.logout('/CanteenStaffLogin');
+  };
+
+  if (!user) return <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-md mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <Beer className="w-10 h-10 text-amber-400" />
-          <div>
-            <h1 className="text-2xl font-bold">Bar Scanner</h1>
-            <p className="text-gray-400 text-sm">+5 points per drink</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <Beer className="w-10 h-10 text-amber-400" />
+            <div>
+              <h1 className="text-2xl font-bold">Bar Scanner</h1>
+              <p className="text-gray-400 text-sm">+5 points per drink</p>
+            </div>
           </div>
+          <Button 
+            onClick={handleLogout} 
+            variant="ghost" 
+            size="sm"
+            className="text-white hover:bg-white/10"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
         </div>
 
         {!scanning && !result && (
