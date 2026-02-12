@@ -36,7 +36,7 @@ export default function Home() {
 
   const { data: rewards = [] } = useQuery({
     queryKey: ['rewards'],
-    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'stamps_required')
+    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required')
   });
 
   const { data: featuredOffer } = useQuery({
@@ -101,9 +101,13 @@ export default function Home() {
           <QuickActions />
         </div>
 
-        {/* Stamp Progress */}
+        {/* Points Progress */}
         <div className="mb-6">
-          <StampProgress stamps={membership?.stamps || 0} rewards={rewards} />
+          <StampProgress 
+            stamps={membership?.stamps || 0} 
+            points={membership?.points || 0}
+            rewards={rewards} 
+          />
         </div>
 
         {/* Featured Offer */}

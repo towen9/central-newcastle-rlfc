@@ -63,6 +63,7 @@ import BarScan from './pages/BarScan';
 import Benefits from './pages/Benefits';
 import CheckIn from './pages/CheckIn';
 import DayPass from './pages/DayPass';
+import DayPassQR from './pages/DayPassQR';
 import Fixtures from './pages/Fixtures';
 import GameDayCheckIn from './pages/GameDayCheckIn';
 import GameDayPass from './pages/GameDayPass';
@@ -77,7 +78,8 @@ import PhotoCapture from './pages/PhotoCapture';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
-import DayPassQR from './pages/DayPassQR';
+import LeaguesClubScan from './pages/LeaguesClubScan';
+import PointsRewards from './pages/PointsRewards';
 import __Layout from './Layout.jsx';
 
 
@@ -98,6 +100,7 @@ export const PAGES = {
     "Benefits": Benefits,
     "CheckIn": CheckIn,
     "DayPass": DayPass,
+    "DayPassQR": DayPassQR,
     "Fixtures": Fixtures,
     "GameDayCheckIn": GameDayCheckIn,
     "GameDayPass": GameDayPass,
@@ -112,7 +115,8 @@ export const PAGES = {
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
-    "DayPassQR": DayPassQR,
+    "LeaguesClubScan": LeaguesClubScan,
+    "PointsRewards": PointsRewards,
 }
 
 export const pagesConfig = {
