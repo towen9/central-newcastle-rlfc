@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { QrCode, Gift, Percent, Calendar, Zap, Ticket } from 'lucide-react';
+import { QrCode, Gift, Calendar, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
@@ -8,13 +8,12 @@ const actions = [
   { icon: QrCode, label: 'Check In', page: 'CheckIn', color: 'bg-blue-500 dark:bg-blue-600' },
   { icon: Zap, label: 'Scan Bar', page: 'ScanForPoints', color: 'bg-amber-500 dark:bg-amber-600' },
   { icon: Gift, label: 'Rewards', page: 'Rewards', color: 'bg-emerald-500 dark:bg-emerald-600' },
-  { icon: Percent, label: 'Offers', page: 'Offers', color: 'bg-pink-500 dark:bg-pink-600' },
   { icon: Calendar, label: 'Fixtures', page: 'Fixtures', color: 'bg-purple-500 dark:bg-purple-600' },
 ];
 
 export default function QuickActions() {
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-4 gap-2">
       {actions.map((action, idx) => {
         const content = (
           <motion.div
