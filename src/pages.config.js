@@ -50,14 +50,18 @@
 import AdminDashboard from './pages/AdminDashboard';
 import AdminEvents from './pages/AdminEvents';
 import AdminFixtures from './pages/AdminFixtures';
+import AdminFixturesComms from './pages/AdminFixturesComms';
 import AdminGameDay from './pages/AdminGameDay';
 import AdminLocationDiscounts from './pages/AdminLocationDiscounts';
 import AdminMembers from './pages/AdminMembers';
+import AdminMonitoring from './pages/AdminMonitoring';
 import AdminNews from './pages/AdminNews';
 import AdminOffers from './pages/AdminOffers';
+import AdminPerformance from './pages/AdminPerformance';
 import AdminPushNotifications from './pages/AdminPushNotifications';
 import AdminQRCodes from './pages/AdminQRCodes';
 import AdminRewards from './pages/AdminRewards';
+import AdminSMSNotifications from './pages/AdminSMSNotifications';
 import AdminSponsors from './pages/AdminSponsors';
 import AdminTransactions from './pages/AdminTransactions';
 import BarScan from './pages/BarScan';
@@ -85,10 +89,6 @@ import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
-import AdminSMSNotifications from './pages/AdminSMSNotifications';
-import AdminPerformance from './pages/AdminPerformance';
-import AdminMonitoring from './pages/AdminMonitoring';
-import AdminFixturesComms from './pages/AdminFixturesComms';
 import __Layout from './Layout.jsx';
 
 
@@ -96,14 +96,18 @@ export const PAGES = {
     "AdminDashboard": AdminDashboard,
     "AdminEvents": AdminEvents,
     "AdminFixtures": AdminFixtures,
+    "AdminFixturesComms": AdminFixturesComms,
     "AdminGameDay": AdminGameDay,
     "AdminLocationDiscounts": AdminLocationDiscounts,
     "AdminMembers": AdminMembers,
+    "AdminMonitoring": AdminMonitoring,
     "AdminNews": AdminNews,
     "AdminOffers": AdminOffers,
+    "AdminPerformance": AdminPerformance,
     "AdminPushNotifications": AdminPushNotifications,
     "AdminQRCodes": AdminQRCodes,
     "AdminRewards": AdminRewards,
+    "AdminSMSNotifications": AdminSMSNotifications,
     "AdminSponsors": AdminSponsors,
     "AdminTransactions": AdminTransactions,
     "BarScan": BarScan,
@@ -131,10 +135,6 @@ export const PAGES = {
     "Rewards": Rewards,
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
-    "AdminSMSNotifications": AdminSMSNotifications,
-    "AdminPerformance": AdminPerformance,
-    "AdminMonitoring": AdminMonitoring,
-    "AdminFixturesComms": AdminFixturesComms,
 }
 
 export const pagesConfig = {
