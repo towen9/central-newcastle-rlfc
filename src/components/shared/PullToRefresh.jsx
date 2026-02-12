@@ -40,6 +40,10 @@ export default function PullToRefresh({ onRefresh, children }) {
     <motion.div
       ref={containerRef}
       className="overflow-y-auto h-full"
+      style={{ 
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-y'
+      }}
       drag="y"
       dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={{ top: 0.2, bottom: 0 }}
