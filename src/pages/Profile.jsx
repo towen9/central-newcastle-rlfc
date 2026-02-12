@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, Mail, Phone, MapPin, Bell, LogOut, ChevronRight, Shield, Edit2, Check, X, Trash2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, MapPin, Bell, LogOut, ChevronRight, Shield, Edit2, Check, X, Trash2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
@@ -87,6 +87,25 @@ export default function Profile() {
 
   const handleLogout = () => {
     base44.auth.logout();
+  };
+
+  const handleClearCache = async () => {
+    // Clear all caches
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(name => caches.delete(name)));
+    }
+    
+    // Clear localStorage and sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    toast.success('Cache cleared! Reloading...');
+    
+    // Hard reload the page
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 500);
   };
 
   const consentSettings = [
@@ -231,6 +250,16 @@ export default function Profile() {
             ))}
           </div>
         </div>
+
+        {/* Clear Cache */}
+        <Button
+          variant="outline"
+          onClick={handleClearCache}
+          className="w-full border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+        >
+          <RefreshCw className="w-5 h-5 mr-2" />
+          Clear Cache & Refresh
+        </Button>
 
         {/* Logout */}
         <Button
