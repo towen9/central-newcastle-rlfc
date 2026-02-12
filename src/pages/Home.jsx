@@ -7,7 +7,7 @@ import { createPageUrl } from '@/utils';
 import MembershipPass from '../components/home/MembershipPass';
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';
-import FeaturedOffer from '../components/home/FeaturedOffer';
+
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
 
@@ -39,19 +39,12 @@ export default function Home() {
     queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required')
   });
 
-  const { data: featuredOffer } = useQuery({
-    queryKey: ['featuredOffer'],
-    queryFn: async () => {
-      const offers = await base44.entities.Offer.filter({ is_featured: true, is_active: true });
-      return offers[0] || null;
-    }
-  });
+
 
   const handleRefresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries(['membership']),
-      queryClient.invalidateQueries(['rewards']),
-      queryClient.invalidateQueries(['featuredOffer'])
+      queryClient.invalidateQueries(['rewards'])
     ]);
   };
 
@@ -117,12 +110,7 @@ export default function Home() {
           />
         </div>
 
-        {/* Featured Offer */}
-        {featuredOffer && (
-          <div>
-            <FeaturedOffer offer={featuredOffer} />
-          </div>
-        )}
+
         </div>
       </PullToRefresh>
 
