@@ -55,6 +55,7 @@ import AdminLocationDiscounts from './pages/AdminLocationDiscounts';
 import AdminMembers from './pages/AdminMembers';
 import AdminNews from './pages/AdminNews';
 import AdminOffers from './pages/AdminOffers';
+import AdminPushNotifications from './pages/AdminPushNotifications';
 import AdminQRCodes from './pages/AdminQRCodes';
 import AdminRewards from './pages/AdminRewards';
 import AdminSponsors from './pages/AdminSponsors';
@@ -81,7 +82,6 @@ import PointsRewards from './pages/PointsRewards';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
-import AdminPushNotifications from './pages/AdminPushNotifications';
 import __Layout from './Layout.jsx';
 
 
@@ -94,6 +94,7 @@ export const PAGES = {
     "AdminMembers": AdminMembers,
     "AdminNews": AdminNews,
     "AdminOffers": AdminOffers,
+    "AdminPushNotifications": AdminPushNotifications,
     "AdminQRCodes": AdminQRCodes,
     "AdminRewards": AdminRewards,
     "AdminSponsors": AdminSponsors,
@@ -120,7 +121,6 @@ export const PAGES = {
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
-    "AdminPushNotifications": AdminPushNotifications,
 }
 
 export const pagesConfig = {

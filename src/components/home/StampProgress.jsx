@@ -14,7 +14,7 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
 
   return (
     <Link to={createPageUrl('PointsRewards')}>
-      <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-3 shadow-lg text-white">
+      <div className="bg-gradient-to-br from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 rounded-xl p-3 shadow-lg text-white">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
@@ -22,18 +22,18 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
             </div>
             <div>
               <h3 className="font-semibold text-sm">Points Balance</h3>
-              <p className="text-xs text-amber-100">Tap • <Link to={createPageUrl('HowPointsWork')} className="underline">How it works</Link></p>
+              <p className="text-xs text-amber-100 dark:text-amber-200">Tap • <Link to={createPageUrl('HowPointsWork')} className="underline">How it works</Link></p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold">{points}</p>
-            <p className="text-xs text-amber-100">pts</p>
+            <p className="text-xs text-amber-100 dark:text-amber-200">pts</p>
           </div>
         </div>
 
       {/* Progress Bar */}
       {nextReward && (
-        <div className="relative h-1.5 bg-white/20 rounded-full overflow-hidden mb-2">
+        <div className="relative h-1.5 bg-white/20 dark:bg-white/30 rounded-full overflow-hidden mb-2">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
@@ -45,15 +45,15 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
 
       {/* Next Reward */}
       {nextReward ? (
-        <p className="text-xs text-amber-50">
+        <p className="text-xs text-amber-50 dark:text-amber-100">
           <span className="font-semibold">{pointsToNext} pts</span> until {nextReward.title}
         </p>
       ) : points > 0 ? (
-        <p className="text-xs font-semibold text-amber-50">
+        <p className="text-xs font-semibold text-amber-50 dark:text-amber-100">
           🎉 All rewards unlocked!
         </p>
       ) : (
-        <p className="text-xs text-amber-50">
+        <p className="text-xs text-amber-50 dark:text-amber-100">
           Earn points at games and bar!
         </p>
       )}

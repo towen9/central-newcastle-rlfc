@@ -62,9 +62,9 @@ export default function News() {
         <div className="px-5 py-6">
         {news.length === 0 ? (
           <div className="text-center py-12">
-            <Newspaper className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">No news yet</h3>
-            <p className="text-sm text-gray-500">Check back soon for updates</p>
+            <Newspaper className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">No news yet</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Check back soon for updates</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -93,8 +93,8 @@ export default function News() {
                       {item.publish_date && format(new Date(item.publish_date), 'MMM d, yyyy')}
                     </span>
                   </div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-500 line-clamp-2">{item.summary}</p>
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{item.summary}</p>
                 </div>
               </motion.div>
             ))}
@@ -126,8 +126,8 @@ export default function News() {
                       {item.category?.replace('_', ' ')}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1">{item.title}</h3>
-                  <p className="text-xs text-gray-500">
+                  <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-1">{item.title}</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {item.publish_date && format(new Date(item.publish_date), 'MMM d, yyyy')}
                   </p>
                 </div>
@@ -157,12 +157,12 @@ export default function News() {
               className="min-h-screen bg-white sm:min-h-0 sm:max-w-2xl sm:mx-auto sm:my-8 sm:rounded-2xl overflow-hidden"
             >
               {/* Header */}
-              <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-gray-100 px-4 py-3 flex items-center justify-between z-10">
+              <div className="sticky top-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center justify-between z-10">
                 <button 
                   onClick={() => setSelectedNews(null)}
                   className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"
                 >
-                  <X className="w-5 h-5 text-gray-600" />
+                  <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                 </button>
                 <span className={`px-3 py-1 text-xs font-medium rounded-full ${categoryColors[selectedNews.category] || categoryColors.general}`}>
                   {selectedNews.category?.replace('_', ' ')}
@@ -185,15 +185,15 @@ export default function News() {
                   {selectedNews.publish_date && format(new Date(selectedNews.publish_date), 'MMMM d, yyyy')}
                 </div>
 
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">{selectedNews.title}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{selectedNews.title}</h1>
 
                 {selectedNews.summary && (
-                  <p className="text-lg text-gray-600 mb-6 border-l-4 border-[#1a365d] pl-4">
+                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 border-l-4 border-[#1a365d] dark:border-blue-500 pl-4">
                     {selectedNews.summary}
                   </p>
                 )}
 
-                <div className="prose prose-gray max-w-none">
+                <div className="prose prose-gray dark:prose-invert max-w-none">
                   <ReactMarkdown>{selectedNews.content}</ReactMarkdown>
                 </div>
               </div>

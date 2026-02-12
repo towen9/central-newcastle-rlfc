@@ -1,3 +1,4 @@
+css
 /**
  * App Metadata
  * @name Central Newcastle RLFC Membership
@@ -7,3 +8,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+  }
+}
+
+html {
+  color-scheme: light dark;
+}

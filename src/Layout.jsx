@@ -43,26 +43,41 @@ export default function Layout({ children, currentPageName }) {
         }
         
         /* Native UX */
+        * {
+          -webkit-tap-highlight-color: transparent;
+        }
+
         body {
           overscroll-behavior-x: none;
           overscroll-behavior-y: auto;
           -webkit-user-select: none;
           user-select: none;
           -webkit-overflow-scrolling: touch;
+          -webkit-touch-callout: none;
         }
 
         html, body {
           height: 100%;
           overflow-x: hidden;
         }
-        
-        input, textarea {
+
+        input, textarea, [contenteditable] {
           -webkit-user-select: text;
           user-select: text;
+          -webkit-touch-callout: default;
         }
-        
-        button, a, [role="button"] {
+
+        button, a, [role="button"], .clickable {
           -webkit-tap-highlight-color: transparent;
+          -webkit-user-select: none;
+          user-select: none;
+          touch-action: manipulation;
+        }
+
+        img, video {
+          -webkit-user-select: none;
+          user-select: none;
+          pointer-events: none;
         }
       `}</style>
       

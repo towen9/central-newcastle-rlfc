@@ -14,7 +14,7 @@ const navItems = [
 
 export default function BottomNav({ currentPage }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-2 pb-safe z-50 shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 px-2 pb-safe z-50 shadow-lg">
       <div className="flex items-center justify-around py-2">
         {navItems.map((item, idx) => {
           const isActive = currentPage === item.page;
@@ -23,7 +23,7 @@ export default function BottomNav({ currentPage }) {
               <motion.div
                 whileTap={{ scale: 0.9 }}
                 className={`flex flex-col items-center py-2 px-3 rounded-xl transition-colors ${
-                  isActive ? 'text-blue-600' : 'text-gray-400'
+                  isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
                 }`}
               >
                 <item.icon className={`w-6 h-6 mb-1 ${isActive ? 'stroke-[2.5]' : ''}`} />
@@ -31,7 +31,7 @@ export default function BottomNav({ currentPage }) {
                 {isActive && (
                   <motion.div
                     layoutId="navIndicator"
-                    className="absolute bottom-1 w-1 h-1 bg-blue-600 rounded-full"
+                    className="absolute bottom-1 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full"
                   />
                 )}
               </motion.div>
