@@ -7,6 +7,7 @@ import { createPageUrl } from '@/utils';
 import MembershipPass from '../components/home/MembershipPass';
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';
+import NextMatch from '../components/home/NextMatch';
 
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
@@ -94,6 +95,11 @@ export default function Home() {
             user={user}
             onShowQR={() => setShowQR(true)}
           />
+        </div>
+
+        {/* Next Match */}
+        <div>
+          <NextMatch />
         </div>
 
         {/* Quick Actions */}
