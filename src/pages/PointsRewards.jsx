@@ -168,7 +168,7 @@ export default function PointsRewards() {
           </motion.div>
         ) : (
           <div className="space-y-6 pt-4">
-            <h2 className="text-2xl font-bold text-white px-1">Available Rewards</h2>
+            <h2 className="text-2xl font-bold text-black px-1">Available Rewards</h2>
             
             {rewards.map((reward) => {
               const canAfford = pointsBalance >= reward.points_required;
