@@ -43,14 +43,10 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
         </div>
       )}
 
-      {/* Next Reward */}
-      {nextReward ? (
-        <p className="text-xs text-amber-50 dark:text-amber-100">
-          <span className="font-semibold">{pointsToNext} pts</span> until {nextReward.title}
-        </p>
-      ) : points > 0 ? (
+      {/* Message */}
+      {points > 0 ? (
         <p className="text-xs font-semibold text-amber-50 dark:text-amber-100">
-          🎉 All rewards unlocked!
+          Keep earning for great rewards!
         </p>
       ) : (
         <p className="text-xs text-amber-50 dark:text-amber-100">
