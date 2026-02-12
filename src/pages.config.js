@@ -88,6 +88,7 @@ import Sponsors from './pages/Sponsors';
 import AdminSMSNotifications from './pages/AdminSMSNotifications';
 import AdminPerformance from './pages/AdminPerformance';
 import AdminMonitoring from './pages/AdminMonitoring';
+import AdminFixturesComms from './pages/AdminFixturesComms';
 import __Layout from './Layout.jsx';
 
 
@@ -133,6 +134,7 @@ export const PAGES = {
     "AdminSMSNotifications": AdminSMSNotifications,
     "AdminPerformance": AdminPerformance,
     "AdminMonitoring": AdminMonitoring,
+    "AdminFixturesComms": AdminFixturesComms,
 }
 
 export const pagesConfig = {

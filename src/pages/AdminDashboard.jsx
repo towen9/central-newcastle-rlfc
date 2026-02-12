@@ -20,6 +20,7 @@ const adminMenuItems = [
   { icon: QrCode, label: 'QR Codes', page: 'AdminQRCodes', color: 'bg-cyan-500' },
   { icon: Newspaper, label: 'News', page: 'AdminNews', color: 'bg-pink-500' },
   { icon: Calendar, label: 'Fixtures', page: 'AdminFixtures', color: 'bg-indigo-500' },
+  { icon: MessageSquare, label: 'Comms', page: 'AdminFixturesComms', color: 'bg-sky-500' },
   { icon: Calendar, label: 'Events', page: 'AdminEvents', color: 'bg-orange-500' },
   { icon: Bell, label: 'Push Alerts', page: 'AdminPushNotifications', color: 'bg-red-500' },
   { icon: MessageSquare, label: 'SMS', page: 'AdminSMSNotifications', color: 'bg-green-500' },
