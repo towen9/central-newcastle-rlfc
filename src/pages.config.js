@@ -87,6 +87,7 @@ import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
 import AdminSMSNotifications from './pages/AdminSMSNotifications';
 import AdminPerformance from './pages/AdminPerformance';
+import AdminMonitoring from './pages/AdminMonitoring';
 import __Layout from './Layout.jsx';
 
 
@@ -131,6 +132,7 @@ export const PAGES = {
     "Sponsors": Sponsors,
     "AdminSMSNotifications": AdminSMSNotifications,
     "AdminPerformance": AdminPerformance,
+    "AdminMonitoring": AdminMonitoring,
 }
 
 export const pagesConfig = {
