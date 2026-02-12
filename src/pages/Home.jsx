@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bell, Settings } from 'lucide-react';
+import { Bell, Settings, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import MembershipPass from '../components/home/MembershipPass';
@@ -72,6 +72,13 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {user?.role === 'admin' && (
+              <Link to={createPageUrl('AdminDashboard')}>
+                <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4 text-white" />
+                </div>
+              </Link>
+            )}
             <button className="w-8 h-8 bg-white/10 dark:bg-white/5 rounded-full flex items-center justify-center">
               <Bell className="w-4 h-4 text-white" />
             </button>
