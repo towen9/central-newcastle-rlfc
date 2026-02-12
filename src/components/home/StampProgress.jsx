@@ -22,7 +22,7 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
             </div>
             <div>
               <h3 className="font-semibold">Points Balance</h3>
-              <p className="text-sm text-amber-100">Tap to view rewards</p>
+              <p className="text-sm text-amber-100">Tap to view rewards • <Link to={createPageUrl('HowPointsWork')} className="underline">How it works</Link></p>
             </div>
           </div>
           <div className="text-right">
