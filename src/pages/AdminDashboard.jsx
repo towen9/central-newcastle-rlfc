@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   Users, CreditCard, Gift, Percent, TrendingUp, Calendar, 
   BarChart3, ArrowUpRight, ArrowDownRight, QrCode, Newspaper,
-  Menu, X, ChevronRight, Shield, Bell, MessageSquare
+  Menu, X, ChevronRight, Shield, Bell, MessageSquare, LineChart
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -23,6 +23,7 @@ const adminMenuItems = [
   { icon: Calendar, label: 'Events', page: 'AdminEvents', color: 'bg-orange-500' },
   { icon: Bell, label: 'Push Alerts', page: 'AdminPushNotifications', color: 'bg-red-500' },
   { icon: MessageSquare, label: 'SMS', page: 'AdminSMSNotifications', color: 'bg-green-500' },
+  { icon: LineChart, label: 'Performance', page: 'AdminPerformance', color: 'bg-violet-500' },
 ];
 
 export default function AdminDashboard() {
