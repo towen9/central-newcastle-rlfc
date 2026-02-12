@@ -80,6 +80,7 @@ import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
 import LeaguesClubScan from './pages/LeaguesClubScan';
 import PointsRewards from './pages/PointsRewards';
+import HowPointsWork from './pages/HowPointsWork';
 import __Layout from './Layout.jsx';
 
 
@@ -117,6 +118,7 @@ export const PAGES = {
     "Sponsors": Sponsors,
     "LeaguesClubScan": LeaguesClubScan,
     "PointsRewards": PointsRewards,
+    "HowPointsWork": HowPointsWork,
 }
 
 export const pagesConfig = {

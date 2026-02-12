@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trophy, Beer, Gift, Ticket, ArrowRight, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function PointsRewards() {
   const [user, setUser] = useState(null);
@@ -113,7 +115,12 @@ export default function PointsRewards() {
       <div className="bg-[#1a365d] pt-safe pb-8">
         <div className="px-5 py-6">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-white">Points & Rewards</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Points & Rewards</h1>
+              <Link to={createPageUrl('HowPointsWork')}>
+                <p className="text-blue-200 text-sm">How it works →</p>
+              </Link>
+            </div>
             <Button
               onClick={() => setShowHistory(!showHistory)}
               variant="ghost"
