@@ -90,8 +90,8 @@ export default function Profile() {
   };
 
   const consentSettings = [
+    { key: 'push_enabled', label: 'Push notifications', description: 'Match reminders and instant updates' },
     { key: 'marketing_email', label: 'Email updates', description: 'News, events, and announcements' },
-    { key: 'marketing_push', label: 'Push notifications', description: 'Match reminders and rewards' },
     { key: 'sponsor_offers', label: 'Sponsor offers', description: 'Exclusive deals from partners' }
   ];
 
