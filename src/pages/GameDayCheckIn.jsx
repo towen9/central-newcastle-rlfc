@@ -20,6 +20,7 @@ export default function GameDayCheckIn() {
     postcode: '',
     opt_in_club: true,
     opt_in_partners: true,
+    opt_in_push: true,
     accept_terms: false
   });
   const [entryId, setEntryId] = useState(null);
@@ -289,6 +290,17 @@ export default function GameDayCheckIn() {
                 />
                 <label htmlFor="partners" className="text-xs text-gray-600 leading-relaxed">
                   Send me partner and sponsor offers
+                </label>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Checkbox 
+                  checked={formData.opt_in_push}
+                  onCheckedChange={(checked) => setFormData({...formData, opt_in_push: checked})}
+                  id="push"
+                />
+                <label htmlFor="push" className="text-xs text-gray-600 leading-relaxed">
+                  Enable push notifications for game reminders and offers
                 </label>
               </div>
             </div>

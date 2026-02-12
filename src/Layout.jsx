@@ -1,5 +1,6 @@
 import React from 'react';
 import BottomNav from './components/shared/BottomNav';
+import PushNotificationManager from './components/shared/PushNotificationManager';
 
 const memberPages = ['Home', 'Membership', 'Benefits', 'Sponsors', 'Profile', 'CheckIn', 'Fixtures', 'News', 'PointsRewards'];
 const adminPages = ['AdminDashboard', 'AdminMembers', 'AdminOffers', 'AdminRewards', 'AdminNews', 'AdminQRCodes', 'AdminSponsors', 'AdminFixtures', 'AdminEvents', 'AdminGameDay', 'AdminTransactions', 'AdminLocationDiscounts'];
@@ -10,6 +11,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <PushNotificationManager />
       <style>{`
         :root {
           --color-primary: #1a365d;

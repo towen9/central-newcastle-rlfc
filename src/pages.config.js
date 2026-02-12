@@ -69,18 +69,19 @@ import GameDayCheckIn from './pages/GameDayCheckIn';
 import GameDayPass from './pages/GameDayPass';
 import GateScan from './pages/GateScan';
 import Home from './pages/Home';
+import HowPointsWork from './pages/HowPointsWork';
 import JoinMembership from './pages/JoinMembership';
+import LeaguesClubScan from './pages/LeaguesClubScan';
 import Membership from './pages/Membership';
 import MyDayPass from './pages/MyDayPass';
 import News from './pages/News';
 import Offers from './pages/Offers';
 import PhotoCapture from './pages/PhotoCapture';
+import PointsRewards from './pages/PointsRewards';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import Sponsors from './pages/Sponsors';
-import LeaguesClubScan from './pages/LeaguesClubScan';
-import PointsRewards from './pages/PointsRewards';
-import HowPointsWork from './pages/HowPointsWork';
+import AdminPushNotifications from './pages/AdminPushNotifications';
 import __Layout from './Layout.jsx';
 
 
@@ -107,18 +108,19 @@ export const PAGES = {
     "GameDayPass": GameDayPass,
     "GateScan": GateScan,
     "Home": Home,
+    "HowPointsWork": HowPointsWork,
     "JoinMembership": JoinMembership,
+    "LeaguesClubScan": LeaguesClubScan,
     "Membership": Membership,
     "MyDayPass": MyDayPass,
     "News": News,
     "Offers": Offers,
     "PhotoCapture": PhotoCapture,
+    "PointsRewards": PointsRewards,
     "Profile": Profile,
     "Rewards": Rewards,
     "Sponsors": Sponsors,
-    "LeaguesClubScan": LeaguesClubScan,
-    "PointsRewards": PointsRewards,
-    "HowPointsWork": HowPointsWork,
+    "AdminPushNotifications": AdminPushNotifications,
 }
 
 export const pagesConfig = {
