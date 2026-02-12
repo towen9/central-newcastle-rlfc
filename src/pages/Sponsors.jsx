@@ -9,7 +9,15 @@ import { createPageUrl } from '@/utils';
 export default function Sponsors() {
   const { data: sponsors = [] } = useQuery({
     queryKey: ['sponsors'],
-    queryFn: () => base44.entities.Sponsor.filter({ is_active: true })
+    queryFn: async () => {
+      const allSponsors = await base44.entities.Sponsor.filter({ is_active: true });
+      // Sort sponsors: naming rights first, then alphabetically
+      return allSponsors.sort((a, b) => {
+        if (a.tier === 'naming_rights') return -1;
+        if (b.tier === 'naming_rights') return 1;
+        return a.name.localeCompare(b.name);
+      });
+    }
   });
 
   const { data: offers = [] } = useQuery({
@@ -62,31 +70,36 @@ export default function Sponsors() {
                 <div className="p-5">
                   {/* Logo & Name */}
                   <div className="flex items-start gap-4 mb-4">
-                    {sponsor.logo_url ? (
-                      <img 
-                        src={sponsor.logo_url} 
-                        alt={sponsor.name}
-                        className="w-16 h-16 object-contain rounded-xl border-2 border-gray-200 p-2"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
-                        {sponsor.name.charAt(0)}
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-gray-900 text-lg">{sponsor.name}</h3>
-                        {sponsorOffers.length > 0 && (
-                          <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
-                            <Percent className="w-3 h-3" />
-                            {sponsorOffers.length}
-                          </span>
-                        )}
-                      </div>
-                      {sponsor.description && (
-                        <p className="text-sm text-gray-500">{sponsor.description}</p>
-                      )}
-                    </div>
+                   {sponsor.logo_url ? (
+                     <img 
+                       src={sponsor.logo_url} 
+                       alt={sponsor.name}
+                       className="w-16 h-16 object-contain rounded-xl border-2 border-gray-200 p-2"
+                     />
+                   ) : (
+                     <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                       {sponsor.name.charAt(0)}
+                     </div>
+                   )}
+                   <div className="flex-1">
+                     <div className="flex items-center gap-2 mb-1">
+                       <h3 className="font-bold text-gray-900 text-lg">{sponsor.name}</h3>
+                       {sponsor.tier === 'naming_rights' && (
+                         <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                           Naming Rights Partner
+                         </span>
+                       )}
+                       {sponsorOffers.length > 0 && (
+                         <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
+                           <Percent className="w-3 h-3" />
+                           {sponsorOffers.length}
+                         </span>
+                       )}
+                     </div>
+                     {sponsor.description && (
+                       <p className="text-sm text-gray-500">{sponsor.description}</p>
+                     )}
+                   </div>
                   </div>
 
                   {/* Contact Info */}
