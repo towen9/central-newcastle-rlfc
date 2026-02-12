@@ -11,8 +11,10 @@ export default function Sponsors() {
     queryKey: ['sponsors'],
     queryFn: async () => {
       const allSponsors = await base44.entities.Sponsor.filter({ is_active: true });
-      // Sort sponsors: naming rights first, then alphabetically
+      // Sort sponsors: Oneills Tyres first, then naming rights, then alphabetically
       return allSponsors.sort((a, b) => {
+        if (a.name === "Oneills Tyres") return -1;
+        if (b.name === "Oneills Tyres") return 1;
         if (a.tier === 'naming_rights') return -1;
         if (b.tier === 'naming_rights') return 1;
         return a.name.localeCompare(b.name);
