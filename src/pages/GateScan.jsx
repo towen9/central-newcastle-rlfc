@@ -49,7 +49,6 @@ export default function GateScan() {
       const pointsEarned = 10;
       
       await base44.entities.Membership.update(membership.id, {
-        stamps: (membership.stamps || 0) + 1,
         points: (membership.points || 0) + pointsEarned,
         total_checkins: (membership.total_checkins || 0) + 1
       });
