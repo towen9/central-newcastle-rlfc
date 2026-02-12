@@ -56,9 +56,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Compact Header */}
-      <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe">
+      <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
@@ -84,9 +84,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Content - No Scroll */}
+      {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="px-4 -mt-2 space-y-3">
+        <div className="px-4 pt-2 pb-32 space-y-3">
         {/* Membership Pass */}
         <div className="relative z-10">
           <MembershipPass 
