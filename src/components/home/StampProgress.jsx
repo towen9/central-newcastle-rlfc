@@ -14,26 +14,26 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
 
   return (
     <Link to={createPageUrl('PointsRewards')}>
-      <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-5 shadow-lg text-white">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <Zap className="w-5 h-5 fill-white" />
+      <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-3 shadow-lg text-white">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+              <Zap className="w-4 h-4 fill-white" />
             </div>
             <div>
-              <h3 className="font-semibold">Points Balance</h3>
-              <p className="text-sm text-amber-100">Tap to view rewards • <Link to={createPageUrl('HowPointsWork')} className="underline">How it works</Link></p>
+              <h3 className="font-semibold text-sm">Points Balance</h3>
+              <p className="text-xs text-amber-100">Tap • <Link to={createPageUrl('HowPointsWork')} className="underline">How it works</Link></p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold">{points}</p>
-            <p className="text-xs text-amber-100">points</p>
+            <p className="text-2xl font-bold">{points}</p>
+            <p className="text-xs text-amber-100">pts</p>
           </div>
         </div>
 
       {/* Progress Bar */}
       {nextReward && (
-        <div className="relative h-2 bg-white/20 rounded-full overflow-hidden mb-3">
+        <div className="relative h-1.5 bg-white/20 rounded-full overflow-hidden mb-2">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
@@ -45,16 +45,16 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
 
       {/* Next Reward */}
       {nextReward ? (
-        <p className="text-sm text-amber-50">
-          <span className="font-semibold">{pointsToNext} points</span> until {nextReward.title}
+        <p className="text-xs text-amber-50">
+          <span className="font-semibold">{pointsToNext} pts</span> until {nextReward.title}
         </p>
       ) : points > 0 ? (
-        <p className="text-sm font-semibold text-amber-50">
+        <p className="text-xs font-semibold text-amber-50">
           🎉 All rewards unlocked!
         </p>
       ) : (
-        <p className="text-sm text-amber-50">
-          Earn points by attending games and making purchases!
+        <p className="text-xs text-amber-50">
+          Earn points at games and bar!
         </p>
       )}
       </div>

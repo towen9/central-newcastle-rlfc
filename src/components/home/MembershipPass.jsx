@@ -13,22 +13,17 @@ export default function MembershipPass({ membership, user, onShowQR }) {
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden"
     >
-      {/* Main Card */}
-      <div className={`relative rounded-3xl p-6 ${
+      {/* Main Card - Compact */}
+      <div className={`relative rounded-2xl p-4 ${
         isActive 
           ? 'bg-gradient-to-br from-[#1a365d] via-[#2c5282] to-[#2b6cb0]' 
           : 'bg-gradient-to-br from-gray-600 to-gray-800'
-      } shadow-2xl`}>
-        {/* Pattern Overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
-        </div>
+      } shadow-xl`}>
         
-        {/* Club Logo/Name */}
-        <div className="relative flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1">
+        {/* Club Logo/Name & Status */}
+        <div className="relative flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-0.5">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
                 alt="Central Newcastle RLFC"
@@ -36,58 +31,40 @@ export default function MembershipPass({ membership, user, onShowQR }) {
               />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg tracking-wide">CENTRAL NEWCASTLE</h3>
-              <p className="text-white/70 text-xs tracking-widest">RLFC</p>
+              <h3 className="text-white font-bold text-sm tracking-wide">CENTRAL NEWCASTLE</h3>
+              <p className="text-white/70 text-xs">{membership?.tier_name || 'N/A'}</p>
             </div>
           </div>
-          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+          <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
             isActive ? 'bg-emerald-400/20 text-emerald-300' : 'bg-red-400/20 text-red-300'
           }`}>
             {isActive ? 'ACTIVE' : membership?.status?.toUpperCase() || 'NO MEMBERSHIP'}
           </div>
         </div>
 
-        {/* Member Info */}
-        <div className="relative space-y-4 mb-6">
-          <div>
-            <p className="text-white/60 text-xs uppercase tracking-wider mb-1">Member Name</p>
-            <p className="text-white text-xl font-semibold">{user?.full_name || 'Member'}</p>
-          </div>
-          
-          <div className="flex gap-6">
-            <div>
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-1">Membership</p>
-              <p className="text-white font-medium">{membership?.tier_name || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-1">Valid Until</p>
-              <p className="text-white font-medium">
-                {expiryDate ? format(expiryDate, 'MMM yyyy') : 'N/A'}
-              </p>
-            </div>
-          </div>
+        {/* Member Info - Compact */}
+        <div className="relative mb-3">
+          <p className="text-white text-lg font-semibold">{user?.full_name || 'Member'}</p>
+          <p className="text-white/60 text-xs">
+            Valid until: {expiryDate ? format(expiryDate, 'MMM yyyy') : 'N/A'}
+          </p>
         </div>
 
-        {/* QR Button */}
+        {/* QR Button - Compact */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onShowQR}
           disabled={!isActive}
-          className={`relative w-full py-4 rounded-2xl flex items-center justify-center gap-3 font-semibold transition-all ${
+          className={`relative w-full py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold transition-all ${
             isActive 
               ? 'bg-white text-[#1a365d] hover:bg-white/95' 
               : 'bg-white/20 text-white/50 cursor-not-allowed'
           }`}
         >
-          <QrCode className="w-5 h-5" />
-          <span>Show Membership Pass</span>
+          <QrCode className="w-4 h-4" />
+          <span>Show Pass</span>
         </motion.button>
-
-        {/* Member ID */}
-        <p className="text-center text-white/40 text-xs mt-4 font-mono tracking-wider">
-          ID: {membership?.qr_code_id?.slice(0, 12)?.toUpperCase() || '---'}
-        </p>
       </div>
     </motion.div>
   );

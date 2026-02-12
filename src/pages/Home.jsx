@@ -56,39 +56,39 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-32">
-      {/* Header */}
+    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 pb-20">
+      {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe">
-        <div className="px-5 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
               alt="Central Newcastle RLFC"
-              className="w-14 h-14 object-contain bg-white rounded-full p-1"
+              className="w-10 h-10 object-contain bg-white rounded-full p-0.5"
             />
             <div>
-              <p className="text-blue-200 dark:text-gray-400 text-sm">Welcome back</p>
-              <h1 className="text-white text-xl font-bold">{user?.full_name || 'Member'}</h1>
+              <p className="text-blue-200 dark:text-gray-400 text-xs">Welcome back</p>
+              <h1 className="text-white text-sm font-bold">{user?.full_name || 'Member'}</h1>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="w-10 h-10 bg-white/10 dark:bg-white/5 rounded-full flex items-center justify-center">
-              <Bell className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2">
+            <button className="w-8 h-8 bg-white/10 dark:bg-white/5 rounded-full flex items-center justify-center">
+              <Bell className="w-4 h-4 text-white" />
             </button>
             <Link to={createPageUrl('Profile')}>
-              <div className="w-10 h-10 bg-white/20 dark:bg-white/10 rounded-full flex items-center justify-center">
-                <Settings className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-white/20 dark:bg-white/10 rounded-full flex items-center justify-center">
+                <Settings className="w-4 h-4 text-white" />
               </div>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Content with Pull to Refresh */}
+      {/* Content - No Scroll */}
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="px-5 -mt-2">
+        <div className="px-4 -mt-2 space-y-3">
         {/* Membership Pass */}
-        <div className="relative z-10 mb-6">
+        <div className="relative z-10">
           <MembershipPass 
             membership={membership} 
             user={user}
@@ -97,12 +97,12 @@ export default function Home() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-6">
+        <div>
           <QuickActions />
         </div>
 
         {/* Points Progress */}
-        <div className="mb-6">
+        <div>
           <StampProgress 
             stamps={membership?.stamps || 0} 
             points={membership?.points || 0}
@@ -112,7 +112,7 @@ export default function Home() {
 
         {/* Featured Offer */}
         {featuredOffer && (
-          <div className="mb-6">
+          <div>
             <FeaturedOffer offer={featuredOffer} />
           </div>
         )}
