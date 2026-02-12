@@ -12,7 +12,9 @@ export default function NextMatch() {
     queryFn: async () => {
       const all = await base44.entities.Fixture.filter({ status: 'upcoming' });
       return all.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
-    }
+    },
+    staleTime: 0,
+    gcTime: 0
   });
 
   const nextMatch = fixtures[0];
