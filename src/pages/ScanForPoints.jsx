@@ -159,7 +159,17 @@ export default function ScanForPoints() {
 
   const handleQRCodeScanned = async (qrData) => {
     stopScanning();
-    scanMutation.mutate({ qrId: qrData });
+    
+    // Parse QR data (supports both JSON format and plain string)
+    let qrId = qrData;
+    try {
+      const parsed = JSON.parse(qrData);
+      qrId = parsed.id || qrData;
+    } catch {
+      // Already a plain string
+    }
+    
+    scanMutation.mutate({ qrId });
   };
 
   useEffect(() => {
