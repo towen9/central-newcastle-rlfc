@@ -44,6 +44,7 @@ export default function AdminSponsors() {
   const [editingSponsor, setEditingSponsor] = useState(null);
   const [formData, setFormData] = useState(defaultSponsor);
   const [uploading, setUploading] = useState(false);
+  const [showOnlyNoLogo, setShowOnlyNoLogo] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: sponsors = [] } = useQuery({
@@ -131,6 +132,12 @@ export default function AdminSponsors() {
     }
   };
 
+  const filteredSponsors = showOnlyNoLogo 
+    ? sponsors.filter(s => !s.logo_url) 
+    : sponsors;
+
+  const noLogoCount = sponsors.filter(s => !s.logo_url).length;
+
   return (
     <AdminLayout title="Sponsors" currentPage="AdminSponsors">
       <div className="flex justify-between items-center mb-6">
@@ -141,9 +148,34 @@ export default function AdminSponsors() {
         </Button>
       </div>
 
+      {/* Filter Section */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button
+            variant={!showOnlyNoLogo ? "default" : "outline"}
+            onClick={() => setShowOnlyNoLogo(false)}
+            size="sm"
+          >
+            All Sponsors ({sponsors.length})
+          </Button>
+          <Button
+            variant={showOnlyNoLogo ? "default" : "outline"}
+            onClick={() => setShowOnlyNoLogo(true)}
+            size="sm"
+          >
+            No Logo ({noLogoCount})
+          </Button>
+        </div>
+        {showOnlyNoLogo && noLogoCount > 0 && (
+          <p className="text-sm text-amber-600 font-medium">
+            {noLogoCount} sponsor{noLogoCount !== 1 ? 's' : ''} need{noLogoCount === 1 ? 's' : ''} a logo
+          </p>
+        )}
+      </div>
+
       {/* Sponsors Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sponsors.map((sponsor) => (
+        {filteredSponsors.map((sponsor) => (
           <div 
             key={sponsor.id}
             className={`bg-white rounded-xl border p-6 ${
@@ -226,6 +258,14 @@ export default function AdminSponsors() {
           </div>
         ))}
       </div>
+
+      {filteredSponsors.length === 0 && sponsors.length > 0 && (
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+          <Building2 className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+          <h3 className="font-semibold text-gray-900 mb-1">All sponsors have logos</h3>
+          <p className="text-gray-500">Great work!</p>
+        </div>
+      )}
 
       {sponsors.length === 0 && (
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
