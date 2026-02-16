@@ -11,12 +11,11 @@ export default function Sponsors() {
     queryKey: ['sponsors'],
     queryFn: async () => {
       const allSponsors = await base44.entities.Sponsor.filter({ is_active: true });
-      // Sort sponsors: Oneills Tyres first, then naming rights, then alphabetically
+      // Sort by sort_order (lower first), then alphabetically
       return allSponsors.sort((a, b) => {
-        if (a.name === "Oneills Tyres") return -1;
-        if (b.name === "Oneills Tyres") return 1;
-        if (a.tier === 'naming_rights') return -1;
-        if (b.tier === 'naming_rights') return 1;
+        const orderA = a.sort_order ?? 999;
+        const orderB = b.sort_order ?? 999;
+        if (orderA !== orderB) return orderA - orderB;
         return a.name.localeCompare(b.name);
       });
     }

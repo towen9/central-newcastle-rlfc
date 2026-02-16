@@ -36,7 +36,8 @@ const defaultSponsor = {
   website: '',
   contact_email: '',
   contact_phone: '',
-  is_active: true
+  is_active: true,
+  sort_order: 999
 };
 
 export default function AdminSponsors() {
@@ -49,7 +50,15 @@ export default function AdminSponsors() {
 
   const { data: sponsors = [] } = useQuery({
     queryKey: ['sponsors'],
-    queryFn: () => base44.entities.Sponsor.list()
+    queryFn: async () => {
+      const allSponsors = await base44.entities.Sponsor.list();
+      return allSponsors.sort((a, b) => {
+        const orderA = a.sort_order ?? 999;
+        const orderB = b.sort_order ?? 999;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.name.localeCompare(b.name);
+      });
+    }
   });
 
   const { data: offers = [] } = useQuery({
@@ -325,6 +334,15 @@ export default function AdminSponsors() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="About the sponsor..."
+              />
+            </div>
+            <div>
+              <Label>Display Order (lower = first)</Label>
+              <Input
+                type="number"
+                value={formData.sort_order}
+                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 999 })}
+                placeholder="999"
               />
             </div>
             <div>

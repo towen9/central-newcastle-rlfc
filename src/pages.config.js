@@ -66,6 +66,7 @@ import AdminSponsors from './pages/AdminSponsors';
 import AdminTransactions from './pages/AdminTransactions';
 import BarScan from './pages/BarScan';
 import Benefits from './pages/Benefits';
+import CanteenStaffGuide from './pages/CanteenStaffGuide';
 import CanteenStaffLogin from './pages/CanteenStaffLogin';
 import CheckIn from './pages/CheckIn';
 import DayPass from './pages/DayPass';
@@ -74,6 +75,7 @@ import Fixtures from './pages/Fixtures';
 import GameDayCheckIn from './pages/GameDayCheckIn';
 import GameDayPass from './pages/GameDayPass';
 import GateScan from './pages/GateScan';
+import GateStaffGuide from './pages/GateStaffGuide';
 import GateStaffLogin from './pages/GateStaffLogin';
 import Home from './pages/Home';
 import HowPointsWork from './pages/HowPointsWork';
@@ -89,8 +91,6 @@ import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
-import GateStaffGuide from './pages/GateStaffGuide';
-import CanteenStaffGuide from './pages/CanteenStaffGuide';
 import TroubleshootingGuide from './pages/TroubleshootingGuide';
 import __Layout from './Layout.jsx';
 
@@ -115,6 +115,7 @@ export const PAGES = {
     "AdminTransactions": AdminTransactions,
     "BarScan": BarScan,
     "Benefits": Benefits,
+    "CanteenStaffGuide": CanteenStaffGuide,
     "CanteenStaffLogin": CanteenStaffLogin,
     "CheckIn": CheckIn,
     "DayPass": DayPass,
@@ -123,6 +124,7 @@ export const PAGES = {
     "GameDayCheckIn": GameDayCheckIn,
     "GameDayPass": GameDayPass,
     "GateScan": GateScan,
+    "GateStaffGuide": GateStaffGuide,
     "GateStaffLogin": GateStaffLogin,
     "Home": Home,
     "HowPointsWork": HowPointsWork,
@@ -138,8 +140,6 @@ export const PAGES = {
     "Rewards": Rewards,
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
-    "GateStaffGuide": GateStaffGuide,
-    "CanteenStaffGuide": CanteenStaffGuide,
     "TroubleshootingGuide": TroubleshootingGuide,
 }
 
