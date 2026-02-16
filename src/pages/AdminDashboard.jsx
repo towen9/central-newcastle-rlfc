@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   Users, CreditCard, Gift, Percent, TrendingUp, Calendar, 
   BarChart3, ArrowUpRight, ArrowDownRight, QrCode, Newspaper,
-  Menu, X, ChevronRight, Shield, Bell, MessageSquare, LineChart, AlertTriangle
+  Menu, X, ChevronRight, Shield, Bell, MessageSquare, LineChart, AlertTriangle, BookOpen
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -204,6 +204,38 @@ export default function AdminDashboard() {
             </motion.div>
           ))}
         </div>
+
+        {/* Staff Resources */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+              Staff Resources & Guides
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Link to={createPageUrl('GateStaffGuide')}>
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+                  <h3 className="font-bold text-blue-900 mb-1">Gate Staff Guide</h3>
+                  <p className="text-sm text-blue-700">Entry & check-in procedures</p>
+                </div>
+              </Link>
+              <Link to={createPageUrl('CanteenStaffGuide')}>
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
+                  <h3 className="font-bold text-green-900 mb-1">Canteen Staff Guide</h3>
+                  <p className="text-sm text-green-700">Bar & food service instructions</p>
+                </div>
+              </Link>
+              <Link to={createPageUrl('TroubleshootingGuide')}>
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors">
+                  <h3 className="font-bold text-amber-900 mb-1">Troubleshooting Guide</h3>
+                  <p className="text-sm text-amber-700">Quick fixes for common issues</p>
+                </div>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
