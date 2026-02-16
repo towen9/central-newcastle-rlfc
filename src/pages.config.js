@@ -89,6 +89,9 @@ import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
+import GateStaffGuide from './pages/GateStaffGuide';
+import CanteenStaffGuide from './pages/CanteenStaffGuide';
+import TroubleshootingGuide from './pages/TroubleshootingGuide';
 import __Layout from './Layout.jsx';
 
 
@@ -135,6 +138,9 @@ export const PAGES = {
     "Rewards": Rewards,
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
+    "GateStaffGuide": GateStaffGuide,
+    "CanteenStaffGuide": CanteenStaffGuide,
+    "TroubleshootingGuide": TroubleshootingGuide,
 }
 
 export const pagesConfig = {
