@@ -205,6 +205,32 @@ export default function AdminDashboard() {
           ))}
         </div>
 
+        {/* Staff Access */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-blue-600" />
+              Staff Access Points
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <Link to={createPageUrl('GateScan')}>
+                <div className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <h3 className="font-bold mb-1">🎫 Gate Scanner</h3>
+                  <p className="text-sm text-blue-100">Scan member & day pass QR codes</p>
+                </div>
+              </Link>
+              <Link to={createPageUrl('BarScan')}>
+                <div className="p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                  <h3 className="font-bold mb-1">🍺 Bar/Canteen Scanner</h3>
+                  <p className="text-sm text-green-100">Award points for purchases</p>
+                </div>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Staff Resources */}
         <Card className="mb-8">
           <CardHeader>
