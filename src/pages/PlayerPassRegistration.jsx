@@ -19,7 +19,6 @@ export default function PlayerPassRegistration() {
     email: '',
     phone: '',
     team: '',
-    grade: '',
     player_number: ''
   });
 
@@ -82,7 +81,6 @@ export default function PlayerPassRegistration() {
             Email: ${data.email}
             Phone: ${data.phone}
             Team: ${data.team}
-            Grade: ${data.grade}
             Player Number: ${data.player_number}
             
             Please review and approve in the Admin Dashboard > Members section.
@@ -205,17 +203,6 @@ export default function PlayerPassRegistration() {
                 <SelectItem value="womens">Women's Team</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="grade">Grade *</Label>
-            <Input
-              id="grade"
-              value={formData.grade}
-              onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-              placeholder="e.g., First Grade, Reserve Grade, U18"
-              required
-            />
           </div>
 
           <div>
