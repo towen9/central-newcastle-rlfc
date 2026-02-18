@@ -86,13 +86,13 @@ import MyDayPass from './pages/MyDayPass';
 import News from './pages/News';
 import Offers from './pages/Offers';
 import PhotoCapture from './pages/PhotoCapture';
+import PlayerPassRegistration from './pages/PlayerPassRegistration';
 import PointsRewards from './pages/PointsRewards';
 import Profile from './pages/Profile';
 import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
 import TroubleshootingGuide from './pages/TroubleshootingGuide';
-import PlayerPassRegistration from './pages/PlayerPassRegistration';
 import __Layout from './Layout.jsx';
 
 
@@ -136,13 +136,13 @@ export const PAGES = {
     "News": News,
     "Offers": Offers,
     "PhotoCapture": PhotoCapture,
+    "PlayerPassRegistration": PlayerPassRegistration,
     "PointsRewards": PointsRewards,
     "Profile": Profile,
     "Rewards": Rewards,
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
     "TroubleshootingGuide": TroubleshootingGuide,
-    "PlayerPassRegistration": PlayerPassRegistration,
 }
 
 export const pagesConfig = {
