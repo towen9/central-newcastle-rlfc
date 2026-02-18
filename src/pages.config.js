@@ -92,6 +92,7 @@ import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
 import TroubleshootingGuide from './pages/TroubleshootingGuide';
+import PlayerPassRegistration from './pages/PlayerPassRegistration';
 import __Layout from './Layout.jsx';
 
 
@@ -141,6 +142,7 @@ export const PAGES = {
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
     "TroubleshootingGuide": TroubleshootingGuide,
+    "PlayerPassRegistration": PlayerPassRegistration,
 }
 
 export const pagesConfig = {
