@@ -18,7 +18,6 @@ export default function PlayerPassRegistration() {
     full_name: '',
     email: '',
     phone: '',
-    team: '',
     player_number: ''
   });
 
@@ -80,7 +79,6 @@ export default function PlayerPassRegistration() {
             Name: ${data.full_name}
             Email: ${data.email}
             Phone: ${data.phone}
-            Team: ${data.team}
             Player Number: ${data.player_number}
             
             Please review and approve in the Admin Dashboard > Members section.
@@ -190,19 +188,6 @@ export default function PlayerPassRegistration() {
               placeholder="0400 000 000"
               required
             />
-          </div>
-
-          <div>
-            <Label htmlFor="team">Team *</Label>
-            <Select value={formData.team} onValueChange={(value) => setFormData({ ...formData, team: value })} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select team" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="mens">Men's Team</SelectItem>
-                <SelectItem value="womens">Women's Team</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div>
