@@ -54,7 +54,7 @@ export default function QuickActions() {
 
         if (action.action === 'share') {
           return (
-            <button key={idx} onClick={handleShare}>
+            <button key={idx} onClick={handleShare} type="button" className="focus:outline-none">
               {content}
             </button>
           );
