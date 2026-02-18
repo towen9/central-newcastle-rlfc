@@ -39,6 +39,24 @@ export default function QuickActions() {
   return (
     <div className="grid grid-cols-5 gap-2">
       {actions.map((action, idx) => {
+        if (action.action === 'share') {
+          return (
+            <motion.button
+              key={idx}
+              onClick={handleShare}
+              type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex flex-col items-center gap-1.5 focus:outline-none"
+            >
+              <div className={`w-11 h-11 ${action.color} rounded-xl flex items-center justify-center shadow-md`}>
+                <action.icon className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{action.label}</span>
+            </motion.button>
+          );
+        }
+
         const content = (
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -51,14 +69,6 @@ export default function QuickActions() {
             <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{action.label}</span>
           </motion.div>
         );
-
-        if (action.action === 'share') {
-          return (
-            <button key={idx} onClick={handleShare} type="button" className="focus:outline-none">
-              {content}
-            </button>
-          );
-        }
 
         return action.external ? (
           <a key={idx} href={action.url} target="_blank" rel="noopener noreferrer">
