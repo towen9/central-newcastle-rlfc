@@ -63,6 +63,8 @@ export default function AdminMembers() {
     }
   });
 
+  const pendingCount = memberships.filter(m => m.status === 'pending').length;
+
   const filteredMemberships = memberships.filter(m => {
     const matchesSearch = 
       m.user_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -101,6 +103,33 @@ export default function AdminMembers() {
 
   return (
     <AdminLayout title="Members" currentPage="AdminMembers">
+      {/* Pending Alert */}
+      {pendingCount > 0 && (
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-amber-900">
+                  {pendingCount} Pending Approval{pendingCount !== 1 ? 's' : ''}
+                </h3>
+                <p className="text-sm text-amber-700">
+                  Player pass applications awaiting review
+                </p>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setStatusFilter('pending')}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              View Pending
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -189,34 +218,62 @@ export default function AdminMembers() {
                 </TableCell>
                 <TableCell>{membership.total_checkins || 0}</TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setSelectedMember(membership)}>
-                        Edit Membership
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => updateMutation.mutate({ 
-                          id: membership.id, 
-                          data: { status: membership.status === 'active' ? 'cancelled' : 'active' }
-                        })}
-                      >
-                        {membership.status === 'active' ? 'Deactivate' : 'Activate'}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => updateMutation.mutate({ 
-                          id: membership.id, 
-                          data: { stamps: 0 }
-                        })}
-                      >
-                        Reset Stamps
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex items-center gap-2">
+                    {membership.status === 'pending' && (
+                      <>
+                        <Button 
+                          size="sm" 
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                          onClick={() => updateMutation.mutate({ 
+                            id: membership.id, 
+                            data: { status: 'active' }
+                          })}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Approve
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="destructive"
+                          onClick={() => updateMutation.mutate({ 
+                            id: membership.id, 
+                            data: { status: 'cancelled' }
+                          })}
+                        >
+                          <XCircle className="w-4 h-4 mr-1" />
+                          Reject
+                        </Button>
+                      </>
+                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setSelectedMember(membership)}>
+                          Edit Membership
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => updateMutation.mutate({ 
+                            id: membership.id, 
+                            data: { status: membership.status === 'active' ? 'cancelled' : 'active' }
+                          })}
+                        >
+                          {membership.status === 'active' ? 'Deactivate' : 'Activate'}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => updateMutation.mutate({ 
+                            id: membership.id, 
+                            data: { stamps: 0 }
+                          })}
+                        >
+                          Reset Stamps
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
