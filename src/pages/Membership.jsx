@@ -267,6 +267,19 @@ export default function Membership() {
             <p className="text-gray-500 mb-6">Join Central Newcastle RLFC to access exclusive benefits</p>
             
             <div className="space-y-4">
+              <Link to={createPageUrl('PlayerPassRegistration')}>
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 border-2 border-blue-700 text-white mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-bold text-lg">🏉 2026 Player Pass</h3>
+                    <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">FREE</span>
+                  </div>
+                  <p className="text-sm text-blue-100 mb-3">For Central Newcastle RLFC players (Men's & Women's)</p>
+                  <Button className="w-full bg-white text-blue-600 hover:bg-blue-50">
+                    Apply Now
+                  </Button>
+                </div>
+              </Link>
+              
               {tiers.filter(t => !t.is_admin_only).map((tier) => (
                 <div key={tier.id} className="bg-white rounded-xl p-4 border border-gray-200 text-left">
                   <div className="flex items-center justify-between mb-2">
