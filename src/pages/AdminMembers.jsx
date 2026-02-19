@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, Filter, Download, Plus, MoreVertical, 
-  Mail, CreditCard, CheckCircle, XCircle, Clock 
+  Mail, CreditCard, CheckCircle, XCircle, Clock, ChevronDown 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +43,7 @@ export default function AdminMembers() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: memberships = [], isLoading } = useQuery({
@@ -80,8 +81,8 @@ export default function AdminMembers() {
     cancelled: 'bg-gray-100 text-gray-700'
   };
 
-  const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Tier', 'Status', 'Start Date', 'Expiry Date', 'Stamps'];
+  const exportBasicCSV = () => {
+    const headers = ['Name', 'Email', 'Tier', 'Status', 'Start Date', 'Expiry Date', 'Stamps', 'Points', 'Check-ins'];
     const rows = filteredMemberships.map(m => [
       m.user_name,
       m.user_email,
@@ -89,7 +90,9 @@ export default function AdminMembers() {
       m.status,
       m.start_date,
       m.expiry_date,
-      m.stamps
+      m.stamps || 0,
+      m.points || 0,
+      m.total_checkins || 0
     ]);
     
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -97,8 +100,131 @@ export default function AdminMembers() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `members-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.download = `members-basic-${format(new Date(), 'yyyy-MM-dd')}.csv`;
     a.click();
+  };
+
+  const exportDetailedData = async () => {
+    setIsExporting(true);
+    toast.loading('Preparing detailed export...');
+
+    try {
+      // Fetch all related data
+      const [checkIns, pointsTransactions, fixtures] = await Promise.all([
+        base44.entities.CheckIn.list('-timestamp'),
+        base44.entities.PointsTransaction.list('-timestamp'),
+        base44.entities.Fixture.list('-date_time')
+      ]);
+
+      // Build detailed rows
+      const rows = [];
+      
+      for (const member of filteredMemberships) {
+        const memberCheckIns = checkIns.filter(c => c.membership_id === member.id);
+        const memberTransactions = pointsTransactions.filter(t => t.membership_id === member.id);
+        
+        // Get unique games attended
+        const gamesAttended = new Set();
+        memberCheckIns.forEach(checkIn => {
+          const checkInDate = new Date(checkIn.timestamp);
+          fixtures.forEach(fixture => {
+            const fixtureDate = new Date(fixture.date_time);
+            // Check if check-in was within 6 hours of a fixture
+            const timeDiff = Math.abs(checkInDate - fixtureDate) / (1000 * 60 * 60);
+            if (timeDiff <= 6) {
+              gamesAttended.add(`${fixture.opponent} (${format(fixtureDate, 'MMM d, yyyy')})`);
+            }
+          });
+        });
+
+        // Calculate points breakdown
+        const pointsEarned = memberTransactions
+          .filter(t => t.points > 0)
+          .reduce((sum, t) => sum + t.points, 0);
+        const pointsSpent = Math.abs(memberTransactions
+          .filter(t => t.points < 0)
+          .reduce((sum, t) => sum + t.points, 0));
+
+        rows.push([
+          member.user_name || '',
+          member.user_email || '',
+          member.tier_name || '',
+          member.status || '',
+          member.start_date || '',
+          member.expiry_date || '',
+          member.stamps || 0,
+          member.points || 0,
+          pointsEarned,
+          pointsSpent,
+          member.total_checkins || 0,
+          memberCheckIns.length,
+          gamesAttended.size,
+          Array.from(gamesAttended).join(' | ') || 'None'
+        ]);
+      }
+
+      const headers = [
+        'Name', 'Email', 'Tier', 'Status', 'Start Date', 'Expiry Date',
+        'Stamps', 'Current Points', 'Points Earned', 'Points Spent',
+        'Total Check-ins', 'Location Check-ins', 'Games Attended (Count)', 'Games Attended (List)'
+      ];
+
+      const csv = [headers, ...rows].map(row => 
+        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      ).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `members-detailed-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      a.click();
+      
+      toast.success('Detailed export complete');
+    } catch (error) {
+      toast.error('Export failed: ' + error.message);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const exportCheckInsData = async () => {
+    setIsExporting(true);
+    toast.loading('Preparing check-ins export...');
+
+    try {
+      const checkIns = await base44.entities.CheckIn.list('-timestamp');
+      
+      const rows = checkIns.map(checkIn => {
+        const member = memberships.find(m => m.id === checkIn.membership_id);
+        return [
+          member?.user_name || 'Unknown',
+          member?.user_email || 'Unknown',
+          member?.tier_name || 'Unknown',
+          checkIn.location || '',
+          checkIn.timestamp ? format(new Date(checkIn.timestamp), 'yyyy-MM-dd HH:mm:ss') : '',
+          checkIn.location_qr_id || ''
+        ];
+      });
+
+      const headers = ['Member Name', 'Email', 'Tier', 'Location', 'Check-in Time', 'QR Code'];
+      const csv = [headers, ...rows].map(row => 
+        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      ).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `check-ins-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      a.click();
+
+      toast.success('Check-ins export complete');
+    } catch (error) {
+      toast.error('Export failed: ' + error.message);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -154,10 +280,29 @@ export default function AdminMembers() {
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={exportCSV}>
-            <Download className="w-4 h-4 mr-2" />
-            Export CSV
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" disabled={isExporting}>
+                <Download className="w-4 h-4 mr-2" />
+                {isExporting ? 'Exporting...' : 'Export Data'}
+                <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={exportBasicCSV}>
+                <Download className="w-4 h-4 mr-2" />
+                Basic Member List
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportDetailedData}>
+                <Download className="w-4 h-4 mr-2" />
+                Detailed with Games Attended
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportCheckInsData}>
+                <Download className="w-4 h-4 mr-2" />
+                All Check-ins History
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
