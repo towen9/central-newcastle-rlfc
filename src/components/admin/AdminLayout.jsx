@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { 
   Shield, Users, Gift, Percent, QrCode, Newspaper, 
-  Calendar, LayoutDashboard, ArrowLeft, ChevronRight, Ticket, ShoppingBag 
+  Calendar, LayoutDashboard, ArrowLeft, ChevronRight, Ticket, ShoppingBag, UserCog 
 } from 'lucide-react';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', page: 'AdminDashboard' },
+  { icon: UserCog, label: 'Users', page: 'AdminUsers' },
   { icon: Users, label: 'Members', page: 'AdminMembers' },
   { icon: Gift, label: 'Rewards', page: 'AdminRewards' },
   { icon: Percent, label: 'Offers', page: 'AdminOffers' },
