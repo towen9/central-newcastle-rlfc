@@ -93,6 +93,7 @@ import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
 import TroubleshootingGuide from './pages/TroubleshootingGuide';
+import AdminUsers from './pages/AdminUsers';
 import __Layout from './Layout.jsx';
 
 
@@ -143,6 +144,7 @@ export const PAGES = {
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
     "TroubleshootingGuide": TroubleshootingGuide,
+    "AdminUsers": AdminUsers,
 }
 
 export const pagesConfig = {
