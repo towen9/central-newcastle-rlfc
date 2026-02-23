@@ -127,7 +127,7 @@ export default function Home() {
 
         {/* Quick Actions */}
         <div>
-          <QuickActions membership={membership} />
+          <QuickActions />
         </div>
 
         {/* Points Progress */}
