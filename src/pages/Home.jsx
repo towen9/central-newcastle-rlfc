@@ -8,6 +8,8 @@ import MembershipPass from '../components/home/MembershipPass';
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';
 import NextMatch from '../components/home/NextMatch';
+import { Ticket } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
@@ -88,6 +90,27 @@ export default function Home() {
       {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 pt-2 pb-32 space-y-3">
+        {/* Day Pass CTA - Only for non-members */}
+        {!membership && user && (
+          <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] rounded-2xl p-6 text-white shadow-lg">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Ticket className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-1">Get Your Game Day Pass</h3>
+                <p className="text-blue-200 text-sm">Single entry to any upcoming home game - Just $8</p>
+              </div>
+            </div>
+            <Button 
+              onClick={() => window.location.href = createPageUrl('DayPass')}
+              className="w-full bg-white text-[#1a365d] hover:bg-blue-50 py-6 text-lg font-semibold"
+            >
+              Buy Day Pass - $8
+            </Button>
+          </div>
+        )}
+
         {/* Membership Pass */}
         <div className="relative z-10">
           <MembershipPass 
@@ -104,7 +127,7 @@ export default function Home() {
 
         {/* Quick Actions */}
         <div>
-          <QuickActions />
+          <QuickActions membership={membership} />
         </div>
 
         {/* Points Progress */}
