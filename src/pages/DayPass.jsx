@@ -22,14 +22,11 @@ export default function DayPass() {
     loadUser();
   }, []);
 
-  // Get today's home fixtures with entry enabled
-  const { data: todayFixtures = [] } = useQuery({
-    queryKey: ['todayFixtures'],
+  // Get upcoming home fixtures with entry enabled
+  const { data: upcomingFixtures = [] } = useQuery({
+    queryKey: ['upcomingFixtures'],
     queryFn: async () => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      const now = new Date();
 
       const fixtures = await base44.entities.Fixture.filter({
         entry_enabled: true,
@@ -38,7 +35,7 @@ export default function DayPass() {
 
       return fixtures.filter(f => {
         const fixtureDate = new Date(f.date_time);
-        return fixtureDate >= today && fixtureDate < tomorrow;
+        return fixtureDate > now;
       });
     }
   });
@@ -140,7 +137,7 @@ export default function DayPass() {
             className="w-16 h-16 mb-4 bg-white rounded-full p-2"
           />
           <h1 className="text-white text-2xl font-bold mb-2">Day Pass – $8</h1>
-          <p className="text-blue-200">Single entry to today's home game</p>
+          <p className="text-blue-200">Single entry to upcoming home games</p>
         </div>
       </div>
 
@@ -151,10 +148,10 @@ export default function DayPass() {
           <div className="space-y-3">
             {[
               'Digital QR pass with your photo',
-              'Entry to today\'s home game',
+              'Entry to the selected home game',
               'Special game-day offers & promotions',
               'Exclusive deals from our partners',
-              'Valid until midnight tonight'
+              'Valid on game day only'
             ].map((item, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -166,11 +163,11 @@ export default function DayPass() {
           </div>
         </div>
 
-        {/* Today's Games */}
-        {todayFixtures.length > 0 ? (
+        {/* Upcoming Games */}
+        {upcomingFixtures.length > 0 ? (
           <div className="space-y-4">
-            <h3 className="font-bold text-gray-900">Today's Home Games</h3>
-            {todayFixtures.map((fixture) => (
+            <h3 className="font-bold text-gray-900">Select Your Game</h3>
+            {upcomingFixtures.map((fixture) => (
               <motion.div
                 key={fixture.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -193,7 +190,7 @@ export default function DayPass() {
                   <div className="space-y-2 mb-6">
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Calendar className="w-4 h-4" />
-                      {format(new Date(fixture.date_time), 'h:mm a')}
+                      {format(new Date(fixture.date_time), 'EEE, MMM d • h:mm a')}
                     </div>
                     {fixture.venue && (
                       <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -224,9 +221,9 @@ export default function DayPass() {
         ) : (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
             <Calendar className="w-12 h-12 text-amber-600 mx-auto mb-3" />
-            <h3 className="font-bold text-gray-900 mb-2">No Games Today</h3>
+            <h3 className="font-bold text-gray-900 mb-2">No Upcoming Games</h3>
             <p className="text-sm text-gray-600">
-              Check back on game day to purchase your Day Pass
+              Check back later for upcoming fixtures
             </p>
           </div>
         )}

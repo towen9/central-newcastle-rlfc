@@ -64,6 +64,7 @@ import AdminRewards from './pages/AdminRewards';
 import AdminSMSNotifications from './pages/AdminSMSNotifications';
 import AdminSponsors from './pages/AdminSponsors';
 import AdminTransactions from './pages/AdminTransactions';
+import AdminUsers from './pages/AdminUsers';
 import BarScan from './pages/BarScan';
 import Benefits from './pages/Benefits';
 import CanteenStaffGuide from './pages/CanteenStaffGuide';
@@ -93,7 +94,6 @@ import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
 import TroubleshootingGuide from './pages/TroubleshootingGuide';
-import AdminUsers from './pages/AdminUsers';
 import __Layout from './Layout.jsx';
 
 
@@ -115,6 +115,7 @@ export const PAGES = {
     "AdminSMSNotifications": AdminSMSNotifications,
     "AdminSponsors": AdminSponsors,
     "AdminTransactions": AdminTransactions,
+    "AdminUsers": AdminUsers,
     "BarScan": BarScan,
     "Benefits": Benefits,
     "CanteenStaffGuide": CanteenStaffGuide,
@@ -144,7 +145,6 @@ export const PAGES = {
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
     "TroubleshootingGuide": TroubleshootingGuide,
-    "AdminUsers": AdminUsers,
 }
 
 export const pagesConfig = {
