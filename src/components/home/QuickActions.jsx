@@ -6,8 +6,7 @@ import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 
 const actions = [
-  { icon: QrCode, label: 'Check In', page: 'CheckIn', color: 'bg-blue-500 dark:bg-blue-600' },
-  { icon: Zap, label: 'Scan Bar', page: 'ScanForPoints', color: 'bg-amber-500 dark:bg-amber-600' },
+  { icon: Zap, label: 'Earn Points', page: 'ScanForPoints', color: 'bg-amber-500 dark:bg-amber-600' },
   { icon: Gift, label: 'Rewards', page: 'Rewards', color: 'bg-emerald-500 dark:bg-emerald-600' },
   { icon: Calendar, label: 'Fixtures', page: 'Fixtures', color: 'bg-purple-500 dark:bg-purple-600' },
   { icon: Share2, label: 'Share App', action: 'share', color: 'bg-pink-500 dark:bg-pink-600' },
