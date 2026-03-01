@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { QrCode, Gift, Calendar, Zap, Share2 } from 'lucide-react';
+import { Gift, Calendar, Zap, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
