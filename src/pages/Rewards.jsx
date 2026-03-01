@@ -229,7 +229,7 @@ export default function Rewards() {
           <ProgressRing
             points={points}
             target={nextReward?.points_required || 100}
-            size={220}
+            size={280}
           />
           {nextReward && points < nextReward.points_required && (
             <p className="text-blue-200 text-sm mt-3">
