@@ -92,6 +92,33 @@ export default function Rewards() {
   const availableRedemptions = redemptions.filter(r => r.status === 'available');
   const redeemedRedemptions = redemptions.filter(r => r.status === 'redeemed');
 
+  // Block non-members - must be after all hooks
+  if (user && !membership) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="bg-gradient-to-br from-amber-500 to-orange-500 pt-safe">
+          <div className="px-5 py-4 flex items-center gap-4">
+            <Link to={createPageUrl('Home')}>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </div>
+            </Link>
+          </div>
+        </div>
+        <div className="px-5 py-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+            <Lock className="w-8 h-8 text-amber-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Members Only</h2>
+          <p className="text-gray-600 mb-6">The rewards system is exclusive to membership holders.</p>
+          <Link to={createPageUrl('Membership')}>
+            <Button className="bg-amber-500 hover:bg-amber-600">View Memberships</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
