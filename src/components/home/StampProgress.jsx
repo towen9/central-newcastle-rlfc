@@ -13,7 +13,7 @@ export default function StampProgress({ stamps = 0, points = 0, rewards = [] }) 
   const pointsToNext = nextReward ? (nextReward.points_required || nextReward.stamps_required) - points : 0;
 
   return (
-    <Link to={createPageUrl('PointsRewards')}>
+    <Link to={createPageUrl('Rewards')}>
       <div className="bg-gradient-to-br from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 rounded-xl p-3 shadow-lg text-white">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
