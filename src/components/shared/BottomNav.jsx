@@ -6,7 +6,7 @@ import { createPageUrl } from '@/utils';
 
 const navItems = [
   { icon: Home, label: 'Home', page: 'Home' },
-  { icon: CreditCard, label: 'Pass', page: 'Membership' },
+  { icon: CreditCard, label: 'Membership', page: 'Membership' },
   { icon: Gift, label: 'Benefits', page: 'Benefits' },
   { icon: Award, label: 'Sponsors', page: 'Sponsors' },
   { icon: User, label: 'Profile', page: 'Profile' },
