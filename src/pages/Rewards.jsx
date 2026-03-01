@@ -370,64 +370,9 @@ export default function Rewards() {
                 </div>
               )}
 
-              {/* All rewards progress */}
-              <div>
-                <h2 className="text-base font-bold text-gray-900 mb-3">All Rewards</h2>
-                <div className="space-y-3">
-                  {rewards.map((reward) => {
-                    const canClaim = points >= reward.points_required;
-                    const progress = Math.min((points / reward.points_required) * 100, 100);
-                    const pointsNeeded = Math.max(0, reward.points_required - points);
-
-                    return (
-                      <div
-                        key={reward.id}
-                        className={`bg-white rounded-2xl p-4 border shadow-sm ${canClaim ? 'border-green-200' : 'border-gray-100'}`}
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${canClaim ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
-                            {getRewardIcon(reward.reward_type)}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900 text-sm">{reward.title}</p>
-                            <p className="text-xs text-gray-400">{reward.description}</p>
-                          </div>
-                          <div className={`text-xs font-bold px-2 py-1 rounded-lg ${canClaim ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                            {reward.points_required} pts
-                          </div>
-                        </div>
-                        <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.9, ease: 'easeOut' }}
-                            className={`h-full rounded-full ${canClaim ? 'bg-green-400' : 'bg-blue-400'}`}
-                          />
-                        </div>
-                        <div className="flex justify-between mt-1">
-                          <p className="text-xs text-gray-400">{points} pts</p>
-                          {canClaim ? (
-                            <p className="text-xs text-green-600 font-semibold">Ready!</p>
-                          ) : (
-                            <p className="text-xs text-gray-400">{pointsNeeded} to go</p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {rewards.length === 0 && (
-                    <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
-                      <Trophy className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                      <p className="text-gray-400 text-sm">No rewards configured yet</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
               {/* How Rewards Work link */}
               <div className="text-center pt-2 pb-4">
-                <Link to={createPageUrl('HowPointsWork')} className="text-sm text-blue-500 underline underline-offset-2">
+                <Link to={createPageUrl('HowPointsWork')} className="inline-block bg-white border border-blue-200 text-blue-600 font-semibold text-base px-8 py-4 rounded-2xl shadow-sm">
                   How rewards work →
                 </Link>
               </div>
