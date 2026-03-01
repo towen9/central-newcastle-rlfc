@@ -8,6 +8,60 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { format, addDays } from 'date-fns';
 
+// SVG circular progress ring
+function ProgressRing({ points, target, size = 220 }) {
+  const radius = (size / 2) - 18;
+  const circumference = 2 * Math.PI * radius;
+  const progress = target > 0 ? Math.min(points / target, 1) : 0;
+  const offset = circumference - progress * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="absolute top-0 left-0 -rotate-90">
+        {/* Track */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,0.15)"
+          strokeWidth="12"
+        />
+        {/* Progress */}
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={progress >= 1 ? '#22c55e' : '#f59e0b'}
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+        />
+      </svg>
+      {/* Centre content */}
+      <div className="relative z-10 text-center">
+        <motion.p
+          key={points}
+          initial={{ scale: 1.2, opacity: 0.6 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="text-5xl font-bold text-white leading-none"
+        >
+          {points}
+        </motion.p>
+        <p className="text-blue-200 text-sm mt-1">points</p>
+        {target > 0 && (
+          <p className="text-blue-300 text-xs mt-1">/ {target} for next</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Rewards() {
   const [selectedReward, setSelectedReward] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -90,17 +144,23 @@ export default function Rewards() {
   const points = membership?.points || 0;
   const availableRedemptions = redemptions.filter(r => r.status === 'available');
 
+  // Find the next reward the user is working toward
+  const nextReward = rewards.find(r => r.points_required > points) || rewards[rewards.length - 1] || null;
+  // Find rewards the user can currently claim
+  const claimableRewards = rewards.filter(r => points >= r.points_required);
+  const canRedeem = claimableRewards.length > 0;
+
   const getRewardIcon = (type) => {
     switch(type) {
       case 'beer_mid':
       case 'beer_full':
-        return <Beer className="w-6 h-6" />;
+        return <Beer className="w-5 h-5" />;
       case 'merchandise':
-        return <Gift className="w-6 h-6" />;
+        return <Gift className="w-5 h-5" />;
       case 'prize_draw':
-        return <Ticket className="w-6 h-6" />;
+        return <Ticket className="w-5 h-5" />;
       default:
-        return <Trophy className="w-6 h-6" />;
+        return <Trophy className="w-5 h-5" />;
     }
   };
 
@@ -113,11 +173,11 @@ export default function Rewards() {
     }
   };
 
-  // Non-member gate (after all hooks)
+  // Non-member gate (must be after all hooks)
   if (user && !membership) {
     return (
       <div className="min-h-screen bg-gray-50 pb-24">
-        <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] pt-safe">
+        <div className="bg-[#1a365d] pt-safe">
           <div className="px-5 py-4 flex items-center gap-4">
             <Link to={createPageUrl('Home')}>
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -142,8 +202,8 @@ export default function Rewards() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header */}
-      <div className="bg-[#1a365d] pt-safe">
+      {/* Header + Circle */}
+      <div className="bg-[#1a365d] pt-safe pb-10">
         <div className="px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to={createPageUrl('Home')}>
@@ -153,7 +213,7 @@ export default function Rewards() {
             </Link>
             <div>
               <h1 className="text-white text-xl font-bold">Points & Rewards</h1>
-              <p className="text-blue-200 text-xs">Track your points balance</p>
+              <p className="text-blue-200 text-xs">Your progress toward rewards</p>
             </div>
           </div>
           <button
@@ -164,25 +224,97 @@ export default function Rewards() {
           </button>
         </div>
 
-        {/* Big Points Display */}
-        <div className="px-5 pb-8 pt-2 text-center">
-          <p className="text-blue-200 text-sm mb-1">Your Balance</p>
-          <motion.p
-            key={points}
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            className="text-6xl font-bold text-white"
-          >
-            {points}
-          </motion.p>
-          <p className="text-blue-300 text-base mt-1">Points</p>
+        {/* Progress Circle */}
+        <div className="flex flex-col items-center pt-2 pb-2">
+          <ProgressRing
+            points={points}
+            target={nextReward?.points_required || 100}
+            size={220}
+          />
+          {nextReward && points < nextReward.points_required && (
+            <p className="text-blue-200 text-sm mt-3">
+              {nextReward.points_required - points} more points for <span className="text-white font-semibold">{nextReward.title}</span>
+            </p>
+          )}
+          {canRedeem && (
+            <motion.p
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-green-300 text-sm mt-3 font-semibold"
+            >
+              🎉 You have rewards ready to claim!
+            </motion.p>
+          )}
         </div>
+      </div>
+
+      {/* Redeem Button */}
+      <div className="px-5 -mt-5">
+        <AnimatePresence mode="wait">
+          {canRedeem ? (
+            <motion.div
+              key="active"
+              initial={{ scale: 0.97, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {/* If multiple claimable, show a selector; otherwise direct claim */}
+              {claimableRewards.length === 1 ? (
+                <button
+                  onClick={() => setSelectedReward(claimableRewards[0])}
+                  className="w-full py-4 rounded-2xl font-bold text-lg text-white shadow-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, #16a34a, #22c55e)',
+                    boxShadow: '0 0 24px rgba(34,197,94,0.4)'
+                  }}
+                >
+                  Redeem — {claimableRewards[0].title}
+                </button>
+              ) : (
+                <div className="bg-white rounded-2xl shadow-lg border border-green-200 overflow-hidden">
+                  <div className="bg-green-500 px-4 py-3 text-center" style={{ boxShadow: '0 0 20px rgba(34,197,94,0.3)' }}>
+                    <p className="text-white font-bold text-base">Redeem a Reward</p>
+                    <p className="text-green-100 text-xs">Choose one below</p>
+                  </div>
+                  <div className="divide-y divide-gray-50">
+                    {claimableRewards.map(reward => (
+                      <button
+                        key={reward.id}
+                        onClick={() => setSelectedReward(reward)}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 transition-colors text-left"
+                      >
+                        <div className="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center text-green-600">
+                          {getRewardIcon(reward.reward_type)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900 text-sm">{reward.title}</p>
+                          <p className="text-xs text-gray-400">{reward.points_required} pts</p>
+                        </div>
+                        <span className="text-green-500 text-sm font-bold">Claim →</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div key="locked" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <button
+                disabled
+                className="w-full py-4 rounded-2xl font-bold text-lg text-gray-400 bg-gray-200 cursor-not-allowed"
+              >
+                <Lock className="w-5 h-5 inline mr-2 opacity-60" />
+                Not enough points to redeem
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="px-4 py-5 space-y-4">
         <AnimatePresence mode="wait">
           {showHistory ? (
-            /* ---- ACTIVITY HISTORY ---- */
+            /* Activity History */
             <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <h2 className="text-lg font-bold text-gray-900 mb-3">Points Activity</h2>
               <div className="bg-white rounded-2xl divide-y divide-gray-50 shadow-sm">
@@ -206,19 +338,19 @@ export default function Rewards() {
           ) : (
             <motion.div key="rewards" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
 
-              {/* Unlocked Rewards */}
+              {/* Unlocked / pending codes */}
               {availableRedemptions.length > 0 && (
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 mb-3">🎉 Ready to Redeem</h2>
+                  <h2 className="text-base font-bold text-gray-900 mb-3">🎉 Ready to Use</h2>
                   <div className="space-y-3">
                     {availableRedemptions.map((redemption) => (
                       <div key={redemption.id} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                          <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center">
                             <CheckCircle className="w-5 h-5 text-emerald-500" />
                           </div>
                           <div className="flex-1">
-                            <p className="font-semibold text-gray-900">{redemption.reward_title}</p>
+                            <p className="font-semibold text-gray-900 text-sm">{redemption.reward_title}</p>
                             {redemption.expires_at && (
                               <p className="text-xs text-gray-500 flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
@@ -238,9 +370,9 @@ export default function Rewards() {
                 </div>
               )}
 
-              {/* Rewards Progress */}
+              {/* All rewards progress */}
               <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-3">Rewards Progress</h2>
+                <h2 className="text-base font-bold text-gray-900 mb-3">All Rewards</h2>
                 <div className="space-y-3">
                   {rewards.map((reward) => {
                     const canClaim = points >= reward.points_required;
@@ -250,50 +382,36 @@ export default function Rewards() {
                     return (
                       <div
                         key={reward.id}
-                        className={`bg-white rounded-2xl p-4 border shadow-sm ${canClaim ? 'border-amber-200' : 'border-gray-100'}`}
+                        className={`bg-white rounded-2xl p-4 border shadow-sm ${canClaim ? 'border-green-200' : 'border-gray-100'}`}
                       >
                         <div className="flex items-center gap-3 mb-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${canClaim ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'}`}>
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${canClaim ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                             {getRewardIcon(reward.reward_type)}
                           </div>
                           <div className="flex-1">
-                            <p className="font-semibold text-gray-900">{reward.title}</p>
-                            <p className="text-xs text-gray-500">{reward.description}</p>
+                            <p className="font-semibold text-gray-900 text-sm">{reward.title}</p>
+                            <p className="text-xs text-gray-400">{reward.description}</p>
                           </div>
-                          <div className={`text-sm font-bold px-2 py-1 rounded-lg ${canClaim ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'}`}>
+                          <div className={`text-xs font-bold px-2 py-1 rounded-lg ${canClaim ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                             {reward.points_required} pts
                           </div>
                         </div>
-
-                        {/* Progress Bar */}
-                        <div className="mb-2">
-                          <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${progress}%` }}
-                              transition={{ duration: 0.8, ease: 'easeOut' }}
-                              className={`h-full rounded-full ${canClaim ? 'bg-amber-400' : 'bg-blue-400'}`}
-                            />
-                          </div>
-                          <div className="flex justify-between mt-1">
-                            <p className="text-xs text-gray-400">{points} pts</p>
-                            <p className="text-xs text-gray-400">{reward.points_required} pts</p>
-                          </div>
+                        <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.9, ease: 'easeOut' }}
+                            className={`h-full rounded-full ${canClaim ? 'bg-green-400' : 'bg-blue-400'}`}
+                          />
                         </div>
-
-                        {canClaim ? (
-                          <Button
-                            size="sm"
-                            className="w-full bg-amber-500 hover:bg-amber-600 mt-1"
-                            onClick={() => setSelectedReward(reward)}
-                          >
-                            <Gift className="w-4 h-4 mr-2" /> Claim Reward
-                          </Button>
-                        ) : (
-                          <p className="text-xs text-center text-gray-400 mt-1">
-                            {pointsNeeded} more points needed
-                          </p>
-                        )}
+                        <div className="flex justify-between mt-1">
+                          <p className="text-xs text-gray-400">{points} pts</p>
+                          {canClaim ? (
+                            <p className="text-xs text-green-600 font-semibold">Ready!</p>
+                          ) : (
+                            <p className="text-xs text-gray-400">{pointsNeeded} to go</p>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -301,10 +419,17 @@ export default function Rewards() {
                   {rewards.length === 0 && (
                     <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
                       <Trophy className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                      <p className="text-gray-400">No rewards configured yet</p>
+                      <p className="text-gray-400 text-sm">No rewards configured yet</p>
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* How Rewards Work link */}
+              <div className="text-center pt-2 pb-4">
+                <Link to={createPageUrl('HowPointsWork')} className="text-sm text-blue-500 underline underline-offset-2">
+                  How rewards work →
+                </Link>
               </div>
             </motion.div>
           )}
@@ -329,39 +454,39 @@ export default function Rewards() {
               className="bg-white rounded-3xl p-6 max-w-md w-full"
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-xl font-bold text-gray-900">Claim Reward</h3>
+                <h3 className="text-xl font-bold text-gray-900">Are you sure?</h3>
                 <button onClick={() => setSelectedReward(null)}>
                   <X className="w-6 h-6 text-gray-400" />
                 </button>
               </div>
 
               <div className="text-center mb-5">
-                <div className="w-16 h-16 mx-auto mb-3 bg-amber-100 rounded-2xl flex items-center justify-center">
-                  <Gift className="w-8 h-8 text-amber-500" />
+                <div className="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-2xl flex items-center justify-center">
+                  <Gift className="w-8 h-8 text-green-500" />
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-1">{selectedReward.title}</h4>
-                <p className="text-gray-500 text-sm">{selectedReward.description}</p>
+                <p className="text-gray-600 text-sm mb-1">Are you sure you want to redeem your points?</p>
+                <h4 className="text-lg font-bold text-gray-900">{selectedReward.title}</h4>
               </div>
 
-              <div className="bg-amber-50 rounded-xl p-4 mb-5 space-y-2">
+              <div className="bg-gray-50 rounded-xl p-4 mb-5 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-amber-700">Cost</span>
-                  <span className="font-bold text-amber-700">{selectedReward.points_required} pts</span>
+                  <span className="text-gray-600">Cost</span>
+                  <span className="font-bold text-gray-800">{selectedReward.points_required} pts</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-amber-700">Balance after</span>
-                  <span className="font-bold text-amber-700">{points - selectedReward.points_required} pts</span>
+                  <span className="text-gray-600">Balance after</span>
+                  <span className="font-bold text-gray-800">{points - selectedReward.points_required} pts</span>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => setSelectedReward(null)}>Cancel</Button>
                 <Button
-                  className="flex-1 bg-amber-500 hover:bg-amber-600"
+                  className="flex-1 bg-green-500 hover:bg-green-600"
                   onClick={() => claimMutation.mutate(selectedReward)}
                   disabled={claimMutation.isPending}
                 >
-                  {claimMutation.isPending ? 'Claiming...' : 'Confirm'}
+                  {claimMutation.isPending ? 'Redeeming...' : 'Confirm'}
                 </Button>
               </div>
             </motion.div>
