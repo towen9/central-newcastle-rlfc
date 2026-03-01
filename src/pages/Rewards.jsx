@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Gift, Lock, CheckCircle, Star, Clock, Ticket, X } from 'lucide-react';
+import { ArrowLeft, Gift, Lock, Star, Zap, History, CheckCircle, Clock, X, Beer, Ticket, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format, addDays } from 'date-fns';
 
 export default function Rewards() {
-  const [activeTab, setActiveTab] = useState('available');
   const [selectedReward, setSelectedReward] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
 
@@ -38,6 +37,12 @@ export default function Rewards() {
     queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required')
   });
 
+  const { data: transactions = [] } = useQuery({
+    queryKey: ['pointsTransactions', membership?.id],
+    queryFn: () => base44.entities.PointsTransaction.filter({ membership_id: membership.id }, '-timestamp', 30),
+    enabled: !!membership?.id
+  });
+
   const { data: redemptions = [] } = useQuery({
     queryKey: ['myRedemptions', user?.id],
     queryFn: () => base44.entities.RewardRedemption.filter({ user_id: user?.id }, '-created_date'),
@@ -47,9 +52,7 @@ export default function Rewards() {
   const claimMutation = useMutation({
     mutationFn: async (reward) => {
       const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-      const expiresAt = reward.expiry_days 
-        ? addDays(new Date(), reward.expiry_days).toISOString() 
-        : null;
+      const expiresAt = reward.expiry_days ? addDays(new Date(), reward.expiry_days).toISOString() : null;
 
       await base44.entities.RewardRedemption.create({
         user_id: user.id,
@@ -62,12 +65,10 @@ export default function Rewards() {
         redemption_code: code
       });
 
-      // Deduct points
       await base44.entities.Membership.update(membership.id, {
         points: Math.max(0, (membership.points || 0) - reward.points_required)
       });
 
-      // Create points transaction
       await base44.entities.PointsTransaction.create({
         user_id: user.id,
         membership_id: membership.id,
@@ -77,26 +78,46 @@ export default function Rewards() {
         related_id: reward.id,
         timestamp: new Date().toISOString()
       });
-
-      return code;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['membership']);
       queryClient.invalidateQueries(['myRedemptions']);
+      queryClient.invalidateQueries(['pointsTransactions']);
       setSelectedReward(null);
     }
   });
 
   const points = membership?.points || 0;
-  
   const availableRedemptions = redemptions.filter(r => r.status === 'available');
-  const redeemedRedemptions = redemptions.filter(r => r.status === 'redeemed');
 
-  // Block non-members - must be after all hooks
+  const getRewardIcon = (type) => {
+    switch(type) {
+      case 'beer_mid':
+      case 'beer_full':
+        return <Beer className="w-6 h-6" />;
+      case 'merchandise':
+        return <Gift className="w-6 h-6" />;
+      case 'prize_draw':
+        return <Ticket className="w-6 h-6" />;
+      default:
+        return <Trophy className="w-6 h-6" />;
+    }
+  };
+
+  const getTransactionIcon = (type, pts) => {
+    if (pts < 0) return <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center"><Gift className="w-4 h-4 text-red-500" /></div>;
+    switch(type) {
+      case 'attendance': return <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"><Zap className="w-4 h-4 text-blue-500" /></div>;
+      case 'bar_purchase': return <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center"><Beer className="w-4 h-4 text-amber-500" /></div>;
+      default: return <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"><Star className="w-4 h-4 text-gray-500" /></div>;
+    }
+  };
+
+  // Non-member gate (after all hooks)
   if (user && !membership) {
     return (
       <div className="min-h-screen bg-gray-50 pb-24">
-        <div className="bg-gradient-to-br from-amber-500 to-orange-500 pt-safe">
+        <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] pt-safe">
           <div className="px-5 py-4 flex items-center gap-4">
             <Link to={createPageUrl('Home')}>
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -106,13 +127,13 @@ export default function Rewards() {
           </div>
         </div>
         <div className="px-5 py-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
-            <Lock className="w-8 h-8 text-amber-600" />
+          <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+            <Lock className="w-8 h-8 text-blue-600" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Members Only</h2>
           <p className="text-gray-600 mb-6">The rewards system is exclusive to membership holders.</p>
           <Link to={createPageUrl('Membership')}>
-            <Button className="bg-amber-500 hover:bg-amber-600">View Memberships</Button>
+            <Button className="bg-[#1a365d] hover:bg-[#2c5282]">View Memberships</Button>
           </Link>
         </div>
       </div>
@@ -122,203 +143,175 @@ export default function Rewards() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-amber-500 to-orange-500 pt-safe">
-        <div className="px-5 py-4 flex items-center gap-4">
-          <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-white" />
+      <div className="bg-[#1a365d] pt-safe">
+        <div className="px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link to={createPageUrl('Home')}>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </div>
+            </Link>
+            <div>
+              <h1 className="text-white text-xl font-bold">Points & Rewards</h1>
+              <p className="text-blue-200 text-xs">Track your points balance</p>
             </div>
-          </Link>
-          <div className="flex-1">
-            <h1 className="text-white text-xl font-bold">Rewards</h1>
-            <p className="text-white/80 text-sm">Earn points, unlock rewards</p>
           </div>
-          <div className="text-right">
-            <p className="text-white/80 text-xs">Your Points</p>
-            <p className="text-white text-2xl font-bold">{points}</p>
-          </div>
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${showHistory ? 'bg-white/30' : 'bg-white/10'}`}
+          >
+            <History className="w-5 h-5 text-white" />
+          </button>
+        </div>
+
+        {/* Big Points Display */}
+        <div className="px-5 pb-8 pt-2 text-center">
+          <p className="text-blue-200 text-sm mb-1">Your Balance</p>
+          <motion.p
+            key={points}
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            className="text-6xl font-bold text-white"
+          >
+            {points}
+          </motion.p>
+          <p className="text-blue-300 text-base mt-1">Points</p>
         </div>
       </div>
 
-      <div className="px-5 py-6">
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="w-full bg-white border border-gray-200">
-            <TabsTrigger value="available" className="flex-1">Earn</TabsTrigger>
-            <TabsTrigger value="unlocked" className="flex-1">
-              Unlocked {availableRedemptions.length > 0 && `(${availableRedemptions.length})`}
-            </TabsTrigger>
-            <TabsTrigger value="history" className="flex-1">History</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
+      <div className="px-4 py-5 space-y-4">
         <AnimatePresence mode="wait">
-          {activeTab === 'available' && (
-            <motion.div
-              key="available"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-4"
-            >
-              {rewards.map((reward, idx) => {
-                const canClaim = points >= reward.points_required;
-                const progress = Math.min((points / reward.points_required) * 100, 100);
-                
-                return (
-                  <motion.div
-                    key={reward.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className={`bg-white rounded-2xl p-4 border ${
-                      canClaim ? 'border-amber-200 shadow-lg shadow-amber-100' : 'border-gray-100'
-                    }`}
-                  >
-                    <div className="flex gap-4">
-                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                        canClaim ? 'bg-amber-100' : 'bg-gray-100'
-                      }`}>
-                        {canClaim ? (
-                          <Gift className="w-7 h-7 text-amber-500" />
-                        ) : (
-                          <Lock className="w-6 h-6 text-gray-400" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-gray-900">{reward.title}</h3>
-                            <p className="text-sm text-gray-500">{reward.description}</p>
+          {showHistory ? (
+            /* ---- ACTIVITY HISTORY ---- */
+            <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <h2 className="text-lg font-bold text-gray-900 mb-3">Points Activity</h2>
+              <div className="bg-white rounded-2xl divide-y divide-gray-50 shadow-sm">
+                {transactions.length === 0 && (
+                  <p className="text-center text-gray-500 py-10">No activity yet</p>
+                )}
+                {transactions.map((tx) => (
+                  <div key={tx.id} className="flex items-center gap-3 px-4 py-3">
+                    {getTransactionIcon(tx.transaction_type, tx.points)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{tx.description}</p>
+                      <p className="text-xs text-gray-400">{tx.timestamp ? format(new Date(tx.timestamp), 'dd MMM yyyy, h:mm a') : ''}</p>
+                    </div>
+                    <p className={`text-base font-bold ${tx.points >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      {tx.points >= 0 ? '+' : ''}{tx.points}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key="rewards" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+
+              {/* Unlocked Rewards */}
+              {availableRedemptions.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900 mb-3">🎉 Ready to Redeem</h2>
+                  <div className="space-y-3">
+                    {availableRedemptions.map((redemption) => (
+                      <div key={redemption.id} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                            <CheckCircle className="w-5 h-5 text-emerald-500" />
                           </div>
-                          <div className={`px-2 py-1 rounded-lg text-xs font-bold ${
-                            canClaim ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
-                          }`}>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{redemption.reward_title}</p>
+                            {redemption.expires_at && (
+                              <p className="text-xs text-gray-500 flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                Expires {format(new Date(redemption.expires_at), 'MMM d, yyyy')}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="bg-white rounded-xl p-3 text-center">
+                          <p className="text-xs text-gray-400 mb-1">Redemption Code</p>
+                          <p className="font-mono text-2xl font-bold text-gray-900 tracking-widest">{redemption.redemption_code}</p>
+                        </div>
+                        <p className="text-xs text-gray-400 text-center mt-2">Show this to staff at the club</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rewards Progress */}
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-3">Rewards Progress</h2>
+                <div className="space-y-3">
+                  {rewards.map((reward) => {
+                    const canClaim = points >= reward.points_required;
+                    const progress = Math.min((points / reward.points_required) * 100, 100);
+                    const pointsNeeded = Math.max(0, reward.points_required - points);
+
+                    return (
+                      <div
+                        key={reward.id}
+                        className={`bg-white rounded-2xl p-4 border shadow-sm ${canClaim ? 'border-amber-200' : 'border-gray-100'}`}
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${canClaim ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'}`}>
+                            {getRewardIcon(reward.reward_type)}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{reward.title}</p>
+                            <p className="text-xs text-gray-500">{reward.description}</p>
+                          </div>
+                          <div className={`text-sm font-bold px-2 py-1 rounded-lg ${canClaim ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'}`}>
                             {reward.points_required} pts
                           </div>
                         </div>
-                        
-                        {/* Progress bar */}
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
-                          <div 
-                            className={`h-full rounded-full transition-all ${
-                              canClaim ? 'bg-amber-500' : 'bg-gray-300'
-                            }`}
-                            style={{ width: `${progress}%` }}
-                          />
+
+                        {/* Progress Bar */}
+                        <div className="mb-2">
+                          <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${progress}%` }}
+                              transition={{ duration: 0.8, ease: 'easeOut' }}
+                              className={`h-full rounded-full ${canClaim ? 'bg-amber-400' : 'bg-blue-400'}`}
+                            />
+                          </div>
+                          <div className="flex justify-between mt-1">
+                            <p className="text-xs text-gray-400">{points} pts</p>
+                            <p className="text-xs text-gray-400">{reward.points_required} pts</p>
+                          </div>
                         </div>
 
                         {canClaim ? (
-                          <Button 
+                          <Button
                             size="sm"
-                            className="bg-amber-500 hover:bg-amber-600"
+                            className="w-full bg-amber-500 hover:bg-amber-600 mt-1"
                             onClick={() => setSelectedReward(reward)}
                           >
-                            Claim Reward
+                            <Gift className="w-4 h-4 mr-2" /> Claim Reward
                           </Button>
                         ) : (
-                          <p className="text-sm text-gray-500">
-                            {reward.points_required - points} more points needed
+                          <p className="text-xs text-center text-gray-400 mt-1">
+                            {pointsNeeded} more points needed
                           </p>
                         )}
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          )}
+                    );
+                  })}
 
-          {activeTab === 'unlocked' && (
-            <motion.div
-              key="unlocked"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-4"
-            >
-              {availableRedemptions.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Ticket className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">No rewards yet</h3>
-                  <p className="text-sm text-gray-500">Earn points to unlock rewards</p>
+                  {rewards.length === 0 && (
+                    <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
+                      <Trophy className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                      <p className="text-gray-400">No rewards configured yet</p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                availableRedemptions.map((redemption) => (
-                  <div 
-                    key={redemption.id}
-                    className="bg-white rounded-2xl p-4 border border-emerald-200 shadow-lg shadow-emerald-50"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                          <Gift className="w-6 h-6 text-emerald-500" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{redemption.reward_title}</h3>
-                          {redemption.expires_at && (
-                            <p className="text-xs text-gray-500 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              Expires {format(new Date(redemption.expires_at), 'MMM d, yyyy')}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gray-50 rounded-xl p-4 text-center mb-3">
-                      <p className="text-xs text-gray-500 mb-1">Redemption Code</p>
-                      <p className="font-mono text-2xl font-bold text-gray-900 tracking-wider">
-                        {redemption.redemption_code}
-                      </p>
-                    </div>
-                    
-                    <p className="text-xs text-gray-500 text-center">
-                      Show this code to redeem at the club
-                    </p>
-                  </div>
-                ))
-              )}
-            </motion.div>
-          )}
-
-          {activeTab === 'history' && (
-            <motion.div
-              key="history"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-3"
-            >
-              {redeemedRedemptions.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">No redeemed rewards yet</p>
-                </div>
-              ) : (
-                redeemedRedemptions.map((redemption) => (
-                  <div key={redemption.id} className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <CheckCircle className="w-5 h-5 text-gray-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{redemption.reward_title}</p>
-                        <p className="text-sm text-gray-500">
-                          Redeemed {redemption.redeemed_at ? format(new Date(redemption.redeemed_at), 'MMM d, yyyy') : ''}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Claim Modal */}
+      {/* Claim Confirmation Modal */}
       <AnimatePresence>
         {selectedReward && (
           <motion.div
@@ -335,41 +328,35 @@ export default function Rewards() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl p-6 max-w-md w-full"
             >
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-5">
                 <h3 className="text-xl font-bold text-gray-900">Claim Reward</h3>
                 <button onClick={() => setSelectedReward(null)}>
                   <X className="w-6 h-6 text-gray-400" />
                 </button>
               </div>
 
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-2xl flex items-center justify-center">
+              <div className="text-center mb-5">
+                <div className="w-16 h-16 mx-auto mb-3 bg-amber-100 rounded-2xl flex items-center justify-center">
                   <Gift className="w-8 h-8 text-amber-500" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-1">{selectedReward.title}</h4>
-                <p className="text-gray-500">{selectedReward.description}</p>
+                <p className="text-gray-500 text-sm">{selectedReward.description}</p>
               </div>
 
-              <div className="bg-amber-50 rounded-xl p-4 mb-6">
-                <div className="flex items-center justify-between">
+              <div className="bg-amber-50 rounded-xl p-4 mb-5 space-y-2">
+                <div className="flex justify-between text-sm">
                   <span className="text-amber-700">Cost</span>
-                  <span className="font-bold text-amber-700">{selectedReward.points_required} points</span>
+                  <span className="font-bold text-amber-700">{selectedReward.points_required} pts</span>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-amber-700">Your points after</span>
-                  <span className="font-bold text-amber-700">{points - selectedReward.points_required}</span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-amber-700">Balance after</span>
+                  <span className="font-bold text-amber-700">{points - selectedReward.points_required} pts</span>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={() => setSelectedReward(null)}
-                >
-                  Cancel
-                </Button>
-                <Button 
+                <Button variant="outline" className="flex-1" onClick={() => setSelectedReward(null)}>Cancel</Button>
+                <Button
                   className="flex-1 bg-amber-500 hover:bg-amber-600"
                   onClick={() => claimMutation.mutate(selectedReward)}
                   disabled={claimMutation.isPending}
