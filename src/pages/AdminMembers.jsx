@@ -356,8 +356,8 @@ export default function AdminMembers() {
               <TableHead>Tier</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Expiry</TableHead>
-              <TableHead>Stamps</TableHead>
-              <TableHead>Check-ins</TableHead>
+              <TableHead>Points</TableHead>
+              <TableHead>Games</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
