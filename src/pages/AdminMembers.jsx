@@ -271,7 +271,7 @@ export default function AdminMembers() {
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]">
+            <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -280,6 +280,17 @@ export default function AdminMembers() {
               <SelectItem value="expired">Expired</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={tierFilter} onValueChange={setTierFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Tier" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Tiers</SelectItem>
+              <SelectItem value="Supporter Pack">Supporter Pack</SelectItem>
+              <SelectItem value="Family Membership">Family Membership</SelectItem>
+              <SelectItem value="Premium Membership">Premium Membership</SelectItem>
             </SelectContent>
           </Select>
           <DropdownMenu>
