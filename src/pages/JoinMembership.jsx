@@ -2,11 +2,39 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Check, Loader2, ArrowLeft } from 'lucide-react';
+import { Check, Loader2, ArrowLeft, Star, Users, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+
+const tierConfig = {
+  'Supporter Pack': {
+    gradient: 'from-[#1a365d] to-[#2b6cb0]',
+    icon: Shield,
+    iconColor: 'text-blue-300',
+    badge: 'bg-blue-100 text-blue-800',
+    badgeLabel: '5 GAME PACK',
+    buttonClass: 'bg-[#1a365d] hover:bg-[#2c5282]',
+  },
+  'Family Membership': {
+    gradient: 'from-[#4c1d95] to-[#7c3aed]',
+    icon: Users,
+    iconColor: 'text-purple-300',
+    badge: 'bg-purple-100 text-purple-800',
+    badgeLabel: 'FAMILY PASS',
+    buttonClass: 'bg-[#5b21b6] hover:bg-[#4c1d95]',
+  },
+  'Premium Membership': {
+    gradient: 'from-[#78350f] to-[#b45309]',
+    icon: Star,
+    iconColor: 'text-amber-300',
+    badge: 'bg-amber-100 text-amber-800',
+    badgeLabel: 'PREMIUM',
+    buttonClass: 'bg-[#92400e] hover:bg-[#78350f]',
+    featured: true,
+  },
+};
 
 export default function JoinMembership() {
   const [selectedTier, setSelectedTier] = useState(null);
@@ -36,7 +64,6 @@ export default function JoinMembership() {
     setProcessing(true);
 
     try {
-      // Check if running in iframe
       if (window.self !== window.top) {
         toast.error('Please open this page in a new tab to complete checkout');
         setProcessing(false);
@@ -77,8 +104,8 @@ export default function JoinMembership() {
               Back
             </button>
           </Link>
-          <h1 className="text-white text-2xl font-bold mb-2">Join as a Member</h1>
-          <p className="text-blue-200">Choose your membership tier</p>
+          <h1 className="text-white text-2xl font-bold mb-1">2026 Memberships</h1>
+          <p className="text-blue-200 text-sm">Choose your tier for the season</p>
         </div>
       </div>
 
@@ -95,54 +122,79 @@ export default function JoinMembership() {
           </div>
         )}
 
-        <div className="space-y-4">
-          {tiers.map((tier) => (
-            <motion.div
-              key={tier.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden hover:border-blue-400 transition-colors"
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">{tier.name}</h3>
-                    <p className="text-gray-600 text-sm mt-1">{tier.description}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-bold text-[#1a365d]">${tier.price}</p>
-                    <p className="text-xs text-gray-500">per {tier.price_period}</p>
-                  </div>
-                </div>
+        <div className="space-y-5">
+          {tiers.map((tier, idx) => {
+            const config = tierConfig[tier.name] || tierConfig['Supporter Pack'];
+            const Icon = config.icon;
+            const isFeatured = config.featured;
 
-                <div className="space-y-2 mb-6">
-                  {tier.benefits?.map((benefit, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Check className="w-3 h-3 text-emerald-600" />
+            return (
+              <motion.div
+                key={tier.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className={`relative rounded-2xl overflow-hidden shadow-lg ${isFeatured ? 'ring-2 ring-amber-400' : 'border border-gray-100'}`}
+              >
+                {isFeatured && (
+                  <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-bl-xl z-10">
+                    ★ BEST VALUE
+                  </div>
+                )}
+
+                {/* Tier Header */}
+                <div className={`bg-gradient-to-r ${config.gradient} p-5`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Icon className={`w-5 h-5 ${config.iconColor}`} />
                       </div>
-                      <span>{benefit}</span>
+                      <div>
+                        <h3 className="text-white text-lg font-bold">{tier.name}</h3>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${config.badge}`}>
+                          {config.badgeLabel}
+                        </span>
+                      </div>
                     </div>
-                  ))}
+                    <div className="text-right">
+                      <p className="text-white text-3xl font-bold">${tier.price}</p>
+                      <p className="text-white/60 text-xs">per {tier.price_period}</p>
+                    </div>
+                  </div>
+                  <p className="text-white/80 text-sm mt-3">{tier.description}</p>
                 </div>
 
-                <Button
-                  onClick={() => handlePurchase(tier)}
-                  disabled={processing || !user?.photo_url}
-                  className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6"
-                >
-                  {processing && selectedTier?.id === tier.id ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    `Join for $${tier.price}`
-                  )}
-                </Button>
-              </div>
-            </motion.div>
-          ))}
+                {/* Benefits */}
+                <div className="bg-white p-5">
+                  <div className="space-y-2 mb-5">
+                    {tier.benefits?.map((benefit, bidx) => (
+                      <div key={bidx} className="flex items-start gap-2 text-sm text-gray-700">
+                        <div className="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 text-emerald-600" />
+                        </div>
+                        <span>{benefit}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button
+                    onClick={() => handlePurchase(tier)}
+                    disabled={processing || !user?.photo_url}
+                    className={`w-full py-6 text-base font-semibold ${config.buttonClass} text-white`}
+                  >
+                    {processing && selectedTier?.id === tier.id ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      `Join for $${tier.price} →`
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         <div className="mt-8 bg-blue-50 rounded-xl p-4">
