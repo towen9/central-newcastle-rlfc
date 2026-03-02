@@ -72,7 +72,8 @@ export default function AdminMembers() {
       m.user_name?.toLowerCase().includes(search.toLowerCase()) ||
       m.user_email?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || m.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesTier = tierFilter === 'all' || m.tier_name === tierFilter;
+    return matchesSearch && matchesStatus && matchesTier;
   });
 
   const statusColors = {
