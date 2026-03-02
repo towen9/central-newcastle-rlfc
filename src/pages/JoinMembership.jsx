@@ -26,11 +26,15 @@ export default function JoinMembership() {
     queryFn: () => base44.entities.MembershipTier.filter({ is_active: true, is_admin_only: false }, 'sort_order')
   });
 
-  // Stripe price IDs (from setup)
+  // Stripe price IDs mapped to tier names
   const stripePriceMap = {
     'Central ~ Charlestown Member': 'price_1SzmSnLgCWdDbHyljAjksGY9',
     'Family Season Pass': 'price_1SzmSnLgCWdDbHylNiYsILRQ',
-    'Supporter Pack': 'price_1SzmSnLgCWdDbHylFLsGSW4g'
+    'Supporter Pack': 'price_1SzmSnLgCWdDbHylFLsGSW4g',
+    'Adult Supporter Membership': 'price_1SzTLGLgCWdDbHyljJy4zwQK',
+    'Family Membership': 'price_1SzTLGLgCWdDbHylVwULN89v',
+    'Junior Player Membership': 'price_1SzTLGLgCWdDbHylLsK4GBqn',
+    'Senior Player Membership': 'price_1SzTLGLgCWdDbHylxb9IjKYw'
   };
 
   const handlePurchase = async (tier) => {
