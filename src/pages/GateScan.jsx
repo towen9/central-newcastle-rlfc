@@ -343,6 +343,16 @@ export default function GateScan() {
                       {membershipData.expiry_date ? format(new Date(membershipData.expiry_date), 'MMM d, yyyy') : 'N/A'}
                     </p>
                   </div>
+                  {membershipData.tier_name?.includes('Supporter Pack') && (
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-sm text-gray-500">Games Remaining</p>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        (membershipData.games_remaining ?? 5) > 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'
+                      }`}>
+                        {membershipData.games_remaining ?? 5} / 5
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
