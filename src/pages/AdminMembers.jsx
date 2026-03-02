@@ -320,7 +320,7 @@ export default function AdminMembers() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Total</p>
           <p className="text-2xl font-bold text-gray-900">{memberships.length}</p>
@@ -330,12 +330,20 @@ export default function AdminMembers() {
           <p className="text-2xl font-bold text-emerald-600">{memberships.filter(m => m.status === 'active').length}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-sm text-gray-500">Expired</p>
-          <p className="text-2xl font-bold text-red-600">{memberships.filter(m => m.status === 'expired').length}</p>
+          <p className="text-sm text-gray-500">Supporter</p>
+          <p className="text-2xl font-bold text-blue-600">{memberships.filter(m => m.tier_name === 'Supporter Pack').length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Family</p>
+          <p className="text-2xl font-bold text-purple-600">{memberships.filter(m => m.tier_name === 'Family Membership').length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Premium</p>
+          <p className="text-2xl font-bold text-amber-600">{memberships.filter(m => m.tier_name === 'Premium Membership').length}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Pending</p>
-          <p className="text-2xl font-bold text-amber-600">{memberships.filter(m => m.status === 'pending').length}</p>
+          <p className="text-2xl font-bold text-red-600">{memberships.filter(m => m.status === 'pending').length}</p>
         </div>
       </div>
 
