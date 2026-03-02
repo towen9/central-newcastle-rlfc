@@ -380,9 +380,17 @@ export default function AdminMembers() {
                   {membership.expiry_date ? format(new Date(membership.expiry_date), 'MMM d, yyyy') : '-'}
                 </TableCell>
                 <TableCell>
-                  <span className="font-semibold text-amber-600">{membership.stamps || 0}</span>
+                  <span className="font-semibold text-amber-600">{membership.points || 0}</span>
                 </TableCell>
-                <TableCell>{membership.total_checkins || 0}</TableCell>
+                <TableCell>
+                  {membership.tier_name?.includes('Supporter Pack') ? (
+                    <span className={`font-semibold ${(membership.games_remaining ?? 5) === 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                      {membership.games_remaining ?? 5}/5 left
+                    </span>
+                  ) : (
+                    <span className="text-gray-600">{membership.games_used || 0} attended</span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {membership.status === 'pending' && (
