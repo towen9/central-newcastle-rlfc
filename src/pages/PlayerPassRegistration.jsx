@@ -190,16 +190,6 @@ export default function PlayerPassRegistration() {
             />
           </div>
 
-          <div>
-            <Label htmlFor="player_number">Player Number (Optional)</Label>
-            <Input
-              id="player_number"
-              value={formData.player_number}
-              onChange={(e) => setFormData({ ...formData, player_number: e.target.value })}
-              placeholder="Your jersey number"
-            />
-          </div>
-
           <Button
             type="submit"
             disabled={registrationMutation.isPending}
