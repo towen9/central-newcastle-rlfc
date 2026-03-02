@@ -55,6 +55,10 @@ Deno.serve(async (req) => {
         expiryDate.setFullYear(expiryDate.getFullYear() + 100);
       }
 
+      // Determine games_remaining for Supporter Pack
+      const isSupporter = tierData.name === 'Supporter Pack';
+      const gamesIncluded = tierData.games_included || 0;
+
       // Create membership
       const membership = await base44.asServiceRole.entities.Membership.create({
         user_id: user_id,
@@ -68,10 +72,13 @@ Deno.serve(async (req) => {
         qr_code_id: `M${Date.now()}${Math.random().toString(36).substr(2, 9)}`,
         payment_id: session.payment_intent,
         stamps: 0,
-        total_checkins: 0
+        points: 0,
+        total_checkins: 0,
+        games_used: 0,
+        ...(isSupporter && { games_remaining: gamesIncluded || 5 })
       });
 
-      console.log('Membership created:', membership.id);
+      console.log('Membership created:', membership.id, '| Tier:', tierData.name);
     }
 
     return Response.json({ received: true });
