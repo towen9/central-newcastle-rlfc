@@ -38,6 +38,17 @@ export default function GateScan() {
 
   const checkInMutation = useMutation({
     mutationFn: async ({ membershipId, userId, membership }) => {
+      const isSupporter = membership.tier_name?.includes('Supporter Pack');
+      const isFamilyOrPremium = membership.tier_name?.includes('Family') || membership.tier_name?.includes('Premium');
+      
+      // Block Supporter Pack if no games remaining
+      if (isSupporter) {
+        const remaining = membership.games_remaining ?? 5;
+        if (remaining <= 0) {
+          throw new Error('All 5 game entries have been used for this Supporter Pack');
+        }
+      }
+
       const checkIn = await base44.entities.CheckIn.create({
         user_id: userId,
         membership_id: membershipId,
@@ -45,36 +56,63 @@ export default function GateScan() {
         timestamp: new Date().toISOString()
       });
 
-      // Award 10 points for attendance
-      const pointsEarned = 10;
-      
-      await base44.entities.Membership.update(membership.id, {
-        points: (membership.points || 0) + pointsEarned,
-        total_checkins: (membership.total_checkins || 0) + 1
-      });
+      // Build update object
+      const updateData = {
+        total_checkins: (membership.total_checkins || 0) + 1,
+        games_used: (membership.games_used || 0) + 1
+      };
 
-      // Record points transaction
-      await base44.entities.PointsTransaction.create({
-        user_id: membership.user_id,
-        membership_id: membership.id,
-        points: pointsEarned,
-        transaction_type: 'attendance',
-        description: 'Game attendance',
-        location: 'Gate',
-        related_id: checkIn.id,
-        timestamp: new Date().toISOString()
-      });
+      // Decrement games_remaining for Supporter Pack
+      if (isSupporter) {
+        const remaining = membership.games_remaining ?? 5;
+        updateData.games_remaining = Math.max(0, remaining - 1);
+      }
+
+      // Award 10 points for Premium and Family tiers only
+      let pointsEarned = 0;
+      if (isFamilyOrPremium) {
+        pointsEarned = 10;
+        updateData.points = (membership.points || 0) + pointsEarned;
+      }
+
+      await base44.entities.Membership.update(membership.id, updateData);
+
+      // Record points transaction only if points earned
+      if (pointsEarned > 0) {
+        await base44.entities.PointsTransaction.create({
+          user_id: membership.user_id,
+          membership_id: membership.id,
+          points: pointsEarned,
+          transaction_type: 'attendance',
+          description: 'Game attendance',
+          location: 'Gate',
+          related_id: checkIn.id,
+          timestamp: new Date().toISOString()
+        });
+      }
 
       return checkIn;
     },
     onSuccess: () => {
-      toast.success('Member checked in! +10 points awarded');
+      const isSupporter = membershipData?.tier_name?.includes('Supporter Pack');
+      const msg = isSupporter
+        ? `Member checked in! (${Math.max(0, (membershipData.games_remaining ?? 5) - 1)} games left)`
+        : 'Member checked in! +10 points awarded';
+      toast.success(msg);
       queryClient.invalidateQueries(['checkins']);
       setTimeout(() => {
         setScannedMember(null);
         setMembershipData(null);
         startScanning();
       }, 2000);
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Check-in failed');
+      setTimeout(() => {
+        setScannedMember(null);
+        setMembershipData(null);
+        startScanning();
+      }, 3000);
     }
   });
 
