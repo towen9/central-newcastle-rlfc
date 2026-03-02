@@ -29,13 +29,12 @@ export default function DayPass() {
       const now = new Date();
 
       const fixtures = await base44.entities.Fixture.filter({
-        entry_enabled: true,
         fixture_type: 'home'
       }, 'date_time');
 
       return fixtures.filter(f => {
         const fixtureDate = new Date(f.date_time);
-        return fixtureDate > now;
+        return fixtureDate > now && f.status !== 'cancelled' && f.status !== 'postponed';
       });
     }
   });
