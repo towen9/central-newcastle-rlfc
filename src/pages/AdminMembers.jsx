@@ -41,6 +41,7 @@ import { toast } from 'sonner';
 export default function AdminMembers() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [tierFilter, setTierFilter] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
