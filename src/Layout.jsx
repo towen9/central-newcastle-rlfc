@@ -9,7 +9,7 @@ const adminPages = ['AdminDashboard', 'AdminMembers', 'AdminOffers', 'AdminRewar
 
 export default function Layout({ children, currentPageName }) {
   const isAdminPage = adminPages.includes(currentPageName);
-  const showBottomNav = memberPages.includes(currentPageName);
+  const showBottomNav = memberPages.includes(currentPageName) || memberPages2.includes(currentPageName);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
