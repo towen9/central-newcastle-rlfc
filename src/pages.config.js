@@ -95,6 +95,7 @@ import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
 import TroubleshootingGuide from './pages/TroubleshootingGuide';
 import OldButchersHonourRoll from './pages/OldButchersHonourRoll';
+import OldButchers from './pages/OldButchers';
 import __Layout from './Layout.jsx';
 
 
@@ -147,6 +148,7 @@ export const PAGES = {
     "Sponsors": Sponsors,
     "TroubleshootingGuide": TroubleshootingGuide,
     "OldButchersHonourRoll": OldButchersHonourRoll,
+    "OldButchers": OldButchers,
 }
 
 export const pagesConfig = {
