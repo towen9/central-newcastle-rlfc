@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Check, Loader2, ArrowLeft, Star, Users, Shield } from 'lucide-react';
+import { Check, Loader2, ArrowLeft, Star, Users, Shield, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -33,6 +33,14 @@ const tierConfig = {
     badgeLabel: 'PREMIUM',
     buttonClass: 'bg-[#92400e] hover:bg-[#78350f]',
     featured: true,
+  },
+  'Old Butchers Membership': {
+    gradient: 'from-[#451a03] to-[#92400e]',
+    icon: Trophy,
+    iconColor: 'text-amber-300',
+    badge: 'bg-amber-900 text-amber-300',
+    badgeLabel: 'LEGACY',
+    buttonClass: 'bg-amber-600 hover:bg-amber-500',
   },
 };
 

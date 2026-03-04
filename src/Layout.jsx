@@ -3,6 +3,8 @@ import BottomNav from './components/shared/BottomNav';
 import PushNotificationManager from './components/shared/PushNotificationManager';
 
 const memberPages = ['Home', 'Membership', 'Benefits', 'Sponsors', 'Profile', 'CheckIn', 'Fixtures', 'News', 'PointsRewards'];
+const memberPages2 = ['OldButchers', 'OldButchersHonourRoll'];
+
 const adminPages = ['AdminDashboard', 'AdminMembers', 'AdminOffers', 'AdminRewards', 'AdminNews', 'AdminQRCodes', 'AdminSponsors', 'AdminFixtures', 'AdminEvents', 'AdminGameDay', 'AdminTransactions', 'AdminLocationDiscounts'];
 
 export default function Layout({ children, currentPageName }) {
