@@ -72,12 +72,6 @@ export default function JoinMembership() {
     setProcessing(true);
 
     try {
-      if (window.self !== window.top) {
-        toast.error('Please open this page in a new tab to complete checkout');
-        setProcessing(false);
-        return;
-      }
-
       const priceId = tier.stripe_price_id;
       if (!priceId) {
         toast.error('This membership tier is not available for online purchase');
