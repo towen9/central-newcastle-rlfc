@@ -35,12 +35,12 @@ const tierConfig = {
     featured: true,
   },
   'Old Butchers Membership': {
-    gradient: 'from-[#451a03] to-[#92400e]',
+    gradient: 'from-[#1a1a2e] to-[#16213e]',
     icon: Trophy,
-    iconColor: 'text-amber-300',
-    badge: 'bg-amber-900 text-amber-300',
+    iconColor: 'text-yellow-400',
+    badge: 'bg-yellow-400/20 text-yellow-400',
     badgeLabel: 'LEGACY',
-    buttonClass: 'bg-amber-600 hover:bg-amber-500',
+    buttonClass: 'bg-yellow-500 hover:bg-yellow-400 text-gray-950',
   },
 };
 

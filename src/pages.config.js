@@ -86,6 +86,8 @@ import Membership from './pages/Membership';
 import MyDayPass from './pages/MyDayPass';
 import News from './pages/News';
 import Offers from './pages/Offers';
+import OldButchers from './pages/OldButchers';
+import OldButchersHonourRoll from './pages/OldButchersHonourRoll';
 import PhotoCapture from './pages/PhotoCapture';
 import PlayerPassRegistration from './pages/PlayerPassRegistration';
 import PointsRewards from './pages/PointsRewards';
@@ -94,8 +96,6 @@ import Rewards from './pages/Rewards';
 import ScanForPoints from './pages/ScanForPoints';
 import Sponsors from './pages/Sponsors';
 import TroubleshootingGuide from './pages/TroubleshootingGuide';
-import OldButchersHonourRoll from './pages/OldButchersHonourRoll';
-import OldButchers from './pages/OldButchers';
 import __Layout from './Layout.jsx';
 
 
@@ -139,6 +139,8 @@ export const PAGES = {
     "MyDayPass": MyDayPass,
     "News": News,
     "Offers": Offers,
+    "OldButchers": OldButchers,
+    "OldButchersHonourRoll": OldButchersHonourRoll,
     "PhotoCapture": PhotoCapture,
     "PlayerPassRegistration": PlayerPassRegistration,
     "PointsRewards": PointsRewards,
@@ -147,8 +149,6 @@ export const PAGES = {
     "ScanForPoints": ScanForPoints,
     "Sponsors": Sponsors,
     "TroubleshootingGuide": TroubleshootingGuide,
-    "OldButchersHonourRoll": OldButchersHonourRoll,
-    "OldButchers": OldButchers,
 }
 
 export const pagesConfig = {
