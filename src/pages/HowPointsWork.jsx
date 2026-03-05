@@ -22,7 +22,7 @@ export default function HowPointsWork() {
             </div>
             <h1 className="text-3xl font-bold text-white">How Points Work</h1>
           </div>
-          <p className="text-blue-200 text-lg">Earn rewards for supporting the Butcher Boys</p>
+          <p className="text-blue-200 text-lg">Earn rewards for supporting the club</p>
         </div>
       </div>
 
@@ -138,7 +138,7 @@ export default function HowPointsWork() {
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
               <div>
                 <p className="font-bold text-gray-900">$20 Merchandise Voucher</p>
-                <p className="text-sm text-gray-500">Get some Butcher Boys gear</p>
+                <p className="text-sm text-gray-500">Get some Central Newcastle RLFC gear</p>
               </div>
               <span className="text-xl font-bold text-amber-600">250 pts</span>
             </div>

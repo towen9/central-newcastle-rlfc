@@ -107,7 +107,7 @@ export default function JoinMembership() {
             </button>
           </Link>
           <h1 className="text-white text-2xl font-bold mb-1">2026 Memberships</h1>
-          <p className="text-blue-200 text-sm">Choose your tier for the season</p>
+          <p className="text-blue-200 text-sm">Support Central Newcastle RLFC this season</p>
         </div>
       </div>
 
