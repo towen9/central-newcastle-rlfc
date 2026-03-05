@@ -284,7 +284,7 @@ export default function Membership() {
                 <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-5 border-2 border-emerald-700 text-white mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-bold text-lg">🎟️ Game Day Pass</h3>
-                    <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">$15</span>
+                    <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">$8</span>
                   </div>
                   <p className="text-sm text-emerald-100 mb-3">Single entry pass for today's match</p>
                   <Button className="w-full bg-white text-emerald-600 hover:bg-emerald-50">
