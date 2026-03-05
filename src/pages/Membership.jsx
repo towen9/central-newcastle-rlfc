@@ -264,7 +264,7 @@ export default function Membership() {
               <CreditCard className="w-10 h-10 text-gray-400" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">No Active Membership</h2>
-            <p className="text-gray-500 mb-6">Join Central Newcastle RLFC to access exclusive benefits</p>
+            <p className="text-gray-500 mb-6">Support Central Newcastle RLFC and access exclusive member benefits</p>
             
             <div className="space-y-4">
               <Link to={createPageUrl('PlayerPassRegistration')}>
@@ -273,7 +273,7 @@ export default function Membership() {
                     <h3 className="font-bold text-lg">🏉 2026 Player Pass</h3>
                     <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">FREE</span>
                   </div>
-                  <p className="text-sm text-blue-100 mb-3">For Central Newcastle RLFC players (Men's & Women's)</p>
+                  <p className="text-sm text-blue-100 mb-3">For all registered Central Newcastle RLFC players</p>
                   <Button className="w-full bg-white text-blue-600 hover:bg-blue-50">
                     Apply Now
                   </Button>
@@ -286,7 +286,7 @@ export default function Membership() {
                     <h3 className="font-bold text-lg">🎟️ Game Day Pass</h3>
                     <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">$8</span>
                   </div>
-                  <p className="text-sm text-emerald-100 mb-3">Single entry pass for today's match</p>
+                  <p className="text-sm text-emerald-100 mb-3">Single entry pass for any upcoming home game</p>
                   <Button className="w-full bg-white text-emerald-600 hover:bg-emerald-50">
                     Buy Day Pass
                   </Button>
