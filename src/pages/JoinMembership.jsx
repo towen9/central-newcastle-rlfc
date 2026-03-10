@@ -225,6 +225,8 @@ export default function JoinMembership() {
                         <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                         Processing...
                       </>
+                    ) : tier.price === 0 ? (
+                      'Apply for Sponsor Pass →'
                     ) : (
                       `Join for $${tier.price} →`
                     )}
