@@ -80,9 +80,37 @@ export default function JoinMembership() {
     setProcessing(true);
 
     try {
+      // Free tier — create pending membership requiring admin approval
+      if (tier.price === 0) {
+        const qrCodeId = `SPONSOR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        await base44.entities.Membership.create({
+          user_id: user.id,
+          user_email: user.email,
+          user_name: user.full_name,
+          tier_id: tier.id,
+          tier_name: tier.name,
+          start_date: new Date().toISOString().split('T')[0],
+          expiry_date: new Date('2026-12-31').toISOString().split('T')[0],
+          status: 'pending',
+          qr_code_id: qrCodeId,
+          stamps: 0,
+          points: 0,
+          total_checkins: 0
+        });
+        toast.success('Application submitted! Awaiting admin approval.');
+        window.location.href = createPageUrl('Membership');
+        return;
+      }
+
       const priceId = tier.stripe_price_id;
       if (!priceId) {
         toast.error('This membership tier is not available for online purchase');
+        setProcessing(false);
+        return;
+      }
+
+      if (window.self !== window.top) {
+        toast.error('Please open this page in a new tab to complete checkout');
         setProcessing(false);
         return;
       }
