@@ -42,6 +42,14 @@ const tierConfig = {
     badgeLabel: 'LEGACY',
     buttonClass: 'bg-yellow-500 hover:bg-yellow-400 text-gray-950',
   },
+  'Sponsor Season Pass': {
+    gradient: 'from-[#065f46] to-[#059669]',
+    icon: Star,
+    iconColor: 'text-emerald-300',
+    badge: 'bg-emerald-100 text-emerald-800',
+    badgeLabel: 'SPONSOR',
+    buttonClass: 'bg-emerald-700 hover:bg-emerald-600',
+  },
 };
 
 export default function JoinMembership() {
