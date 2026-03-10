@@ -239,7 +239,7 @@ export default function JoinMembership() {
 
         <div className="mt-8 bg-blue-50 rounded-xl p-4">
           <p className="text-sm text-blue-800">
-            💳 Secure payment powered by Stripe. Your membership activates immediately after purchase.
+            💳 Secure payment powered by Stripe. Paid memberships activate immediately. Sponsor passes require admin approval before activation.
           </p>
         </div>
       </div>
