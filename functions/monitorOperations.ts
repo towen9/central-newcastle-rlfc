@@ -171,36 +171,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create new alert records
-    const newAlerts = [];
-    for (const alert of alerts) {
-      // Check if similar alert already exists
-      const exists = existingAlerts.some(ea => 
-        ea.title === alert.title && ea.status === 'active'
-      );
-      
-      if (!exists) {
-        const created = await base44.asServiceRole.entities.MonitoringAlert.create(alert);
-        newAlerts.push(created);
-      }
-    }
+    // Create new alert records (in parallel)
+    const alertsToCreate = alerts.filter(alert =>
+      !existingAlerts.some(ea => ea.title === alert.title && ea.status === 'active')
+    );
+    const newAlerts = await Promise.all(
+      alertsToCreate.map(alert => base44.asServiceRole.entities.MonitoringAlert.create(alert))
+    );
 
     // Send notifications for new critical/high alerts
-    if (newAlerts.length > 0) {
-      const criticalAlerts = newAlerts.filter(a => a.severity === 'critical' || a.severity === 'high');
-      
-      if (criticalAlerts.length > 0) {
-        await base44.asServiceRole.functions.invoke('sendOperationsAlert', {
-          alerts: criticalAlerts
-        });
-
-        // Mark as notified
-        for (const alert of criticalAlerts) {
-          await base44.asServiceRole.entities.MonitoringAlert.update(alert.id, {
-            notified_admins: true
-          });
-        }
-      }
+    const criticalAlerts = newAlerts.filter(a => a.severity === 'critical' || a.severity === 'high');
+    if (criticalAlerts.length > 0) {
+      await base44.asServiceRole.functions.invoke('sendOperationsAlert', { alerts: criticalAlerts });
+      await Promise.all(
+        criticalAlerts.map(alert =>
+          base44.asServiceRole.entities.MonitoringAlert.update(alert.id, { notified_admins: true })
+        )
+      );
     }
 
     return Response.json({ 
