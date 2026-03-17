@@ -8,12 +8,12 @@ Deno.serve(async (req) => {
     const now = new Date();
     const alerts = [];
 
-    // Fetch data
+    // Fetch data - keep limits small to avoid CPU timeout
     const [memberships, checkins, transactions, offerRedemptions, existingAlerts] = await Promise.all([
-      base44.asServiceRole.entities.Membership.list(),
-      base44.asServiceRole.entities.CheckIn.list('-timestamp', 1000),
-      base44.asServiceRole.entities.Transaction.list('-timestamp', 500),
-      base44.asServiceRole.entities.OfferRedemption.list('-timestamp', 500),
+      base44.asServiceRole.entities.Membership.list('-created_date', 200),
+      base44.asServiceRole.entities.CheckIn.list('-timestamp', 200),
+      base44.asServiceRole.entities.Transaction.list('-timestamp', 200),
+      base44.asServiceRole.entities.OfferRedemption.list('-timestamp', 100),
       base44.asServiceRole.entities.MonitoringAlert.filter({ status: 'active' })
     ]);
 
