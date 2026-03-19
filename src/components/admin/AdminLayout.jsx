@@ -10,6 +10,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', page: 'AdminDashboard' },
   { icon: UserCog, label: 'Users', page: 'AdminUsers' },
   { icon: Users, label: 'Members', page: 'AdminMembers' },
+  { icon: Upload, label: 'Bulk Import', page: 'AdminBulkImport' },
   { icon: Gift, label: 'Rewards', page: 'AdminRewards' },
   { icon: Percent, label: 'Offers', page: 'AdminOffers' },
   { icon: Shield, label: 'Sponsors', page: 'AdminSponsors' },
