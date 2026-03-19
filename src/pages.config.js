@@ -101,6 +101,7 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AdminBulkImport": AdminBulkImport,
     "AdminDashboard": AdminDashboard,
     "AdminEvents": AdminEvents,
     "AdminFixtures": AdminFixtures,

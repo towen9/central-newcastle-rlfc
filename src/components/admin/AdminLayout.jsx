@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { 
   Shield, Users, Gift, Percent, QrCode, Newspaper, 
-  Calendar, LayoutDashboard, ArrowLeft, ChevronRight, Ticket, ShoppingBag, UserCog 
+  Calendar, LayoutDashboard, ArrowLeft, ChevronRight, Ticket, ShoppingBag, UserCog, Upload
 } from 'lucide-react';
 
 const menuItems = [
