@@ -71,11 +71,6 @@ export default function JoinMembership() {
   });
 
   const handlePurchase = async (tier) => {
-    if (!user?.photo_url) {
-      toast.error('Please upload your photo ID first in the Membership page');
-      return;
-    }
-
     setSelectedTier(tier);
     setProcessing(true);
 
@@ -148,17 +143,7 @@ export default function JoinMembership() {
       </div>
 
       <div className="px-5 py-6">
-        {!user?.photo_url && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-            <p className="text-sm text-amber-800">
-              ⚠️ Photo ID required before purchase. Go to{' '}
-              <Link to={createPageUrl('Membership')} className="font-semibold underline">
-                Membership page
-              </Link>{' '}
-              to upload.
-            </p>
-          </div>
-        )}
+        
 
         <div className="space-y-5">
           {tiers.map((tier, idx) => {
@@ -217,7 +202,7 @@ export default function JoinMembership() {
 
                   <Button
                     onClick={() => handlePurchase(tier)}
-                    disabled={processing || !user?.photo_url}
+                    disabled={processing}
                     className={`w-full py-6 text-base font-semibold ${config.buttonClass} text-white`}
                   >
                     {processing && selectedTier?.id === tier.id ? (

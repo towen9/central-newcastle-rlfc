@@ -89,7 +89,7 @@ export default function Home() {
 
       {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="px-4 pt-2 pb-32 space-y-3">
+        <div className="px-4 pt-4 pb-32 space-y-3">
         {/* Non-member CTAs */}
         {!membership && user && (
           <div className="space-y-3">

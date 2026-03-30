@@ -53,7 +53,7 @@ export default function Fixtures() {
   const upcomingEvents = events.filter(e => isAfter(new Date(e.date_time), new Date()));
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="bg-gray-50 pb-24">
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
         <div className="px-5 py-4 flex items-center gap-4">
