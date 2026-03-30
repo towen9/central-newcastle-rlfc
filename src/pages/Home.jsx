@@ -90,24 +90,48 @@ export default function Home() {
       {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 pt-2 pb-32 space-y-3">
-        {/* Day Pass CTA - Only for non-members */}
+        {/* Non-member CTAs */}
         {!membership && user && (
-          <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Ticket className="w-6 h-6 text-white" />
+          <div className="space-y-3">
+            {/* Join Membership - Primary CTA */}
+            <div className="bg-gradient-to-br from-[#78350f] to-[#b45309] rounded-2xl p-6 text-white shadow-lg">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-amber-200 text-xs font-semibold uppercase tracking-wide mb-0.5">2026 Season</p>
+                  <h3 className="text-xl font-bold mb-1">Become a Member</h3>
+                  <p className="text-amber-100 text-sm">From $40 — season entry, rewards, exclusive perks & more</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-1">Get Your Game Day Pass</h3>
-                <p className="text-blue-200 text-sm">Single entry to any upcoming home game - Just $8</p>
-              </div>
+              <Button 
+                onClick={() => window.location.href = createPageUrl('JoinMembership')}
+                className="w-full bg-white text-[#78350f] hover:bg-amber-50 py-6 text-lg font-semibold"
+              >
+                View Membership Options →
+              </Button>
             </div>
-            <Button 
-              onClick={() => window.location.href = createPageUrl('DayPass')}
-              className="w-full bg-white text-[#1a365d] hover:bg-blue-50 py-6 text-lg font-semibold"
-            >
-              Buy Day Pass - $8
-            </Button>
+
+            {/* Day Pass - Secondary CTA */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Ticket className="w-5 h-5 text-[#1a365d]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Just here for one game?</p>
+                  <p className="text-xs text-gray-500">Buy a Day Pass — $8 single entry</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => window.location.href = createPageUrl('DayPass')}
+                variant="outline"
+                className="text-[#1a365d] border-[#1a365d] text-sm font-semibold flex-shrink-0"
+              >
+                Day Pass
+              </Button>
+            </div>
           </div>
         )}
 
