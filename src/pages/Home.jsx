@@ -94,43 +94,52 @@ export default function Home() {
         {!membership && user && (
           <div className="space-y-3">
             {/* Join Membership - Primary CTA */}
-            <div className="bg-gradient-to-br from-[#78350f] to-[#b45309] rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <ShieldCheck className="w-6 h-6 text-white" />
+            <div className="relative rounded-2xl overflow-hidden shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1a365d] via-[#1e4a8a] to-[#2b6cb0]" />
+              <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 60%)'}} />
+              <div className="relative p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center">
+                    <ShieldCheck className="w-4 h-4 text-amber-900" />
+                  </div>
+                  <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">2026 Season Memberships</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-amber-200 text-xs font-semibold uppercase tracking-wide mb-0.5">2026 Season</p>
-                  <h3 className="text-xl font-bold mb-1">Become a Member</h3>
-                  <p className="text-amber-100 text-sm">From $40 — season entry, rewards, exclusive perks & more</p>
+                <h3 className="text-white text-2xl font-extrabold mb-1 leading-tight">Join the Butcher Boys</h3>
+                <p className="text-blue-200 text-sm mb-5">From $40 — season entry, rewards points, exclusive member perks & sponsor deals</p>
+                <div className="flex gap-2 mb-5">
+                  {['$40 Supporter', '$100 Family', '$120 Premium'].map(t => (
+                    <span key={t} className="bg-white/15 text-white text-xs px-2.5 py-1 rounded-full font-medium">{t}</span>
+                  ))}
                 </div>
+                <Button 
+                  onClick={() => window.location.href = createPageUrl('JoinMembership')}
+                  className="w-full bg-amber-400 hover:bg-amber-300 text-amber-900 py-6 text-base font-bold shadow-lg"
+                >
+                  View All Memberships →
+                </Button>
               </div>
-              <Button 
-                onClick={() => window.location.href = createPageUrl('JoinMembership')}
-                className="w-full bg-white text-[#78350f] hover:bg-amber-50 py-6 text-lg font-semibold"
-              >
-                View Membership Options →
-              </Button>
             </div>
 
             {/* Day Pass - Secondary CTA */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Ticket className="w-5 h-5 text-[#1a365d]" />
+            <div className="relative rounded-2xl overflow-hidden shadow-md">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0f2340] to-[#1a365d]" />
+              <div className="relative p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Ticket className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">Just here for one game?</p>
+                    <p className="text-xs text-blue-300">Single-game digital entry — $8</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Just here for one game?</p>
-                  <p className="text-xs text-gray-500">Buy a Day Pass — $8 single entry</p>
-                </div>
+                <Button 
+                  onClick={() => window.location.href = createPageUrl('DayPass')}
+                  className="bg-white/20 hover:bg-white/30 text-white border border-white/30 text-sm font-semibold flex-shrink-0"
+                >
+                  Day Pass
+                </Button>
               </div>
-              <Button 
-                onClick={() => window.location.href = createPageUrl('DayPass')}
-                variant="outline"
-                className="text-[#1a365d] border-[#1a365d] text-sm font-semibold flex-shrink-0"
-              >
-                Day Pass
-              </Button>
             </div>
           </div>
         )}
