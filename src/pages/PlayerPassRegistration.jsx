@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Loader2, CheckCircle2, Camera, RefreshCw, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -14,6 +13,12 @@ import { toast } from 'sonner';
 export default function PlayerPassRegistration() {
   const [user, setUser] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [step, setStep] = useState('form'); // 'form' | 'photo'
+  const [photoDataUrl, setPhotoDataUrl] = useState(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [facingMode, setFacingMode] = useState('user');
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -38,6 +43,80 @@ export default function PlayerPassRegistration() {
     loadUser();
   }, []);
 
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode, width: { ideal: 640 }, height: { ideal: 640 } } 
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setCameraActive(true);
+    } catch (err) {
+      toast.error('Camera access denied. Please allow camera access and try again.');
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+    setCameraActive(false);
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 640;
+    const ctx = canvas.getContext('2d');
+    // Mirror if front camera
+    if (facingMode === 'user') {
+      ctx.translate(640, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, 0, 0, 640, 640);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    setPhotoDataUrl(dataUrl);
+    stopCamera();
+  };
+
+  const retakePhoto = () => {
+    setPhotoDataUrl(null);
+    startCamera();
+  };
+
+  const flipCamera = async () => {
+    stopCamera();
+    const newFacing = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newFacing);
+    setTimeout(async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: newFacing } 
+        });
+        streamRef.current = stream;
+        if (videoRef.current) videoRef.current.srcObject = stream;
+        setCameraActive(true);
+      } catch (err) {
+        toast.error('Could not switch camera');
+      }
+    }, 300);
+  };
+
+  useEffect(() => {
+    if (step === 'photo' && !photoDataUrl) {
+      startCamera();
+    }
+    return () => {
+      if (step !== 'photo') stopCamera();
+    };
+  }, [step]);
+
+  useEffect(() => () => stopCamera(), []);
+
   const registrationMutation = useMutation({
     mutationFn: async (data) => {
       // Find the Player Pass tier
@@ -50,6 +129,15 @@ export default function PlayerPassRegistration() {
       // Create pending membership
       const qrCodeId = `PLAYER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
+      // Upload photo if captured
+      let photoUrl = null;
+      if (data.photoDataUrl) {
+        const blob = await (await fetch(data.photoDataUrl)).blob();
+        const file = new File([blob], 'player-photo.jpg', { type: 'image/jpeg' });
+        const uploadResult = await base44.integrations.Core.UploadFile({ file });
+        photoUrl = uploadResult.file_url;
+      }
+
       const membershipData = {
         user_id: user?.id || 'pending',
         user_email: data.email,
@@ -62,7 +150,8 @@ export default function PlayerPassRegistration() {
         qr_code_id: qrCodeId,
         stamps: 0,
         points: 0,
-        total_checkins: 0
+        total_checkins: 0,
+        ...(photoUrl && { photo_url: photoUrl })
       };
 
       // Create the membership
@@ -99,9 +188,17 @@ export default function PlayerPassRegistration() {
     }
   });
 
-  const handleSubmit = (e) => {
+  const handleFormNext = (e) => {
     e.preventDefault();
-    registrationMutation.mutate(formData);
+    setStep('photo');
+  };
+
+  const handleSubmit = () => {
+    if (!photoDataUrl) {
+      toast.error('Please take a photo first');
+      return;
+    }
+    registrationMutation.mutate({ ...formData, photoDataUrl });
   };
 
   if (submitted) {
@@ -135,76 +232,173 @@ export default function PlayerPassRegistration() {
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
         <div className="px-5 py-6">
-          <Link to={createPageUrl('Home')}>
-            <button className="flex items-center gap-2 text-blue-200 mb-4">
+          {step === 'photo' ? (
+            <button onClick={() => { stopCamera(); setStep('form'); }} className="flex items-center gap-2 text-blue-200 mb-4">
               <ArrowLeft className="w-5 h-5" />
               Back
             </button>
-          </Link>
+          ) : (
+            <Link to={createPageUrl('Home')}>
+              <button className="flex items-center gap-2 text-blue-200 mb-4">
+                <ArrowLeft className="w-5 h-5" />
+                Back
+              </button>
+            </Link>
+          )}
           <h1 className="text-white text-2xl font-bold mb-2">2026 Player Pass</h1>
-          <p className="text-blue-200">Register for your player pass</p>
+          <p className="text-blue-200">
+            {step === 'form' ? 'Step 1 of 2 — Your details' : 'Step 2 of 2 — Player photo'}
+          </p>
         </div>
       </div>
 
       <div className="px-5 py-6 max-w-2xl mx-auto">
-        <div className="bg-blue-50 rounded-xl p-4 mb-6">
-          <p className="text-sm text-blue-800">
-            🏉 This pass is for Central Newcastle RLFC players (Men's & Women's). 
-            Your application will be reviewed by admin before activation.
-          </p>
-        </div>
+        {/* Step 1: Form */}
+        {step === 'form' && (
+          <>
+            <div className="bg-blue-50 rounded-xl p-4 mb-6">
+              <p className="text-sm text-blue-800">
+                🏉 This pass is for Central Newcastle RLFC players (Men's & Women's). 
+                Your application will be reviewed by admin before activation.
+              </p>
+            </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 space-y-5">
-          <div>
-            <Label htmlFor="full_name">Full Name *</Label>
-            <Input
-              id="full_name"
-              value={formData.full_name}
-              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              placeholder="Your full name"
-              required
-            />
-          </div>
+            <form onSubmit={handleFormNext} className="bg-white rounded-2xl p-6 space-y-5">
+              <div>
+                <Label htmlFor="full_name">Full Name *</Label>
+                <Input
+                  id="full_name"
+                  value={formData.full_name}
+                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
 
-          <div>
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="your.email@example.com"
-              required
-            />
-          </div>
+              <div>
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="your.email@example.com"
+                  required
+                />
+              </div>
 
-          <div>
-            <Label htmlFor="phone">Phone Number *</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="0400 000 000"
-              required
-            />
-          </div>
+              <div>
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="0400 000 000"
+                  required
+                />
+              </div>
 
-          <Button
-            type="submit"
-            disabled={registrationMutation.isPending}
-            className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6"
-          >
-            {registrationMutation.isPending ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Submitting...
-              </>
+              <Button type="submit" className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6">
+                Next — Take Your Photo →
+              </Button>
+            </form>
+          </>
+        )}
+
+        {/* Step 2: Photo */}
+        {step === 'photo' && (
+          <div className="bg-white rounded-2xl p-6 space-y-5">
+            <div className="text-center mb-2">
+              <h2 className="text-lg font-bold text-gray-900">Player Photo</h2>
+              <p className="text-sm text-gray-500">This photo will appear on your digital pass for identity verification at the gate.</p>
+            </div>
+
+            {!photoDataUrl ? (
+              <div className="space-y-4">
+                {/* Camera viewfinder */}
+                <div className="relative rounded-2xl overflow-hidden bg-black aspect-square w-full max-w-xs mx-auto">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                    style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
+                  />
+                  {/* Face guide overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-40 h-48 border-4 border-white/60 rounded-full" />
+                  </div>
+                  {!cameraActive && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+                      <Loader2 className="w-8 h-8 text-white animate-spin" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-center text-gray-400">Position your face in the circle • Good lighting • Look at the camera</p>
+
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={flipCamera}
+                    className="flex-1"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Flip
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={capturePhoto}
+                    disabled={!cameraActive}
+                    className="flex-2 bg-[#1a365d] hover:bg-[#2c5282] flex-1"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Take Photo
+                  </Button>
+                </div>
+              </div>
             ) : (
-              'Submit Application'
+              <div className="space-y-4">
+                {/* Preview */}
+                <div className="relative rounded-2xl overflow-hidden aspect-square w-full max-w-xs mx-auto">
+                  <img src={photoDataUrl} alt="Your photo" className="w-full h-full object-cover" />
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    ✓ Photo taken
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={retakePhoto}
+                  className="w-full"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Retake Photo
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={registrationMutation.isPending}
+                  className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6"
+                >
+                  {registrationMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Application'
+                  )}
+                </Button>
+              </div>
             )}
-          </Button>
-        </form>
+          </div>
+        )}
 
         <div className="mt-6 bg-gray-100 rounded-xl p-4">
           <p className="text-sm text-gray-700">

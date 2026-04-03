@@ -1,0 +1,90 @@
+{
+  "name": "Membership",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Reference to user"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "tier_id": {
+      "type": "string",
+      "description": "Reference to MembershipTier"
+    },
+    "tier_name": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "pending",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "qr_code_id": {
+      "type": "string",
+      "description": "Unique QR identifier"
+    },
+    "parent_membership_id": {
+      "type": "string",
+      "description": "For linked family members"
+    },
+    "payment_id": {
+      "type": "string"
+    },
+    "stamps": {
+      "type": "number",
+      "default": 0
+    },
+    "points": {
+      "type": "number",
+      "default": 0,
+      "description": "Current points balance"
+    },
+    "total_checkins": {
+      "type": "number",
+      "default": 0
+    },
+    "games_remaining": {
+      "type": "number",
+      "description": "For Supporter Pack: remaining game entries"
+    },
+    "games_used": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of games attended this season"
+    },
+    "years_played": {
+      "type": "string",
+      "description": "Old Butchers: years played at the club e.g. 2010\u20132015"
+    },
+    "team_grade_played": {
+      "type": "string",
+      "description": "Old Butchers: grade played e.g. First Grade, Reserve Grade"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Player selfie photo URL for identity verification"
+    }
+  },
+  "required": [
+    "user_id",
+    "tier_id"
+  ]
+}
