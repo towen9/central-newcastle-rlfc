@@ -249,10 +249,15 @@ export default function AdminMembers() {
               </div>
             </div>
             <Button 
-              onClick={() => setStatusFilter('pending')}
+              onClick={() => {
+                setStatusFilter('pending');
+                setTimeout(() => {
+                  document.getElementById('members-table')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
               className="bg-amber-600 hover:bg-amber-700"
             >
-              View Pending
+              View Pending ({pendingCount})
             </Button>
           </div>
         </div>
@@ -348,7 +353,7 @@ export default function AdminMembers() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div id="members-table" className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
