@@ -29,9 +29,9 @@ const steps = [
 ];
 
 const perks = [
-  'Free entry to all 8 home games',
-  'Digital membership pass with QR code',
-  '20% off all club merchandise',
+  'FREE entry to all home games — scan your QR at the gate',
+  'Digital QR pass on your phone — no card needed',
+  '20% off all club club merchandise',
   'Earn & redeem rewards points',
   'Exclusive member-only events',
   'All sponsor deals & discounts'
@@ -60,7 +60,7 @@ export default function PlayerPassInvite() {
               You're Invited,<br />Butcher Boy! 🏉
             </h1>
             <p className="text-blue-200 text-base max-w-xs mx-auto">
-              As a registered player, you get a <strong className="text-white">FREE full-season membership</strong> with rewards, discounts, and exclusive perks.
+              As a registered player, you get a <strong className="text-white">FREE digital pass</strong> — your ticket into every home game, plus rewards, discounts & exclusive perks.
             </p>
           </motion.div>
         </div>
@@ -72,12 +72,25 @@ export default function PlayerPassInvite() {
 
       <div className="px-5 pb-16 max-w-md mx-auto">
 
+        {/* Gate Entry Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-amber-400 rounded-2xl p-4 mb-4 -mt-2 flex items-center gap-3"
+        >
+          <span className="text-3xl">🎟️</span>
+          <div>
+            <p className="font-extrabold text-amber-900 text-base">Your pass = your gate ticket</p>
+            <p className="text-amber-800 text-sm">Show your QR code at the gate every home game. No phone = no entry. Keep it charged!</p>
+          </div>
+        </motion.div>
+
         {/* Perks */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-5 -mt-2"
+          className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-5"
         >
           <h2 className="font-bold text-gray-900 mb-3 text-lg">What's included</h2>
           <div className="space-y-2">
