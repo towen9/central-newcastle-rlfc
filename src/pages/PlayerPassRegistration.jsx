@@ -288,13 +288,13 @@ export default function PlayerPassRegistration() {
               </div>
 
               <div>
-                <Label htmlFor="phone">Phone Number *</Label>
+                <Label htmlFor="phone">Mobile Number *</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="0400 000 000"
+                  placeholder="04XX XXX XXX"
                   required
                 />
               </div>
