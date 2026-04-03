@@ -110,9 +110,14 @@ export default function JoinMembership() {
         return;
       }
 
+      // Capture referral code from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+
       const { data } = await base44.functions.invoke('createCheckout', {
         tier_id: tier.id,
         price_id: priceId,
+        referral_code: refCode || null,
         success_url: `${window.location.origin}${createPageUrl('Membership')}?payment=success`,
         cancel_url: `${window.location.origin}${createPageUrl('JoinMembership')}?payment=cancelled`
       });

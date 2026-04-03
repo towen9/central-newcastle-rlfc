@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Users, Calendar, Shield, ChevronRight, RefreshCcw, Plus, Camera } from 'lucide-react';
+import ReferralShare from '../components/membership/ReferralShare';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
@@ -224,6 +225,9 @@ export default function Membership() {
                 ))}
               </div>
             )}
+
+            {/* Referral Share */}
+            <ReferralShare membership={membership} user={user} />
 
             {/* Actions */}
             <div className="space-y-3">

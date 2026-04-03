@@ -1,0 +1,67 @@
+{
+  "name": "Referral",
+  "type": "object",
+  "properties": {
+    "referrer_user_id": {
+      "type": "string",
+      "description": "User ID of the member who shared the link"
+    },
+    "referrer_name": {
+      "type": "string",
+      "description": "Name of the referring member"
+    },
+    "referrer_email": {
+      "type": "string"
+    },
+    "referrer_membership_id": {
+      "type": "string"
+    },
+    "referred_user_id": {
+      "type": "string",
+      "description": "User ID of the new member who signed up"
+    },
+    "referred_name": {
+      "type": "string"
+    },
+    "referred_email": {
+      "type": "string"
+    },
+    "referred_membership_id": {
+      "type": "string",
+      "description": "The membership that was purchased"
+    },
+    "referred_tier_name": {
+      "type": "string"
+    },
+    "referral_code": {
+      "type": "string",
+      "description": "Unique code used to track this referral"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "converted",
+        "rewarded"
+      ],
+      "default": "pending",
+      "description": "pending = link clicked but no purchase yet, converted = membership purchased, rewarded = prize awarded by admin"
+    },
+    "converted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reward_note": {
+      "type": "string",
+      "description": "Admin note about prize awarded"
+    },
+    "rewarded_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "referrer_user_id",
+    "referral_code"
+  ]
+}

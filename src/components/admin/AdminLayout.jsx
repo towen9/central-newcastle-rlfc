@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Shield, Users, Gift, Percent, QrCode, Newspaper, 
-  Calendar, LayoutDashboard, ArrowLeft, Ticket, ShoppingBag, UserCog, Upload
+  Calendar, LayoutDashboard, ArrowLeft, Ticket, ShoppingBag, UserCog, Upload, Share2
 } from 'lucide-react';
 
 const menuItems = [
@@ -23,6 +23,7 @@ const menuItems = [
   { icon: Ticket, label: 'Game Day', page: 'AdminGameDay' },
   { icon: ShoppingBag, label: 'Transactions', page: 'AdminTransactions' },
   { icon: Percent, label: 'Discounts', page: 'AdminLocationDiscounts' },
+  { icon: Share2, label: 'Referrals', page: 'AdminReferrals' },
 ];
 
 export default function AdminLayout({ children, title, currentPage }) {

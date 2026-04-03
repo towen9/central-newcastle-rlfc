@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { tier_id, price_id, success_url, cancel_url } = await req.json();
+    const { tier_id, price_id, success_url, cancel_url, referral_code } = await req.json();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -25,11 +25,12 @@ Deno.serve(async (req) => {
       cancel_url: cancel_url,
       customer_email: user.email,
       metadata: {
-        base44_app_id: Deno.env.get('BASE44_APP_ID'),
-        user_id: user.id,
-        user_email: user.email,
-        user_name: user.full_name,
-        tier_id: tier_id
+      base44_app_id: Deno.env.get('BASE44_APP_ID'),
+      user_id: user.id,
+      user_email: user.email,
+      user_name: user.full_name,
+      tier_id: tier_id,
+      ...(referral_code && { referral_code })
       }
     });
 

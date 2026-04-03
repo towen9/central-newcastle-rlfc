@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 import Stripe from 'npm:stripe';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -20,9 +20,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
+    const base44 = createClientFromRequest(req);
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const { user_id, tier_id, user_email, user_name, product_type, fixture_id } = session.metadata;
+      const { user_id, tier_id, user_email, user_name, product_type, fixture_id, referral_code } = session.metadata;
 
       // Handle Day Pass purchases
       if (product_type === 'day_pass') {
@@ -46,9 +48,6 @@ Deno.serve(async (req) => {
         return Response.json({ received: true });
       }
 
-      // Initialize SDK with service role
-      const base44 = createClientFromRequest(req);
-      
       // Fetch the tier details
       const tier = await base44.asServiceRole.entities.MembershipTier.filter({ id: tier_id });
       
@@ -59,7 +58,7 @@ Deno.serve(async (req) => {
 
       const tierData = tier[0];
       
-      // Calculate expiry date based on price_period
+      // Calculate expiry date
       const startDate = new Date();
       let expiryDate = new Date(startDate);
       
@@ -71,7 +70,6 @@ Deno.serve(async (req) => {
         expiryDate.setFullYear(expiryDate.getFullYear() + 100);
       }
 
-      // Determine games_remaining for Supporter Pack
       const isSupporter = tierData.name === 'Supporter Pack';
       const gamesIncluded = tierData.games_included || 0;
 
@@ -95,6 +93,38 @@ Deno.serve(async (req) => {
       });
 
       console.log('Membership created:', membership.id, '| Tier:', tierData.name);
+
+      // Handle referral tracking (only for season memberships, not day passes)
+      if (referral_code) {
+        try {
+          // Find the referrer by matching their referral code pattern (REF-{first8ofQR})
+          const allMemberships = await base44.asServiceRole.entities.Membership.filter({ status: 'active' });
+          const referrer = allMemberships.find(m => {
+            const code = m.qr_code_id ? `REF-${m.qr_code_id.substring(0, 8).toUpperCase()}` : null;
+            return code === referral_code;
+          });
+
+          if (referrer && referrer.user_id !== user_id) {
+            await base44.asServiceRole.entities.Referral.create({
+              referrer_user_id: referrer.user_id,
+              referrer_name: referrer.user_name,
+              referrer_email: referrer.user_email,
+              referrer_membership_id: referrer.id,
+              referred_user_id: user_id,
+              referred_name: user_name,
+              referred_email: user_email,
+              referred_membership_id: membership.id,
+              referred_tier_name: tierData.name,
+              referral_code: referral_code,
+              status: 'converted',
+              converted_at: new Date().toISOString()
+            });
+            console.log('Referral recorded:', referral_code, '| Referrer:', referrer.user_name);
+          }
+        } catch (refError) {
+          console.error('Failed to record referral (non-fatal):', refError.message);
+        }
+      }
     }
 
     return Response.json({ received: true });
