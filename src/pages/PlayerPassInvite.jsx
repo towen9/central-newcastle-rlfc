@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Smartphone, Star, Gift, Building2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Smartphone, Star, Gift, Building2, ShieldCheck, ArrowRight, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
 
 const steps = [
   {
@@ -38,6 +39,16 @@ const perks = [
 ];
 
 export default function PlayerPassInvite() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    base44.auth.me()
+      .then(u => setUser(u))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
@@ -150,15 +161,38 @@ export default function PlayerPassInvite() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
         >
-          <Link to={createPageUrl('PlayerPassRegistration')}>
-            <Button className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base font-bold">
-              Register My Player Pass
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-          <p className="text-center text-gray-400 text-xs mt-3">
-            Free for all registered Central Newcastle RLFC players • 2026 Season
-          </p>
+          {!loading && (
+            <>
+              {user ? (
+                // Already logged in — go straight to registration
+                <Link to={createPageUrl('PlayerPassRegistration')}>
+                  <Button className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base font-bold">
+                    Register My Player Pass
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+              ) : (
+                // Not logged in — create account first, return here after
+                <>
+                  <Button
+                    className="w-full bg-amber-400 hover:bg-amber-300 text-amber-900 py-6 text-base font-bold shadow-lg mb-3"
+                    onClick={() => base44.auth.redirectToLogin(createPageUrl('PlayerPassRegistration'))}
+                  >
+                    <UserPlus className="w-5 h-5 mr-2" />
+                    Create Account & Get My Pass
+                  </Button>
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
+                    <p className="text-blue-800 text-sm">
+                      👆 This will create your free club account, then take you straight to registration.
+                    </p>
+                  </div>
+                </>
+              )}
+              <p className="text-center text-gray-400 text-xs mt-3">
+                Free for all registered Central Newcastle RLFC players • 2026 Season
+              </p>
+            </>
+          )}
         </motion.div>
       </div>
     </div>
