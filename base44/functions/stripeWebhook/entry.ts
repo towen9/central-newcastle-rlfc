@@ -26,7 +26,23 @@ Deno.serve(async (req) => {
 
       // Handle Day Pass purchases
       if (product_type === 'day_pass') {
-        console.log('Day Pass purchase - redirect to photo capture');
+        const qrCode = `DP${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
+        await base44.asServiceRole.entities.GameDayEntry.create({
+          first_name: user_name?.split(' ')[0] || '',
+          last_name: user_name?.split(' ').slice(1).join(' ') || '',
+          email: user_email,
+          mobile: '',
+          postcode: '',
+          event_id: fixture_id || 'general',
+          event_title: 'Day Pass',
+          entry_timestamp: new Date().toISOString(),
+          payment_reference: session.payment_intent,
+          payment_amount: 8,
+          pass_qr_code: qrCode,
+          status: 'valid',
+          user_id: user_id
+        });
+        console.log('Day Pass created:', qrCode, '| User:', user_email);
         return Response.json({ received: true });
       }
 
