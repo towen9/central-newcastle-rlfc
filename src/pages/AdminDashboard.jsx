@@ -5,12 +5,29 @@ import { motion } from 'framer-motion';
 import { 
   Users, CreditCard, Gift, Percent, TrendingUp, Calendar, 
   BarChart3, ArrowUpRight, ArrowDownRight, QrCode, Newspaper,
-  Menu, X, ChevronRight, Shield, Bell, MessageSquare, LineChart, AlertTriangle, BookOpen
+  Menu, X, ChevronRight, Shield, Bell, MessageSquare, LineChart, AlertTriangle, BookOpen,
+  LayoutDashboard, UserCog, Upload, Ticket, ShoppingBag
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
+
+const tabMenuItems = [
+  { icon: LayoutDashboard, label: 'Dashboard', page: 'AdminDashboard' },
+  { icon: Users, label: 'Members', page: 'AdminMembers' },
+  { icon: UserCog, label: 'Users', page: 'AdminUsers' },
+  { icon: Upload, label: 'Bulk Import', page: 'AdminBulkImport' },
+  { icon: Gift, label: 'Rewards', page: 'AdminRewards' },
+  { icon: Percent, label: 'Offers', page: 'AdminOffers' },
+  { icon: Shield, label: 'Sponsors', page: 'AdminSponsors' },
+  { icon: QrCode, label: 'QR Codes', page: 'AdminQRCodes' },
+  { icon: Newspaper, label: 'News', page: 'AdminNews' },
+  { icon: Calendar, label: 'Fixtures', page: 'AdminFixtures' },
+  { icon: Calendar, label: 'Events', page: 'AdminEvents' },
+  { icon: Ticket, label: 'Game Day', page: 'AdminGameDay' },
+  { icon: ShoppingBag, label: 'Transactions', page: 'AdminTransactions' },
+];
 
 const adminMenuItems = [
   { icon: Users, label: 'Members', page: 'AdminMembers', color: 'bg-blue-500' },
@@ -155,6 +172,26 @@ export default function AdminDashboard() {
                 {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sub Navigation - same as AdminLayout */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-1 overflow-x-auto py-2 scrollbar-hide">
+            {tabMenuItems.map((item) => (
+              <Link key={item.page} to={createPageUrl(item.page)}>
+                <button className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
+                  item.page === 'AdminDashboard'
+                    ? 'bg-[#1a365d] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}>
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </button>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
