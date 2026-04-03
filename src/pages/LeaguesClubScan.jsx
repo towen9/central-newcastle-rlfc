@@ -13,7 +13,8 @@ export default function LeaguesClubScan() {
   useEffect(() => {
     const loadUser = async () => {
       const userData = await base44.auth.me();
-      if (!userData || userData.role !== 'admin') {
+      // Allow admin OR staff (role: 'leagues_staff') to access this scanner
+      if (!userData || (userData.role !== 'admin' && userData.role !== 'leagues_staff')) {
         window.location.href = '/';
         return;
       }
@@ -110,9 +111,20 @@ export default function LeaguesClubScan() {
 
       // Award 20 bonus points
       const pointsEarned = 20;
+      const now = new Date().toISOString();
       
       await base44.entities.Membership.update(member.id, {
-        points: (member.points || 0) + pointsEarned
+        points: (member.points || 0) + pointsEarned,
+        total_checkins: (member.total_checkins || 0) + 1
+      });
+
+      // Create CheckIn record for attendance tracking
+      await base44.entities.CheckIn.create({
+        user_id: member.user_id,
+        membership_id: member.id,
+        location: 'Central Leagues Club',
+        location_qr_id: 'LEAGUES-CLUB',
+        timestamp: now
       });
 
       await base44.entities.PointsTransaction.create({
@@ -122,7 +134,7 @@ export default function LeaguesClubScan() {
         transaction_type: 'leagues_club',
         description: 'Post-game Leagues Club check-in',
         location: 'Central Leagues Club',
-        timestamp: new Date().toISOString()
+        timestamp: now
       });
 
       setResult({

@@ -34,35 +34,6 @@ export default function CheckIn() {
     enabled: !!user?.id
   });
 
-  // Block day pass holders from check-ins
-  if (user && !membership) {
-    return (
-      <div className="min-h-screen bg-gray-50 pb-24">
-        <div className="bg-[#1a365d] pt-safe">
-          <div className="px-5 py-4 flex items-center gap-4">
-            <Link to={createPageUrl('Home')}>
-              <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                <ArrowLeft className="w-5 h-5 text-white" />
-              </div>
-            </Link>
-          </div>
-        </div>
-        <div className="px-5 py-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-            <QrCode className="w-8 h-8 text-blue-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Members Only</h2>
-          <p className="text-gray-600 mb-6">Check-ins are exclusive to membership holders.</p>
-          <Link to={createPageUrl('Membership')}>
-            <Button className="bg-[#1a365d] hover:bg-[#2c5282]">
-              View Memberships
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   const { data: todayCheckins = [] } = useQuery({
     queryKey: ['todayCheckins', user?.id],
     queryFn: async () => {
@@ -178,6 +149,35 @@ export default function CheckIn() {
   };
 
   const hasCheckedInToday = todayCheckins.length > 0;
+
+  // Block non-members after all hooks
+  if (user && !membership) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="bg-[#1a365d] pt-safe">
+          <div className="px-5 py-4 flex items-center gap-4">
+            <Link to={createPageUrl('Home')}>
+              <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </div>
+            </Link>
+          </div>
+        </div>
+        <div className="px-5 py-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+            <QrCode className="w-8 h-8 text-blue-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Members Only</h2>
+          <p className="text-gray-600 mb-6">Check-ins are exclusive to membership holders.</p>
+          <Link to={createPageUrl('Membership')}>
+            <Button className="bg-[#1a365d] hover:bg-[#2c5282]">
+              View Memberships
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
