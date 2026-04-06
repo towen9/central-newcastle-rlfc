@@ -25,12 +25,13 @@ Deno.serve(async (req) => {
       cancel_url: cancel_url,
       customer_email: user.email,
       metadata: {
-      base44_app_id: Deno.env.get('BASE44_APP_ID'),
-      user_id: user.id,
-      user_email: user.email,
-      user_name: user.full_name,
-      tier_id: tier_id,
-      ...(referral_code && { referral_code })
+        base44_app_id: Deno.env.get('BASE44_APP_ID'),
+        user_id: user.id,
+        user_email: user.email,
+        user_name: user.full_name,
+        tier_id: tier_id,
+        product_type: 'membership',
+        ...(referral_code && { referral_code })
       }
     });
 

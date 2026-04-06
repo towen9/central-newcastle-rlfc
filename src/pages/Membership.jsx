@@ -16,7 +16,16 @@ export default function Membership() {
   const [showQR, setShowQR] = useState(false);
   const [user, setUser] = useState(null);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') === 'success') {
+      setPaymentSuccess(true);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -90,6 +99,27 @@ export default function Membership() {
       </div>
 
       <div className="px-5 py-6">
+        {/* Payment Success Banner */}
+        {paymentSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-5 mb-6"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Shield className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-emerald-900 text-lg mb-1">🎉 Welcome to the Club!</h3>
+                <p className="text-sm text-emerald-700">Your payment was successful. Your membership is now active — your digital pass is ready below.</p>
+                <p className="text-xs text-emerald-600 mt-2">Show your QR code at the gate on game day for entry.</p>
+              </div>
+            </div>
+            <button onClick={() => setPaymentSuccess(false)} className="mt-3 text-xs text-emerald-500 underline">Dismiss</button>
+          </motion.div>
+        )}
+
         {/* Photo Upload Required */}
         {showPhotoUpload && (
           <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-6">
