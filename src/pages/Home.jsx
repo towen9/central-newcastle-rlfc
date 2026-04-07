@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
+import DayPassCard from '../components/home/DayPassCard';
 
 export default function Home() {
   const [showQR, setShowQR] = useState(false);
@@ -42,17 +43,39 @@ export default function Home() {
     queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required')
   });
 
+  // Fetch valid day pass for non-members
+  const { data: dayPass } = useQuery({
+    queryKey: ['homeDayPass', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const passes = await base44.entities.GameDayEntry.filter({ user_id: user.id }, '-entry_timestamp');
+      return passes.find(p => p.status === 'valid') || null;
+    },
+    enabled: !!user?.id && !membership
+  });
+
+  const { data: dayPassFixture } = useQuery({
+    queryKey: ['dayPassFixture', dayPass?.event_id],
+    queryFn: async () => {
+      const fixtures = await base44.entities.Fixture.filter({ id: dayPass.event_id });
+      return fixtures[0] || null;
+    },
+    enabled: !!dayPass?.event_id
+  });
+
 
 
   const handleRefresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries(['membership']),
-      queryClient.invalidateQueries(['rewards'])
+      queryClient.invalidateQueries(['rewards']),
+      queryClient.invalidateQueries(['homeDayPass']),
+      queryClient.invalidateQueries(['dayPassFixture'])
     ]);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
         <div className="px-4 py-3 flex items-center justify-between">
@@ -91,7 +114,7 @@ export default function Home() {
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 pt-4 pb-32 space-y-3">
         {/* Non-member CTAs */}
-        {!membership && user && (
+        {!membership && !dayPass && user && (
           <div className="space-y-3">
             {/* Join Membership - Primary CTA */}
             <div className="relative rounded-2xl overflow-hidden shadow-xl">
@@ -144,13 +167,17 @@ export default function Home() {
           </div>
         )}
 
-        {/* Membership Pass */}
+        {/* Membership Pass or Day Pass */}
         <div className="relative z-10">
-          <MembershipPass 
-            membership={membership} 
-            user={user}
-            onShowQR={() => setShowQR(true)}
-          />
+          {!membership && dayPass ? (
+            <DayPassCard pass={dayPass} fixture={dayPassFixture} user={user} />
+          ) : (
+            <MembershipPass 
+              membership={membership} 
+              user={user}
+              onShowQR={() => setShowQR(true)}
+            />
+          )}
         </div>
 
         {/* Next Match */}

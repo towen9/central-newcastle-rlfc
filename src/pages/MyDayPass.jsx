@@ -83,7 +83,7 @@ export default function MyDayPass() {
               pass.status === 'used' ? 'bg-blue-900/30 text-blue-200' :
               'bg-red-500/30 text-red-200'
             }`}>
-              {isValid ? 'VALID TODAY ONLY' : pass.status === 'used' ? 'USED' : 'EXPIRED'}
+              {isValid ? `VALID · ${fixture ? format(fixtureDate, 'd MMM') : 'UPCOMING'}` : pass.status === 'used' ? 'USED' : 'EXPIRED'}
             </div>
           </div>
 
