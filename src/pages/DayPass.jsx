@@ -124,7 +124,7 @@ export default function DayPass() {
         <div className="bg-[#1a365d] pt-safe">
           <div className="px-5 py-6">
             <h1 className="text-white text-2xl font-bold mb-2">My Day Pass</h1>
-            <p className="text-blue-200">You already have a valid pass for today</p>
+            <p className="text-blue-200">Your digital pass is ready to use on game day</p>
           </div>
         </div>
 
@@ -171,7 +171,7 @@ export default function DayPass() {
               'Entry to the selected home game',
               'Special game-day offers & promotions',
               'Exclusive deals from our partners',
-              'Valid on game day only'
+              'Access your QR pass immediately after purchase'
             ].map((item, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">

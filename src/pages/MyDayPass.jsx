@@ -168,7 +168,7 @@ export default function MyDayPass() {
         {isValid && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
             <p className="text-sm text-amber-800 text-center">
-              ⏰ This pass expires at midnight tonight
+              ⏰ Show this QR code at the gate on match day
             </p>
           </div>
         )}
