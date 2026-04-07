@@ -199,6 +199,14 @@ export default function Home() {
           />
         </div>
 
+        {/* Sponsor Footer */}
+        <div className="flex flex-col items-center gap-2 py-3">
+          <p className="text-xs text-gray-400 uppercase tracking-widest font-medium">Proudly brought to you by</p>
+          <div className="bg-white rounded-xl px-6 py-3 shadow-sm border border-gray-100 flex items-center gap-2">
+            <span className="text-lg font-extrabold tracking-tight" style={{color: '#00B4D8'}}>ZOOM</span>
+            <span className="text-lg font-extrabold tracking-tight text-gray-800">ENERGY</span>
+          </div>
+        </div>
 
         </div>
       </PullToRefresh>
