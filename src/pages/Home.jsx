@@ -202,9 +202,12 @@ export default function Home() {
         {/* Sponsor Footer */}
         <div className="flex flex-col items-center gap-2 py-3">
           <p className="text-xs text-gray-400 uppercase tracking-widest font-medium">Proudly brought to you by</p>
-          <div className="bg-white rounded-xl px-6 py-3 shadow-sm border border-gray-100 flex items-center gap-2">
-            <span className="text-lg font-extrabold tracking-tight" style={{color: '#00B4D8'}}>ZOOM</span>
-            <span className="text-lg font-extrabold tracking-tight text-gray-800">ENERGY</span>
+          <div className="bg-white rounded-xl px-6 py-3 shadow-sm border border-gray-100">
+            <img 
+              src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png"
+              alt="Zoom Energy"
+              className="h-14 w-auto object-contain"
+            />
           </div>
         </div>
 
