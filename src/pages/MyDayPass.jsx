@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Ticket, Calendar, MapPin, CheckCircle, User, Clock } from 'lucide-react';
-import { format, isToday } from 'date-fns';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
 
@@ -44,7 +44,7 @@ export default function MyDayPass() {
   }
 
   const fixtureDate = new Date(fixture.date_time);
-  const isValid = pass.status === 'valid' && isToday(fixtureDate);
+  const isValid = pass.status === 'valid' && fixtureDate >= new Date(new Date().setHours(0,0,0,0));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pb-24">
