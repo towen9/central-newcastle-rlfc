@@ -40,23 +40,17 @@ export default function DayPass() {
     }
   });
 
-  // Check if user already has a pass for today
+  // Check if user already has any valid pass (not just today)
   const { data: existingPass } = useQuery({
     queryKey: ['myDayPass', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
       const passes = await base44.entities.GameDayEntry.filter({
         user_id: user.id
       }, '-entry_timestamp');
 
-      return passes.find(p => {
-        const passDate = new Date(p.entry_timestamp);
-        passDate.setHours(0, 0, 0, 0);
-        return passDate.getTime() === today.getTime() && p.status === 'valid';
-      });
+      // Return the most recent valid pass
+      return passes.find(p => p.status === 'valid') || null;
     },
     enabled: !!user?.id
   });
