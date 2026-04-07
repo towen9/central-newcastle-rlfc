@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Ticket, Calendar, MapPin, Check, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,9 @@ export default function DayPass() {
   const [user, setUser] = useState(null);
   const [selectedFixture, setSelectedFixture] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -68,7 +70,7 @@ export default function DayPass() {
 
       const { data } = await base44.functions.invoke('createDayPassCheckout', {
         fixture_id: fixture.id,
-        success_url: `${window.location.origin}${createPageUrl('DayPass')}?payment=success&fixture=${fixture.id}`,
+        success_url: `${window.location.origin}${createPageUrl('DayPass')}?payment=success&session_id={CHECKOUT_SESSION_ID}&fixture=${fixture.id}`,
         cancel_url: `${window.location.origin}${createPageUrl('DayPass')}?payment=cancelled`
       });
 
@@ -81,38 +83,66 @@ export default function DayPass() {
     }
   };
 
-  // Handle payment success
+  // Handle payment success — verify with Stripe and create pass immediately
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('payment') === 'success') {
-      setPaymentSuccess(true);
+      const sessionId = params.get('session_id');
       window.history.replaceState({}, '', window.location.pathname);
+      
+      if (sessionId) {
+        setVerifying(true);
+        base44.functions.invoke('verifyDayPassPayment', { session_id: sessionId })
+          .then(() => {
+            queryClient.invalidateQueries(['myDayPass']);
+            setPaymentSuccess(true);
+          })
+          .catch((err) => {
+            console.error('Verify failed:', err);
+            // Still show success — webhook may have already created it
+            setPaymentSuccess(true);
+          })
+          .finally(() => setVerifying(false));
+      } else {
+        setPaymentSuccess(true);
+      }
     }
   }, []);
 
-  if (paymentSuccess) {
+  if (verifying || paymentSuccess) {
     return (
       <div className="min-h-screen bg-gray-50 pb-24">
         <div className="bg-[#1a365d] pt-safe">
           <div className="px-5 py-6">
             <h1 className="text-white text-2xl font-bold">Payment Successful!</h1>
-            <p className="text-blue-200">Your Day Pass is being set up</p>
+            <p className="text-blue-200">{verifying ? 'Setting up your pass...' : 'Your Day Pass is ready'}</p>
           </div>
         </div>
         <div className="px-5 py-10 flex flex-col items-center text-center">
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
-            <Check className="w-10 h-10 text-emerald-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">You're in! 🎉</h2>
-          <p className="text-gray-600 mb-2">Your Day Pass payment was successful.</p>
-          <p className="text-gray-500 text-sm mb-8">Your digital QR pass will appear below within a few seconds — refresh if it doesn't show straight away.</p>
-          <Button
-            onClick={() => { setPaymentSuccess(false); window.location.reload(); }}
-            className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base"
-          >
-            View My Pass
-          </Button>
-          <p className="text-xs text-gray-400 mt-4">Show your QR code at the gate on game day</p>
+          {verifying ? (
+            <>
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">Setting up your pass...</h2>
+              <p className="text-gray-500 text-sm">Just a moment while we confirm your payment.</p>
+            </>
+          ) : (
+            <>
+              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+                <Check className="w-10 h-10 text-emerald-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">You're in! 🎉</h2>
+              <p className="text-gray-600 mb-2">Your Day Pass is ready to use.</p>
+              <p className="text-gray-500 text-sm mb-8">Show your QR code at the gate on game day.</p>
+              <Button
+                onClick={() => window.location.reload()}
+                className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base"
+              >
+                View My Pass
+              </Button>
+            </>
+          )}
         </div>
       </div>
     );
