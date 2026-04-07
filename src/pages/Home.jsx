@@ -78,6 +78,15 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
+        {/* Sponsor Strip */}
+        <div className="bg-white/10 border-b border-white/10 px-4 py-1 flex items-center justify-center gap-2">
+          <span className="text-white/60 text-[10px] uppercase tracking-widest font-medium">Proudly brought to you by</span>
+          <img 
+            src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png"
+            alt="Zoom Energy"
+            className="h-5 w-auto object-contain brightness-0 invert"
+          />
+        </div>
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
@@ -199,17 +208,7 @@ export default function Home() {
           />
         </div>
 
-        {/* Sponsor Footer */}
-        <div className="flex flex-col items-center gap-2 py-3">
-          <p className="text-xs text-gray-400 uppercase tracking-widest font-medium">Proudly brought to you by</p>
-          <div className="bg-white rounded-xl px-6 py-3 shadow-sm border border-gray-100">
-            <img 
-              src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png"
-              alt="Zoom Energy"
-              className="h-14 w-auto object-contain"
-            />
-          </div>
-        </div>
+
 
         </div>
       </PullToRefresh>
