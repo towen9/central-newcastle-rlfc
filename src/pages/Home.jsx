@@ -141,7 +141,7 @@ export default function Home() {
                   <div className="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center">
                     <ShieldCheck className="w-4 h-4 text-amber-900" />
                   </div>
-                  <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">2026 Season Memberships</span>
+                  <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">2026 Zoom Energy Season Memberships</span>
                 </div>
                 <h3 className="text-white text-2xl font-extrabold mb-1 leading-tight">Join the Butcher Boys</h3>
                 <p className="text-blue-200 text-sm mb-5">From $40 — season entry, rewards points, exclusive member perks & sponsor deals</p>
