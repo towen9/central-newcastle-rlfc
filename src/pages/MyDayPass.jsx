@@ -50,6 +50,13 @@ export default function MyDayPass() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pb-24">
       {/* Header */}
       <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] pt-safe pb-8">
+        <div className="flex items-center justify-center gap-2 bg-white/5 border-b border-white/10 px-4 py-1.5">
+          <span className="text-white/50 text-[9px] uppercase tracking-[0.15em] font-semibold">Proudly brought to you by</span>
+          <div className="h-px w-3 bg-white/20" />
+          <div className="bg-white rounded px-2 py-0.5">
+            <img src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png" alt="Zoom Energy" className="h-4 w-auto object-contain" />
+          </div>
+        </div>
         <div className="px-6 py-6 text-center">
           <img 
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"

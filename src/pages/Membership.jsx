@@ -85,6 +85,13 @@ export default function Membership() {
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
+        <div className="flex items-center justify-center gap-2 bg-white/5 border-b border-white/10 px-4 py-1.5">
+          <span className="text-white/50 text-[9px] uppercase tracking-[0.15em] font-semibold">Proudly brought to you by</span>
+          <div className="h-px w-3 bg-white/20" />
+          <div className="bg-white rounded px-2 py-0.5">
+            <img src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png" alt="Zoom Energy" className="h-4 w-auto object-contain" />
+          </div>
+        </div>
         <div className="px-5 py-4 flex items-center gap-4">
           <Link to={createPageUrl('Home')}>
             <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
