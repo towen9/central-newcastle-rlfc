@@ -79,13 +79,20 @@ export default function Home() {
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
         {/* Sponsor Strip */}
-        <div className="bg-white/10 border-b border-white/10 px-4 py-1 flex items-center justify-center gap-2">
-          <span className="text-white/60 text-[10px] uppercase tracking-widest font-medium">Proudly brought to you by</span>
-          <img 
-            src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png"
-            alt="Zoom Energy"
-            className="h-5 w-auto object-contain brightness-0 invert"
-          />
+        <div className="bg-white/5 border-b border-white/10 px-4 py-1.5 flex items-center justify-center gap-3">
+          <span className="text-white/50 text-[9px] uppercase tracking-[0.15em] font-semibold">Proudly brought to you by</span>
+          <div className="h-px w-3 bg-white/20" />
+          <div className="bg-white rounded px-2 py-0.5 flex items-center">
+            <img 
+              src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png"
+              alt="Zoom Energy"
+              className="h-4 w-auto object-contain"
+              onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+            />
+            <span className="hidden text-xs font-extrabold tracking-tight" style={{display:'none'}}>
+              <span style={{color:'#00B4D8'}}>ZOOM</span><span className="text-gray-800"> ENERGY</span>
+            </span>
+          </div>
         </div>
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
