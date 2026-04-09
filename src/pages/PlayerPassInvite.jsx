@@ -10,7 +10,7 @@ const steps = [
   {
     icon: Smartphone,
     title: 'Download & Sign Up',
-    description: 'Open the Butcher Boys app and create your free account using your email address.'
+    description: 'Open the Central Newcastle RLFC app and create your free account using your email address.'
   },
   {
     icon: ShieldCheck,
@@ -32,8 +32,7 @@ const steps = [
 const perks = [
   'FREE entry to all home games — scan your QR at the gate',
   'Digital QR pass on your phone — no card needed',
-  '20% off all club club merchandise',
-  'Earn & redeem rewards points',
+  'Earn & redeem rewards points at the bar & more',
   'Exclusive member-only events',
   'All sponsor deals & discounts'
 ];
@@ -68,7 +67,7 @@ export default function PlayerPassInvite() {
               <span className="text-amber-300 text-sm font-semibold">2026 Player Pass</span>
             </div>
             <h1 className="text-white text-3xl font-extrabold mb-3 leading-tight">
-              You're Invited,<br />Butcher Boy! 🏉
+              You're Invited,<br />Central Player! 🏉
             </h1>
             <p className="text-blue-200 text-base max-w-xs mx-auto">
               As a registered player, you get a <strong className="text-white">FREE digital pass</strong> — your ticket into every home game, plus rewards, discounts & exclusive perks.
