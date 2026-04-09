@@ -56,6 +56,7 @@ export default function JoinMembership() {
   const [selectedTier, setSelectedTier] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [user, setUser] = useState(null);
+  const [highlightTier, setHighlightTier] = useState(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -63,6 +64,17 @@ export default function JoinMembership() {
       setUser(userData);
     };
     loadUser();
+    // Read ?tier= param to highlight a specific tier
+    const urlParams = new URLSearchParams(window.location.search);
+    const tierParam = urlParams.get('tier');
+    if (tierParam) {
+      setHighlightTier(decodeURIComponent(tierParam));
+      // Scroll to it after render
+      setTimeout(() => {
+        const el = document.getElementById(`tier-${decodeURIComponent(tierParam).replace(/\s+/g, '-').toLowerCase()}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
   }, []);
 
   const { data: tiers = [] } = useQuery({
@@ -162,7 +174,14 @@ export default function JoinMembership() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className={`relative rounded-2xl overflow-hidden shadow-lg ${isFeatured ? 'ring-2 ring-amber-400' : 'border border-gray-100'}`}
+                id={`tier-${tier.name.replace(/\s+/g, '-').toLowerCase()}`}
+                className={`relative rounded-2xl overflow-hidden shadow-lg ${
+                  highlightTier === tier.name
+                    ? 'ring-4 ring-amber-400 shadow-amber-200'
+                    : isFeatured
+                    ? 'ring-2 ring-amber-400'
+                    : 'border border-gray-100'
+                }`}
               >
                 {isFeatured && (
                   <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-bl-xl z-10">
