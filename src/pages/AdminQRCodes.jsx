@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, QrCode, Edit2, Trash2, MoreVertical, Download, Copy } from 'lucide-react';
+import { Plus, QrCode, Edit2, Trash2, MoreVertical, Download, Copy, Printer } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -157,10 +159,14 @@ export default function AdminQRCodes() {
                     <QrCode className="w-4 h-4 mr-2" />
                     View QR
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => downloadQR(qr)}>
+                  <DropdownMenuItem onClick={() => window.open(`/GateQRPoster?qr_id=${qr.qr_id}`, '_blank')}>
+                    <Printer className="w-4 h-4 mr-2" />
+                    Print Poster
+                  </DropdownMenuItem>
+                   <DropdownMenuItem onClick={() => downloadQR(qr)}>
                     <Download className="w-4 h-4 mr-2" />
                     Download
-                  </DropdownMenuItem>
+                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => copyQRData(qr)}>
                     <Copy className="w-4 h-4 mr-2" />
                     Copy Data
