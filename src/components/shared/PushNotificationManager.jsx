@@ -9,60 +9,49 @@ export default function PushNotificationManager() {
   useEffect(() => {
     const initPush = async () => {
       try {
-        const userData = await base44.auth.me();
-        setUser(userData);
-
-        // First, enable push for the user if not already enabled
-        if (!userData?.push_enabled) {
-          await base44.auth.updateMe({ push_enabled: true });
-        }
-
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-          console.log('Push notifications not supported');
-          return;
-        }
-
-        // Register service worker first
-        const registration = await navigator.serviceWorker.register('/sw.js').catch(() => null);
-        if (!registration) {
-          console.error('Service worker registration failed');
-          return;
-        }
-
-        await navigator.serviceWorker.ready;
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
         const permission = Notification.permission;
         const alreadyAsked = localStorage.getItem('push_asked');
 
-        // If already granted, register push
+        // Don't do anything heavy if already denied
+        if (permission === 'denied') return;
+
+        // Register service worker
+        const registration = await navigator.serviceWorker.register('/sw.js').catch(() => null);
+        if (!registration) return;
+
+        await navigator.serviceWorker.ready;
+
+        // If already granted, just register push subscription
         if (permission === 'granted') {
+          const userData = await base44.auth.me();
           await registerPushSubscription(userData);
           return;
         }
 
-        // Ask after 3 seconds if not asked before and not denied
-        if (!alreadyAsked && permission !== 'denied') {
+        // Ask after 3 seconds if not asked before
+        if (!alreadyAsked) {
           setTimeout(() => {
-            if (!hasAsked) {
-              requestNotificationPermission(userData);
-            }
+            requestNotificationPermission();
           }, 3000);
         }
       } catch (error) {
-        console.error('Push init error:', error);
+        // Silent fail — push is non-critical
       }
     };
 
     initPush();
   }, []);
 
-  const requestNotificationPermission = async (userData) => {
+  const requestNotificationPermission = async () => {
     setHasAsked(true);
     localStorage.setItem('push_asked', 'true');
 
     const permission = await Notification.requestPermission();
     
     if (permission === 'granted') {
+      const userData = await base44.auth.me();
       await registerPushSubscription(userData);
       toast.success('Push notifications enabled!');
     }
