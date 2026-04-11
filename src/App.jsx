@@ -10,6 +10,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import PlayerPassInvite from './pages/PlayerPassInvite';
 import AdminReferrals from './pages/AdminReferrals';
 import GateQRPoster from './pages/GateQRPoster';
+import AdminBulkImportSponsors from './pages/AdminBulkImportSponsors';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -64,6 +65,7 @@ const AuthenticatedApp = () => {
       <Route path="/PlayerPassInvite" element={<LayoutWrapper currentPageName="PlayerPassInvite"><PlayerPassInvite /></LayoutWrapper>} />
       <Route path="/AdminReferrals" element={<LayoutWrapper currentPageName="AdminReferrals"><AdminReferrals /></LayoutWrapper>} />
       <Route path="/GateQRPoster" element={<GateQRPoster />} />
+      <Route path="/AdminBulkImportSponsors" element={<LayoutWrapper currentPageName="AdminBulkImportSponsors"><AdminBulkImportSponsors /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
