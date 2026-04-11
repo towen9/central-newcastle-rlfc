@@ -43,6 +43,7 @@ const adminMenuItems = [
   { icon: MessageSquare, label: 'SMS', page: 'AdminSMSNotifications', color: 'bg-green-500' },
   { icon: LineChart, label: 'Performance', page: 'AdminPerformance', color: 'bg-violet-500' },
   { icon: AlertTriangle, label: 'Monitoring', page: 'AdminMonitoring', color: 'bg-rose-500' },
+  { icon: Upload, label: 'Bulk Sponsors', page: 'AdminBulkImportSponsors', color: 'bg-teal-500' },
 ];
 
 export default function AdminDashboard() {
