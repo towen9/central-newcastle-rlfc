@@ -226,6 +226,16 @@ export default function Profile() {
           </div>
         </Link>
 
+        {/* Clear Cache */}
+        <Button
+          variant="outline"
+          onClick={handleClearCache}
+          className="w-full border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+        >
+          <RefreshCw className="w-5 h-5 mr-2" />
+          Clear Cache & Refresh
+        </Button>
+
         {/* Notification Preferences */}
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center gap-3">
@@ -250,16 +260,6 @@ export default function Profile() {
             ))}
           </div>
         </div>
-
-        {/* Clear Cache */}
-        <Button
-          variant="outline"
-          onClick={handleClearCache}
-          className="w-full border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-        >
-          <RefreshCw className="w-5 h-5 mr-2" />
-          Clear Cache & Refresh
-        </Button>
 
         {/* Logout */}
         <Button
