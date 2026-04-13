@@ -8,7 +8,7 @@ import MembershipPass from '../components/home/MembershipPass';
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';
 import NextMatch from '../components/home/NextMatch';
-import LatestNews from '../components/home/LatestNews';
+
 import { Button } from '@/components/ui/button';
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
@@ -44,12 +44,7 @@ export default function Home() {
     enabled: membership !== undefined
   });
 
-  // 3 latest news items — fetched early for above-fold content
-  const { data: news = [], isLoading: newsLoading } = useQuery({
-    queryKey: ['homeNews'],
-    queryFn: () => base44.entities.News.filter({ is_published: true }, '-publish_date', 3),
-    enabled: !!user
-  });
+
 
   // Fetch valid day pass for non-members
   const { data: dayPass } = useQuery({
@@ -81,7 +76,6 @@ export default function Home() {
       queryClient.invalidateQueries(['rewards']),
       queryClient.invalidateQueries(['homeDayPass']),
       queryClient.invalidateQueries(['dayPassFixture']),
-      queryClient.invalidateQueries(['homeNews'])
     ]);
   };
 
@@ -243,19 +237,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Latest News */}
-        <div>
-          {newsLoading ? (
-            <div className="space-y-3">
-              <div className="h-5 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-              {[1,2,3].map(i => (
-                <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
-              ))}
-            </div>
-          ) : (
-            <LatestNews news={news} />
-          )}
-        </div>
+
 
         </div>
       </PullToRefresh>
