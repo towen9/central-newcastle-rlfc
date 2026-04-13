@@ -1,70 +1,65 @@
 import React, { useState, useRef } from 'react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 
 export default function PullToRefresh({ onRefresh, children }) {
+  const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const y = useMotionValue(0);
+  const startY = useRef(null);
   const containerRef = useRef(null);
-  const startY = useRef(0);
 
-  const opacity = useTransform(y, [0, 80], [0, 1]);
-  const scale = useTransform(y, [0, 80], [0.5, 1]);
-  const rotate = useTransform(y, [0, 360], [0, 360]);
+  const THRESHOLD = 70;
 
-  const handleDragStart = (event, info) => {
+  const handleTouchStart = (e) => {
     const container = containerRef.current;
     if (container && container.scrollTop === 0) {
-      startY.current = info.point.y;
+      startY.current = e.touches[0].clientY;
     } else {
-      startY.current = -1;
+      startY.current = null;
     }
   };
 
-  const handleDrag = (event, info) => {
-    if (startY.current === -1) return;
-    const delta = Math.max(0, info.point.y - startY.current);
-    y.set(Math.min(delta * 0.5, 80));
+  const handleTouchMove = (e) => {
+    if (startY.current === null || isRefreshing) return;
+    const delta = e.touches[0].clientY - startY.current;
+    if (delta > 0) {
+      setPullDistance(Math.min(delta * 0.5, THRESHOLD));
+    }
   };
 
-  const handleDragEnd = async (event, info) => {
-    if (y.get() > 60 && !isRefreshing) {
+  const handleTouchEnd = async () => {
+    if (pullDistance >= THRESHOLD && !isRefreshing) {
       setIsRefreshing(true);
+      setPullDistance(THRESHOLD);
       await onRefresh();
       setIsRefreshing(false);
     }
-    y.set(0);
+    setPullDistance(0);
+    startY.current = null;
   };
 
+  const showIndicator = pullDistance > 10 || isRefreshing;
+
   return (
-    <motion.div
+    <div
       ref={containerRef}
       className="overflow-y-auto h-full"
-      style={{ 
-        WebkitOverflowScrolling: 'touch',
-        touchAction: 'pan-y'
-      }}
-      drag="y"
-      dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={{ top: 0.2, bottom: 0 }}
-      onDragStart={handleDragStart}
-      onDrag={handleDrag}
-      onDragEnd={handleDragEnd}
+      style={{ WebkitOverflowScrolling: 'touch' }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      <motion.div
-        className="flex justify-center py-4"
-        style={{ opacity }}
-      >
-        <motion.div
-          className="w-8 h-8 text-[#1a365d] dark:text-blue-400"
-          style={{ scale, rotate: isRefreshing ? rotate : 0 }}
-          animate={isRefreshing ? { rotate: 360 } : {}}
-          transition={isRefreshing ? { repeat: Infinity, duration: 1, ease: "linear" } : {}}
+      {showIndicator && (
+        <div
+          className="flex justify-center py-3 transition-all"
+          style={{ height: isRefreshing ? 48 : pullDistance }}
         >
-          <RefreshCw className="w-8 h-8" />
-        </motion.div>
-      </motion.div>
+          <RefreshCw
+            className={`w-6 h-6 text-[#1a365d] dark:text-blue-400 ${isRefreshing ? 'animate-spin' : ''}`}
+            style={{ transform: `rotate(${pullDistance * 3}deg)` }}
+          />
+        </div>
+      )}
       {children}
-    </motion.div>
+    </div>
   );
 }
