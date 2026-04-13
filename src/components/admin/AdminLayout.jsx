@@ -37,7 +37,7 @@ export default function AdminLayout({ children, title, currentPage }) {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-[#1a365d] text-white">
+      <div className="bg-[#1a365d] text-white" style={{paddingTop: 'env(safe-area-inset-top, 0px)'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
