@@ -1,104 +1,60 @@
 /**
  * pages.config.js - Page routing configuration
- * 
- * This file is AUTO-GENERATED. Do not add imports or modify PAGES manually.
- * Pages are auto-registered when you create files in the ./pages/ folder.
- * 
- * THE ONLY EDITABLE VALUE: mainPage
- * This controls which page is the landing page (shown when users visit the app).
- * 
- * Example file structure:
- * 
- *   import HomePage from './pages/HomePage';
- *   import Dashboard from './pages/Dashboard';
- *   import Settings from './pages/Settings';
- *   
- *   export const PAGES = {
- *       "HomePage": HomePage,
- *       "Dashboard": Dashboard,
- *       "Settings": Settings,
- *   }
- *   
- *   export const pagesConfig = {
- *       mainPage: "HomePage",
- *       Pages: PAGES,
- *   };
- * 
- * Example with Layout (wraps all pages):
- *
- *   import Home from './pages/Home';
- *   import Settings from './pages/Settings';
- *   import __Layout from './Layout.jsx';
- *
- *   export const PAGES = {
- *       "Home": Home,
- *       "Settings": Settings,
- *   }
- *
- *   export const pagesConfig = {
- *       mainPage: "Home",
- *       Pages: PAGES,
- *       Layout: __Layout,
- *   };
- *
- * To change the main page from HomePage to Dashboard, use find_replace:
- *   Old: mainPage: "HomePage",
- *   New: mainPage: "Dashboard",
- *
- * The mainPage value must match a key in the PAGES object exactly.
+ * Home is eagerly loaded; all other pages are lazy-loaded to reduce initial bundle size.
  */
-import AdminBulkImport from './pages/AdminBulkImport';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminEvents from './pages/AdminEvents';
-import AdminFixtures from './pages/AdminFixtures';
-import AdminFixturesComms from './pages/AdminFixturesComms';
-import AdminGameDay from './pages/AdminGameDay';
-import AdminLocationDiscounts from './pages/AdminLocationDiscounts';
-import AdminMembers from './pages/AdminMembers';
-import AdminMonitoring from './pages/AdminMonitoring';
-import AdminNews from './pages/AdminNews';
-import AdminOffers from './pages/AdminOffers';
-import AdminPerformance from './pages/AdminPerformance';
-import AdminPushNotifications from './pages/AdminPushNotifications';
-import AdminQRCodes from './pages/AdminQRCodes';
-import AdminRewards from './pages/AdminRewards';
-import AdminSMSNotifications from './pages/AdminSMSNotifications';
-import AdminSponsors from './pages/AdminSponsors';
-import AdminTransactions from './pages/AdminTransactions';
-import AdminUsers from './pages/AdminUsers';
-import BarScan from './pages/BarScan';
-import Benefits from './pages/Benefits';
-import CanteenStaffGuide from './pages/CanteenStaffGuide';
-import CanteenStaffLogin from './pages/CanteenStaffLogin';
-import CheckIn from './pages/CheckIn';
-import DayPass from './pages/DayPass';
-import DayPassQR from './pages/DayPassQR';
-import Fixtures from './pages/Fixtures';
-import GameDayCheckIn from './pages/GameDayCheckIn';
-import GameDayPass from './pages/GameDayPass';
-import GateScan from './pages/GateScan';
-import GateStaffGuide from './pages/GateStaffGuide';
-import GateStaffLogin from './pages/GateStaffLogin';
+import { lazy } from 'react';
 import Home from './pages/Home';
-import HowPointsWork from './pages/HowPointsWork';
-import JoinMembership from './pages/JoinMembership';
-import LeaguesClubScan from './pages/LeaguesClubScan';
-import Membership from './pages/Membership';
-import MyDayPass from './pages/MyDayPass';
-import News from './pages/News';
-import Offers from './pages/Offers';
-import OldButchers from './pages/OldButchers';
-import OldButchersHonourRoll from './pages/OldButchersHonourRoll';
-import PhotoCapture from './pages/PhotoCapture';
-import PlayerPassRegistration from './pages/PlayerPassRegistration';
-import PointsRewards from './pages/PointsRewards';
-import Profile from './pages/Profile';
-import Rewards from './pages/Rewards';
-import ScanForPoints from './pages/ScanForPoints';
-import Sponsors from './pages/Sponsors';
-import TroubleshootingGuide from './pages/TroubleshootingGuide';
 import __Layout from './Layout.jsx';
 
+const AdminBulkImport = lazy(() => import('./pages/AdminBulkImport'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminEvents = lazy(() => import('./pages/AdminEvents'));
+const AdminFixtures = lazy(() => import('./pages/AdminFixtures'));
+const AdminFixturesComms = lazy(() => import('./pages/AdminFixturesComms'));
+const AdminGameDay = lazy(() => import('./pages/AdminGameDay'));
+const AdminLocationDiscounts = lazy(() => import('./pages/AdminLocationDiscounts'));
+const AdminMembers = lazy(() => import('./pages/AdminMembers'));
+const AdminMonitoring = lazy(() => import('./pages/AdminMonitoring'));
+const AdminNews = lazy(() => import('./pages/AdminNews'));
+const AdminOffers = lazy(() => import('./pages/AdminOffers'));
+const AdminPerformance = lazy(() => import('./pages/AdminPerformance'));
+const AdminPushNotifications = lazy(() => import('./pages/AdminPushNotifications'));
+const AdminQRCodes = lazy(() => import('./pages/AdminQRCodes'));
+const AdminRewards = lazy(() => import('./pages/AdminRewards'));
+const AdminSMSNotifications = lazy(() => import('./pages/AdminSMSNotifications'));
+const AdminSponsors = lazy(() => import('./pages/AdminSponsors'));
+const AdminTransactions = lazy(() => import('./pages/AdminTransactions'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers'));
+const BarScan = lazy(() => import('./pages/BarScan'));
+const Benefits = lazy(() => import('./pages/Benefits'));
+const CanteenStaffGuide = lazy(() => import('./pages/CanteenStaffGuide'));
+const CanteenStaffLogin = lazy(() => import('./pages/CanteenStaffLogin'));
+const CheckIn = lazy(() => import('./pages/CheckIn'));
+const DayPass = lazy(() => import('./pages/DayPass'));
+const DayPassQR = lazy(() => import('./pages/DayPassQR'));
+const Fixtures = lazy(() => import('./pages/Fixtures'));
+const GameDayCheckIn = lazy(() => import('./pages/GameDayCheckIn'));
+const GameDayPass = lazy(() => import('./pages/GameDayPass'));
+const GateScan = lazy(() => import('./pages/GateScan'));
+const GateStaffGuide = lazy(() => import('./pages/GateStaffGuide'));
+const GateStaffLogin = lazy(() => import('./pages/GateStaffLogin'));
+const HowPointsWork = lazy(() => import('./pages/HowPointsWork'));
+const JoinMembership = lazy(() => import('./pages/JoinMembership'));
+const LeaguesClubScan = lazy(() => import('./pages/LeaguesClubScan'));
+const Membership = lazy(() => import('./pages/Membership'));
+const MyDayPass = lazy(() => import('./pages/MyDayPass'));
+const News = lazy(() => import('./pages/News'));
+const Offers = lazy(() => import('./pages/Offers'));
+const OldButchers = lazy(() => import('./pages/OldButchers'));
+const OldButchersHonourRoll = lazy(() => import('./pages/OldButchersHonourRoll'));
+const PhotoCapture = lazy(() => import('./pages/PhotoCapture'));
+const PlayerPassRegistration = lazy(() => import('./pages/PlayerPassRegistration'));
+const PointsRewards = lazy(() => import('./pages/PointsRewards'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Rewards = lazy(() => import('./pages/Rewards'));
+const ScanForPoints = lazy(() => import('./pages/ScanForPoints'));
+const Sponsors = lazy(() => import('./pages/Sponsors'));
+const TroubleshootingGuide = lazy(() => import('./pages/TroubleshootingGuide'));
 
 export const PAGES = {
     "AdminBulkImport": AdminBulkImport,
