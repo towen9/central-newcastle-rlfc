@@ -115,7 +115,7 @@ export default function Profile() {
   ];
 
   return (
-    <div className="bg-gray-50" style={{height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch'}}>
+    <div className="bg-gray-50" style={{height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'none'}}>
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
         <div className="px-5 py-4 flex items-center gap-4">

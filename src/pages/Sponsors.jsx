@@ -31,7 +31,7 @@ export default function Sponsors() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="bg-gray-50" style={{height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'none', paddingBottom: '6rem'}}>
       {/* Header */}
       <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] pt-safe">
         <div className="px-5 py-6 flex items-center gap-4">
