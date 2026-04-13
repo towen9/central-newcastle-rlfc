@@ -15,6 +15,7 @@ import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 
 const tabMenuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', page: 'AdminDashboard' },
+  { icon: Shield, label: 'Gate Scan', page: 'GateScan' },
   { icon: Users, label: 'Members', page: 'AdminMembers' },
   { icon: UserCog, label: 'Users', page: 'AdminUsers' },
   { icon: Upload, label: 'Bulk Import', page: 'AdminBulkImport' },
