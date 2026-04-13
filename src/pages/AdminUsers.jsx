@@ -68,7 +68,7 @@ export default function AdminUsers() {
 
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }) => {
-      await base44.entities.User.update(userId, { role });
+      await base44.functions.invoke('updateUserRole', { userId, role });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['allUsers']);
