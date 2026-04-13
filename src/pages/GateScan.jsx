@@ -225,9 +225,9 @@ export default function GateScan() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: '#f9fafb'}}>
       {/* Header */}
-      <div className="bg-[#1a365d] text-white">
+      <div className="bg-[#1a365d] text-white" style={{paddingTop: 'env(safe-area-inset-top, 0px)'}}>
         <div className="px-5 py-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
