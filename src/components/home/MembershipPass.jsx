@@ -73,6 +73,7 @@ export default function MembershipPass({ membership, user, onShowQR }) {
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-0.5">
               <img
+                loading="lazy"
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
                 alt="Central Newcastle RLFC"
                 className="w-full h-full object-contain"
@@ -149,7 +150,7 @@ export default function MembershipPass({ membership, user, onShowQR }) {
         <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-white/10">
           <span className="text-white/40 text-[9px] uppercase tracking-widest">Brought to you by</span>
           <div className="bg-white rounded px-1.5 py-0.5">
-            <img src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png" alt="Zoom Energy" className="h-3 w-auto object-contain" />
+            <img loading="lazy" src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png" alt="Zoom Energy" className="h-3 w-auto object-contain" />
           </div>
         </div>
       </div>

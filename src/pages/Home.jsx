@@ -74,8 +74,21 @@ export default function Home() {
     ]);
   };
 
+  if (!user) {
+    return (
+      <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+        <div className="bg-[#1a365d] h-20" />
+        <div className="px-4 pt-4 space-y-3">
+          <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />
+          <div className="h-28 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />
+          <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-hidden">
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
         {/* Sponsor Strip */}
