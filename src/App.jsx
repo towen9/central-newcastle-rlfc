@@ -21,8 +21,21 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
 
+const hideSplash = () => {
+  const splash = document.getElementById('splash');
+  if (splash && !splash.classList.contains('hide')) {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 350);
+  }
+};
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+
+  // Hide splash once auth state is resolved
+  if (!isLoadingPublicSettings && !isLoadingAuth) {
+    hideSplash();
+  }
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
