@@ -252,7 +252,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Link to={createPageUrl('GateScan')}>
                 <div className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                   <h3 className="font-bold mb-1">🎫 Gate Scanner</h3>
@@ -265,6 +265,12 @@ export default function AdminDashboard() {
                   <p className="text-sm text-green-100">Award points for purchases</p>
                 </div>
               </Link>
+              <button onClick={() => { window.location.href = '/GateScan'; }} className="w-full text-left">
+                <div className="p-4 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors h-full">
+                  <h3 className="font-bold mb-1">🚪 Enter Gate Staff Mode</h3>
+                  <p className="text-sm text-amber-100">Open gate scanner as admin — no role change needed</p>
+                </div>
+              </button>
             </div>
           </CardContent>
         </Card>

@@ -93,6 +93,7 @@ export default function AdminUsers() {
   };
 
   const adminCount = users.filter(u => u.role === 'admin').length;
+  const gateStaffCount = users.filter(u => u.role === 'gate_staff').length;
   const userCount = users.filter(u => u.role === 'user').length;
 
   return (
@@ -110,7 +111,7 @@ export default function AdminUsers() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Total Users</p>
           <p className="text-2xl font-bold text-gray-900">{users.length}</p>
@@ -118,6 +119,10 @@ export default function AdminUsers() {
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Admins</p>
           <p className="text-2xl font-bold text-blue-600">{adminCount}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Gate Staff</p>
+          <p className="text-2xl font-bold text-amber-600">{gateStaffCount}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Members</p>
@@ -165,6 +170,10 @@ export default function AdminUsers() {
                         <Shield className="w-3 h-3" />
                         Admin
                       </span>
+                    ) : user.role === 'gate_staff' ? (
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 flex items-center gap-1">
+                        🚪 Gate Staff
+                      </span>
                     ) : (
                       <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 flex items-center gap-1">
                         <UserIcon className="w-3 h-3" />
@@ -190,12 +199,25 @@ export default function AdminUsers() {
                         >
                           Remove Admin Access
                         </DropdownMenuItem>
-                      ) : (
+                      ) : user.role === 'gate_staff' ? (
                         <DropdownMenuItem 
-                          onClick={() => updateRoleMutation.mutate({ userId: user.id, role: 'admin' })}
+                          onClick={() => updateRoleMutation.mutate({ userId: user.id, role: 'user' })}
                         >
-                          Make Admin
+                          Remove Gate Staff Role
                         </DropdownMenuItem>
+                      ) : (
+                        <>
+                          <DropdownMenuItem 
+                            onClick={() => updateRoleMutation.mutate({ userId: user.id, role: 'admin' })}
+                          >
+                            Make Admin
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => updateRoleMutation.mutate({ userId: user.id, role: 'gate_staff' })}
+                          >
+                            Make Gate Staff
+                          </DropdownMenuItem>
+                        </>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -237,11 +259,12 @@ export default function AdminUsers() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="gate_staff">Gate Staff</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-gray-500 mt-1">
-                {inviteRole === 'admin' ? 'Admin users have full access to the dashboard' : 'Regular users can access the member app'}
+                {inviteRole === 'admin' ? 'Admin users have full access to the dashboard' : inviteRole === 'gate_staff' ? 'Gate staff can access the gate scanner only' : 'Regular users can access the member app'}
               </p>
             </div>
             <div className="flex justify-end gap-2 pt-4">
