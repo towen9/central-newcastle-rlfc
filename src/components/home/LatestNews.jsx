@@ -18,7 +18,7 @@ export default function LatestNews({ news = [] }) {
       </div>
       
       <div className="space-y-3">
-        {news.slice(0, 2).map((item, idx) => (
+        {news.slice(0, 3).map((item, idx) => (
           <Link key={idx} to={createPageUrl(`News?newsId=${item.id}`)}>
             <motion.div
               whileHover={{ scale: 1.01 }}
@@ -26,6 +26,7 @@ export default function LatestNews({ news = [] }) {
             >
               {item.image_url ? (
                 <img 
+                  loading="lazy"
                   src={item.image_url} 
                   alt={item.title}
                   className="w-20 h-20 rounded-lg object-cover flex-shrink-0"

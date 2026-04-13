@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bell, Settings, ShieldCheck } from 'lucide-react';
+import { Bell, Settings, ShieldCheck, Ticket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import MembershipPass from '../components/home/MembershipPass';
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';
 import NextMatch from '../components/home/NextMatch';
-import { Ticket } from 'lucide-react';
+import LatestNews from '../components/home/LatestNews';
 import { Button } from '@/components/ui/button';
-
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
 import DayPassCard from '../components/home/DayPassCard';
@@ -38,9 +37,18 @@ export default function Home() {
     enabled: !!user?.id
   });
 
+  // Defer rewards until after membership loads
   const { data: rewards = [] } = useQuery({
     queryKey: ['rewards'],
-    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required')
+    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required'),
+    enabled: membership !== undefined
+  });
+
+  // 3 latest news items — fetched early for above-fold content
+  const { data: news = [], isLoading: newsLoading } = useQuery({
+    queryKey: ['homeNews'],
+    queryFn: () => base44.entities.News.filter({ is_published: true }, '-publish_date', 3),
+    enabled: !!user
   });
 
   // Fetch valid day pass for non-members
@@ -65,12 +73,15 @@ export default function Home() {
 
 
 
+  const membershipLoading = !!user?.id && membership === undefined;
+
   const handleRefresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries(['membership']),
       queryClient.invalidateQueries(['rewards']),
       queryClient.invalidateQueries(['homeDayPass']),
-      queryClient.invalidateQueries(['dayPassFixture'])
+      queryClient.invalidateQueries(['dayPassFixture']),
+      queryClient.invalidateQueries(['homeNews'])
     ]);
   };
 
@@ -88,7 +99,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-hidden">
+    <div className="flex flex-col bg-gray-50 dark:bg-gray-900" style={{height: '100%', overflow: 'hidden'}}>
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
         {/* Sponsor Strip */}
@@ -198,7 +209,9 @@ export default function Home() {
 
         {/* Membership Pass or Day Pass */}
         <div className="relative z-10">
-          {!membership && dayPass ? (
+          {membershipLoading ? (
+            <div className="h-44 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />
+          ) : !membership && dayPass ? (
             <DayPassCard pass={dayPass} fixture={dayPassFixture} user={user} />
           ) : (
             <MembershipPass 
@@ -220,15 +233,29 @@ export default function Home() {
         </div>
 
         {/* Points Progress */}
+        {membership && (
+          <div>
+            <StampProgress 
+              stamps={membership?.stamps || 0} 
+              points={membership?.points || 0}
+              rewards={rewards} 
+            />
+          </div>
+        )}
+
+        {/* Latest News */}
         <div>
-          <StampProgress 
-            stamps={membership?.stamps || 0} 
-            points={membership?.points || 0}
-            rewards={rewards} 
-          />
+          {newsLoading ? (
+            <div className="space-y-3">
+              <div className="h-5 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              {[1,2,3].map(i => (
+                <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <LatestNews news={news} />
+          )}
         </div>
-
-
 
         </div>
       </PullToRefresh>
