@@ -12,7 +12,7 @@ export default function Layout({ children, currentPageName }) {
   const showBottomNav = memberPages.includes(currentPageName) || memberPages2.includes(currentPageName);
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900" style={isAdminPage ? {minHeight: '100dvh'} : {height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
+    <div className="bg-gray-50 dark:bg-gray-900" style={isAdminPage ? {minHeight: '100dvh'} : {minHeight: '100dvh', display: 'flex', flexDirection: 'column'}}>
       <PushNotificationManager />
       <style>{`
         :root {
