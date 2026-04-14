@@ -82,7 +82,7 @@ export default function Membership() {
   const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="bg-gray-50 pb-24" style={{minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch'}}>
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
         <div className="flex items-center justify-center gap-2 bg-white/5 border-b border-white/10 px-4 py-1.5">
