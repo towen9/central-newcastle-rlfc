@@ -93,7 +93,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col bg-gray-50 dark:bg-gray-900" style={{height: '100%', overflow: 'hidden'}}>
+    <div className="flex flex-col bg-gray-50 dark:bg-gray-900" style={{height: '100dvh', overflow: 'hidden'}}>
       {/* Compact Header */}
       <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe sticky top-0 z-30">
         {/* Sponsor Strip */}
