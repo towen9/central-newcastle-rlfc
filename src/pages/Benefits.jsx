@@ -160,7 +160,7 @@ export default function Benefits() {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900" style={{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
+    <div className="bg-gray-50 dark:bg-gray-900" style={{height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
       {/* Header */}
       <div className="bg-gradient-to-br from-emerald-500 to-teal-500 dark:from-emerald-700 dark:to-teal-700 pt-safe sticky top-0 z-30">
         <div className="px-5 py-4 flex items-center gap-4">
