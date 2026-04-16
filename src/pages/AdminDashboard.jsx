@@ -69,6 +69,11 @@ export default function AdminDashboard() {
     queryFn: () => base44.entities.CheckIn.list('-timestamp', 500)
   });
 
+  const { data: dayPassEntries = [] } = useQuery({
+    queryKey: ['recentDayPassEntries'],
+    queryFn: () => base44.entities.GameDayEntry.filter({ status: 'used' }, '-scanned_at', 50)
+  });
+
   const { data: offerRedemptions = [] } = useQuery({
     queryKey: ['allOfferRedemptions'],
     queryFn: () => base44.entities.OfferRedemption.list('-timestamp', 500)
@@ -87,8 +92,28 @@ export default function AdminDashboard() {
   }).length;
 
   const weekAgo = subDays(new Date(), 7);
-  const weekCheckins = checkins.filter(c => new Date(c.timestamp) >= weekAgo).length;
+  const weekCheckins = checkins.filter(c => new Date(c.timestamp) >= weekAgo).length
+    + dayPassEntries.filter(d => new Date(d.scanned_at || d.entry_timestamp) >= weekAgo).length;
   
+  // Build a combined check-in feed: member check-ins + day pass scans
+  const membershipById = Object.fromEntries(memberships.map(m => [m.id, m]));
+  const combinedCheckins = [
+    ...checkins.map(c => ({
+      id: c.id,
+      name: membershipById[c.membership_id]?.user_name || 'Member',
+      type: membershipById[c.membership_id]?.tier_name || 'Member',
+      timestamp: c.timestamp,
+      source: 'member'
+    })),
+    ...dayPassEntries.map(d => ({
+      id: d.id,
+      name: `${d.first_name} ${d.last_name}`.trim() || d.email,
+      type: 'Day Pass',
+      timestamp: d.scanned_at || d.entry_timestamp,
+      source: 'daypass'
+    }))
+  ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
   const monthlyOfferRedemptions = offerRedemptions.filter(r => {
     const date = new Date(r.timestamp);
     return date >= startOfMonth(new Date()) && date <= endOfMonth(new Date());
@@ -322,22 +347,23 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {checkins.slice(0, 5).map((checkin, idx) => (
+                {combinedCheckins.slice(0, 8).map((checkin, idx) => (
                   <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <QrCode className="w-4 h-4 text-emerald-600" />
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${checkin.source === 'daypass' ? 'bg-amber-100' : 'bg-emerald-100'}`}>
+                        <QrCode className={`w-4 h-4 ${checkin.source === 'daypass' ? 'text-amber-600' : 'text-emerald-600'}`} />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{checkin.location}</p>
-                        <p className="text-xs text-gray-500">
-                          {checkin.timestamp && format(new Date(checkin.timestamp), 'MMM d, h:mm a')}
-                        </p>
+                        <p className="font-medium text-gray-900">{checkin.name}</p>
+                        <p className="text-xs text-gray-500">{checkin.type}</p>
                       </div>
                     </div>
+                    <p className="text-xs text-gray-400">
+                      {checkin.timestamp && format(new Date(checkin.timestamp), 'MMM d, h:mm a')}
+                    </p>
                   </div>
                 ))}
-                {checkins.length === 0 && (
+                {combinedCheckins.length === 0 && (
                   <p className="text-center text-gray-500 py-4">No recent check-ins</p>
                 )}
               </div>
