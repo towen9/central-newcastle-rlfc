@@ -195,7 +195,16 @@ export default function GateScan() {
       const [membership] = await base44.entities.Membership.filter({ qr_code_id: qrCodeId });
       
       if (membership) {
-        const [memberUser] = await base44.entities.User.filter({ id: membership.user_id });
+        // Fetch user by email (filter by id is not supported — use email stored on membership)
+        let memberUser = null;
+        if (membership.user_email) {
+          const users = await base44.entities.User.filter({ email: membership.user_email });
+          memberUser = users[0] || null;
+        }
+        // Fallback: construct a minimal user object from membership data
+        if (!memberUser) {
+          memberUser = { full_name: membership.user_name || 'Member', email: membership.user_email || '', photo_url: membership.photo_url || null };
+        }
         setScannedMember(memberUser);
         setMembershipData(membership);
         return;
