@@ -23,7 +23,6 @@ Deno.serve(async (req) => {
     }
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       line_items: [{
         price: 'price_1TJMnRLsW4v58VGVrPzGCXnB', // Day Pass $8 AUD (live)
         quantity: 1,
