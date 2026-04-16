@@ -179,41 +179,31 @@ export default function GateScan() {
     stopScanning();
     
     try {
-      // QR data format: JSON {"type":"membership","id":"...","user_id":"..."} or raw string
-      let qrCodeId, qrType;
+      console.log('QR scanned raw data:', qrData);
+
+      // QR data format: JSON {"type":"membership","id":"...","user_id":"..."} or raw DP string
+      let qrCodeId;
       try {
         const parsed = JSON.parse(qrData);
         qrCodeId = parsed.id;
-        qrType = parsed.type;
       } catch {
-        // Fallback: legacy "membership:ID" format or raw ID
-        qrCodeId = qrData.replace('membership:', '');
-        qrType = 'membership';
+        // Raw string (Day Pass DP... or legacy membership ID)
+        qrCodeId = qrData.replace('membership:', '').trim();
       }
 
-      // Try membership first
-      const [membership] = await base44.entities.Membership.filter({ qr_code_id: qrCodeId });
-      
-      if (membership) {
-        // Fetch user by email (filter by id is not supported — use email stored on membership)
-        let memberUser = null;
-        if (membership.user_email) {
-          const users = await base44.entities.User.filter({ email: membership.user_email });
-          memberUser = users[0] || null;
-        }
-        // Fallback: construct a minimal user object from membership data
-        if (!memberUser) {
-          memberUser = { full_name: membership.user_name || 'Member', email: membership.user_email || '', photo_url: membership.photo_url || null };
-        }
-        setScannedMember(memberUser);
-        setMembershipData(membership);
-        return;
-      }
+      console.log('Resolved qrCodeId:', qrCodeId);
 
-      // Try Day Pass
-      const [dayPass] = await base44.entities.GameDayEntry.filter({ pass_qr_code: qrCodeId });
+      // Check if it's a Day Pass (starts with DP)
+      if (qrCodeId.startsWith('DP')) {
+        const allPasses = await base44.entities.GameDayEntry.list();
+        const dayPass = allPasses.find(p => p.pass_qr_code === qrCodeId);
+        console.log('Day pass lookup result:', dayPass);
 
-      if (dayPass) {
+        if (!dayPass) {
+          toast.error('Day Pass not found');
+          setTimeout(startScanning, 2000);
+          return;
+        }
         if (dayPass.status === 'used') {
           toast.error('Day Pass already used');
           setTimeout(startScanning, 2500);
@@ -224,22 +214,35 @@ export default function GateScan() {
           setTimeout(startScanning, 2500);
           return;
         }
-        // Show day pass as a pseudo-member
-        setScannedMember({ full_name: `${dayPass.first_name} ${dayPass.last_name}`.trim(), email: dayPass.email, photo_url: dayPass.photo_url });
-        setMembershipData({ 
-          ...dayPass, 
-          tier_name: 'Day Pass', 
-          status: 'active', 
-          qr_code_id: qrCodeId,
-          is_day_pass: true 
-        });
+        setScannedMember({ full_name: `${dayPass.first_name} ${dayPass.last_name}`.trim() || dayPass.first_name, email: dayPass.email, photo_url: dayPass.photo_url });
+        setMembershipData({ ...dayPass, tier_name: 'Day Pass', status: 'active', qr_code_id: qrCodeId, is_day_pass: true });
+        return;
+      }
+
+      // Otherwise try Membership
+      const memberships = await base44.entities.Membership.filter({ qr_code_id: qrCodeId });
+      const membership = memberships[0];
+      console.log('Membership lookup result:', membership);
+
+      if (membership) {
+        let memberUser = null;
+        if (membership.user_email) {
+          const users = await base44.entities.User.filter({ email: membership.user_email });
+          memberUser = users[0] || null;
+        }
+        if (!memberUser) {
+          memberUser = { full_name: membership.user_name || 'Member', email: membership.user_email || '', photo_url: membership.photo_url || null };
+        }
+        setScannedMember(memberUser);
+        setMembershipData(membership);
         return;
       }
 
       toast.error('Invalid QR code');
       setTimeout(startScanning, 2000);
     } catch (error) {
-      toast.error('Failed to verify pass');
+      console.error('QR scan error:', error);
+      toast.error('Failed to verify pass: ' + error.message);
       setTimeout(startScanning, 2000);
     }
   };
