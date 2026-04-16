@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { 
   Users, CreditCard, Gift, Percent, TrendingUp, Calendar, 
   BarChart3, ArrowUpRight, ArrowDownRight, QrCode, Newspaper,
   Menu, X, ChevronRight, Shield, Bell, MessageSquare, LineChart, AlertTriangle, BookOpen,
-  LayoutDashboard, UserCog, Upload, Ticket, ShoppingBag
+  LayoutDashboard, UserCog, Upload, Ticket, ShoppingBag, RefreshCw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -50,6 +50,7 @@ const adminMenuItems = [
 export default function AdminDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -66,12 +67,16 @@ export default function AdminDashboard() {
 
   const { data: checkins = [] } = useQuery({
     queryKey: ['allCheckins'],
-    queryFn: () => base44.entities.CheckIn.list('-timestamp', 500)
+    queryFn: () => base44.entities.CheckIn.list('-timestamp', 500),
+    staleTime: 0,
+    refetchInterval: 30000
   });
 
   const { data: dayPassEntries = [] } = useQuery({
     queryKey: ['recentDayPassEntries'],
-    queryFn: () => base44.entities.GameDayEntry.list('-updated_date', 100)
+    queryFn: () => base44.entities.GameDayEntry.list('-updated_date', 100),
+    staleTime: 0,
+    refetchInterval: 30000
   });
 
   const { data: offerRedemptions = [] } = useQuery({
@@ -340,9 +345,14 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>Recent Check-ins</span>
-                <Link to={createPageUrl('AdminMembers')} className="text-sm text-blue-600 font-normal">
-                  View all →
-                </Link>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => { queryClient.invalidateQueries(['recentDayPassEntries']); queryClient.invalidateQueries(['allCheckins']); }} className="text-gray-400 hover:text-gray-600">
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                  <Link to={createPageUrl('AdminMembers')} className="text-sm text-blue-600 font-normal">
+                    View all →
+                  </Link>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
