@@ -71,7 +71,10 @@ export default function AdminDashboard() {
 
   const { data: dayPassEntries = [] } = useQuery({
     queryKey: ['recentDayPassEntries'],
-    queryFn: () => base44.entities.GameDayEntry.filter({ status: 'used' }, '-scanned_at', 50)
+    queryFn: async () => {
+      const all = await base44.entities.GameDayEntry.list('-updated_date', 100);
+      return all.filter(d => d.status === 'used');
+    }
   });
 
   const { data: offerRedemptions = [] } = useQuery({
