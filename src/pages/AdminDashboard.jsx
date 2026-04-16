@@ -71,10 +71,7 @@ export default function AdminDashboard() {
 
   const { data: dayPassEntries = [] } = useQuery({
     queryKey: ['recentDayPassEntries'],
-    queryFn: async () => {
-      const all = await base44.entities.GameDayEntry.list('-updated_date', 100);
-      return all.filter(d => d.status === 'used');
-    }
+    queryFn: () => base44.entities.GameDayEntry.list('-updated_date', 100)
   });
 
   const { data: offerRedemptions = [] } = useQuery({
@@ -96,7 +93,7 @@ export default function AdminDashboard() {
 
   const weekAgo = subDays(new Date(), 7);
   const weekCheckins = checkins.filter(c => new Date(c.timestamp) >= weekAgo).length
-    + dayPassEntries.filter(d => new Date(d.scanned_at || d.entry_timestamp) >= weekAgo).length;
+    + dayPassEntries.filter(d => d.scanned_at && new Date(d.scanned_at) >= weekAgo).length;
   
   // Build a combined check-in feed: member check-ins + day pass scans
   const membershipById = Object.fromEntries(memberships.map(m => [m.id, m]));
@@ -108,11 +105,11 @@ export default function AdminDashboard() {
       timestamp: c.timestamp,
       source: 'member'
     })),
-    ...dayPassEntries.map(d => ({
+    ...dayPassEntries.filter(d => d.scanned_at).map(d => ({
       id: d.id,
       name: `${d.first_name} ${d.last_name}`.trim() || d.email,
       type: 'Day Pass',
-      timestamp: d.scanned_at || d.entry_timestamp,
+      timestamp: d.scanned_at,
       source: 'daypass'
     }))
   ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
