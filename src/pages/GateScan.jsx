@@ -12,6 +12,7 @@ export default function GateScan() {
   const [scanning, setScanning] = useState(false);
   const [scannedMember, setScannedMember] = useState(null);
   const [membershipData, setMembershipData] = useState(null);
+  const [checkInSuccess, setCheckInSuccess] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -94,17 +95,14 @@ export default function GateScan() {
       return checkIn;
     },
     onSuccess: () => {
-      const isSupporter = membershipData?.tier_name?.includes('Supporter Pack');
-      const msg = isSupporter
-        ? `Member checked in! (${Math.max(0, (membershipData.games_remaining ?? 5) - 1)} games left)`
-        : 'Member checked in! +10 points awarded';
-      toast.success(msg);
       queryClient.invalidateQueries(['checkins']);
+      setCheckInSuccess(true);
       setTimeout(() => {
+        setCheckInSuccess(false);
         setScannedMember(null);
         setMembershipData(null);
         startScanning();
-      }, 2000);
+      }, 2500);
     },
     onError: (error) => {
       toast.error(error.message || 'Check-in failed');
@@ -230,6 +228,17 @@ export default function GateScan() {
           <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
           <p className="text-gray-500">Loading...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (checkInSuccess) {
+    return (
+      <div className="fixed inset-0 bg-emerald-500 flex flex-col items-center justify-center z-50">
+        <CheckCircle className="w-32 h-32 text-white mb-6" />
+        <p className="text-white text-4xl font-extrabold mb-2">✅ LET 'EM IN!</p>
+        <p className="text-emerald-100 text-xl font-semibold">{scannedMember?.full_name}</p>
+        <p className="text-emerald-200 text-sm mt-2">{membershipData?.tier_name}</p>
       </div>
     );
   }
