@@ -31,6 +31,12 @@ export default function QRModal({ isOpen, onClose, membership, user }) {
       
       // Cache membership data for offline use
       OfflineCache.cacheMembership(user.id, membership, user);
+
+      // If membership doesn't have photo_url but user does, sync it
+      if (!membership.photo_url && user?.photo_url) {
+        const { base44 } = await import('@/api/base44Client');
+        base44.entities.Membership.update(membership.id, { photo_url: user.photo_url }).catch(() => {});
+      }
     }
 
     // Monitor online/offline status

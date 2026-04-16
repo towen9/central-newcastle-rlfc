@@ -20,6 +20,14 @@ function TierBadge({ tierName }) {
       </div>
     );
   }
+  if (tierName?.includes('Old Butchers')) {
+    return (
+      <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-400/20 rounded-full">
+        <Star className="w-3 h-3 text-amber-300" fill="currentColor" />
+        <span className="text-amber-300 text-xs font-semibold">OLD BUTCHERS</span>
+      </div>
+    );
+  }
   return (
     <div className="flex items-center gap-1 px-2 py-0.5 bg-blue-400/20 rounded-full">
       <Shield className="w-3 h-3 text-blue-300" />
@@ -34,6 +42,9 @@ function getTierGradient(tierName) {
   }
   if (tierName?.includes('Family')) {
     return 'bg-gradient-to-br from-[#4c1d95] via-[#5b21b6] to-[#7c3aed]';
+  }
+  if (tierName?.includes('Old Butchers')) {
+    return 'bg-gradient-to-br from-[#451a03] via-[#78350f] to-[#b45309]';
   }
   return 'bg-gradient-to-br from-[#1a365d] via-[#2c5282] to-[#2b6cb0]';
 }
