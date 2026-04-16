@@ -34,8 +34,9 @@ export default function QRModal({ isOpen, onClose, membership, user }) {
 
       // If membership doesn't have photo_url but user does, sync it
       if (!membership.photo_url && user?.photo_url) {
-        const { base44 } = await import('@/api/base44Client');
-        base44.entities.Membership.update(membership.id, { photo_url: user.photo_url }).catch(() => {});
+        import('@/api/base44Client').then(({ base44 }) => {
+          base44.entities.Membership.update(membership.id, { photo_url: user.photo_url }).catch(() => {});
+        });
       }
     }
 
