@@ -172,10 +172,20 @@ export default function GateScan() {
     stopScanning();
     
     try {
-      // QR data format: "membership:{membership_id}"
-      const membershipId = qrData.replace('membership:', '');
-      
-      const [membership] = await base44.entities.Membership.filter({ qr_code_id: membershipId });
+      // QR data format: JSON {"type":"membership","id":"...","user_id":"..."}
+      let qrCodeId;
+      try {
+        const parsed = JSON.parse(qrData);
+        if (parsed.type !== 'membership' && parsed.type !== 'day_pass') {
+          throw new Error('Not a membership QR');
+        }
+        qrCodeId = parsed.id;
+      } catch {
+        // Fallback: legacy "membership:ID" format
+        qrCodeId = qrData.replace('membership:', '');
+      }
+
+      const [membership] = await base44.entities.Membership.filter({ qr_code_id: qrCodeId });
       
       if (!membership) {
         toast.error('Invalid membership QR code');
