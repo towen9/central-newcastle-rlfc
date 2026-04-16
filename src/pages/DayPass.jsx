@@ -224,12 +224,6 @@ export default function DayPass() {
               </div>
             )}
 
-            <button
-              onClick={() => { stopCamera(); window.location.reload(); }}
-              className="w-full text-center text-sm text-gray-400 mt-4 py-2"
-            >
-              Skip for now
-            </button>
           </div>
         </div>
       );
@@ -240,7 +234,7 @@ export default function DayPass() {
         <div className="bg-[#1a365d] pt-safe">
           <div className="px-5 py-6">
             <h1 className="text-white text-2xl font-bold">Payment Successful!</h1>
-            <p className="text-blue-200">{verifying ? 'Setting up your pass...' : 'Your Day Pass is ready'}</p>
+            <p className="text-blue-200">{verifying ? 'Setting up your pass...' : 'One more step required'}</p>
           </div>
         </div>
         <div className="px-5 py-10 flex flex-col items-center text-center">
@@ -257,22 +251,18 @@ export default function DayPass() {
               <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
                 <Check className="w-10 h-10 text-emerald-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">You're in! 🎉</h2>
-              <p className="text-gray-600 mb-2">Your Day Pass is ready.</p>
-              <p className="text-gray-500 text-sm mb-8">Add your photo so gate staff can verify it's you.</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">Payment confirmed! 🎉</h2>
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 text-left w-full">
+                <p className="text-sm font-bold text-amber-900 mb-1">📸 Photo required to activate your pass</p>
+                <p className="text-sm text-amber-800">Gate staff will check your photo to verify it's you. No photo = no entry.</p>
+              </div>
               <Button
                 onClick={() => setPhotoStep(true)}
-                className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base mb-3"
+                className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base"
               >
                 <Camera className="w-5 h-5 mr-2" />
-                Add My Photo
+                Take My Photo Now
               </Button>
-              <button
-                onClick={() => window.location.reload()}
-                className="text-sm text-gray-400"
-              >
-                Skip for now
-              </button>
             </>
           )}
         </div>
@@ -349,9 +339,36 @@ export default function DayPass() {
                 </Button>
               </div>
             )}
-            <button onClick={() => { stopCamera(); window.location.href = createPageUrl('MyDayPass') + `?passId=${existingPass.id}`; }} className="w-full text-center text-sm text-gray-400 mt-4 py-2">
-              Skip for now
-            </button>
+
+          </div>
+        </div>
+      );
+    }
+
+    // Force photo step if no photo
+    if (!existingPass.photo_url) {
+      // Auto-trigger photo step
+      if (!photoStep) {
+        setTimeout(() => setPhotoStep(true), 100);
+      }
+      return (
+        <div className="min-h-screen bg-gray-50 pb-24">
+          <div className="bg-[#1a365d] pt-safe">
+            <div className="px-5 py-6">
+              <h1 className="text-white text-2xl font-bold mb-2">Photo Required</h1>
+              <p className="text-blue-200">You cannot enter without a photo on your pass</p>
+            </div>
+          </div>
+          <div className="px-5 py-10 flex flex-col items-center text-center">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+              <Camera className="w-10 h-10 text-red-500" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-3">No Photo on Your Pass</h2>
+            <p className="text-gray-600 text-sm mb-8">Gate staff must verify your identity. A clear face photo is required before you can use your pass.</p>
+            <Button onClick={() => setPhotoStep(true)} className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base">
+              <Camera className="w-5 h-5 mr-2" />
+              Take My Photo Now
+            </Button>
           </div>
         </div>
       );
@@ -365,20 +382,7 @@ export default function DayPass() {
             <p className="text-blue-200">Your digital pass is ready to use on game day</p>
           </div>
         </div>
-
-        <div className="px-5 py-6 space-y-3">
-          {!existingPass.photo_url && (
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
-              <Camera className="w-5 h-5 text-amber-600 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-amber-800">Photo required for entry</p>
-                <p className="text-xs text-amber-700">Gate staff need your photo to verify your pass</p>
-              </div>
-              <Button size="sm" onClick={() => setPhotoStep(true)} className="bg-amber-500 hover:bg-amber-600 text-white flex-shrink-0">
-                Add Photo
-              </Button>
-            </div>
-          )}
+        <div className="px-5 py-6">
           <Button 
             onClick={() => window.location.href = createPageUrl('MyDayPass') + `?passId=${existingPass.id}`}
             className="w-full bg-emerald-600 hover:bg-emerald-700 py-6"
