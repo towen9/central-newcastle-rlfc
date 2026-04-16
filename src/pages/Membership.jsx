@@ -38,9 +38,21 @@ export default function Membership() {
     loadUser();
   }, []);
 
+  // When membership loads, sync user photo_url to membership if missing
+  useEffect(() => {
+    if (membership?.id && !membership.photo_url && user?.photo_url) {
+      base44.entities.Membership.update(membership.id, { photo_url: user.photo_url })
+        .then(() => queryClient.invalidateQueries(['membership', user.id]));
+    }
+  }, [membership?.id, membership?.photo_url, user?.photo_url]);
+
   const updatePhotoMutation = useMutation({
     mutationFn: async (photoUrl) => {
       await base44.auth.updateMe({ photo_url: photoUrl });
+      // Also save to membership record so gate scanner can display it
+      if (membership?.id) {
+        await base44.entities.Membership.update(membership.id, { photo_url: photoUrl });
+      }
     },
     onSuccess: async () => {
       const userData = await base44.auth.me();
