@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Beer, CheckCircle, XCircle, Scan, LogOut } from 'lucide-react';
+import { Beer, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import jsQR from 'jsqr';
 
@@ -139,15 +139,26 @@ export default function BarScan() {
               <p className="text-gray-400 text-sm">+5 points per drink</p>
             </div>
           </div>
-          <Button 
-            onClick={handleLogout} 
-            variant="ghost" 
-            size="sm"
-            className="text-white hover:bg-white/10"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => window.location.href = '/AdminDashboard'}
+              variant="ghost" 
+              size="sm"
+              className="text-white hover:bg-white/10"
+            >
+              <LayoutDashboard className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+            <Button 
+              onClick={handleLogout} 
+              variant="ghost" 
+              size="sm"
+              className="text-white hover:bg-white/10"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         {!scanning && !result && (

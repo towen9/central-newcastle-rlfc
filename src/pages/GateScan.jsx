@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Camera, CheckCircle, XCircle, User, Calendar, Shield, LogOut } from 'lucide-react';
+import { Camera, CheckCircle, XCircle, User, Calendar, Shield, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import jsQR from 'jsqr';
@@ -247,10 +247,16 @@ export default function GateScan() {
                 <p className="text-blue-200 text-sm">{user.full_name}</p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-white hover:bg-white/20">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/AdminDashboard'} className="text-white hover:bg-white/20">
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-white hover:bg-white/20">
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>

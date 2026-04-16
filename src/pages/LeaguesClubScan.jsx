@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Building2, CheckCircle, XCircle, Scan } from 'lucide-react';
+import { Building2, CheckCircle, XCircle, Scan, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import jsQR from 'jsqr';
 
@@ -154,12 +154,23 @@ export default function LeaguesClubScan() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-md mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <Building2 className="w-10 h-10 text-blue-400" />
-          <div>
-            <h1 className="text-2xl font-bold">Leagues Club Scanner</h1>
-            <p className="text-gray-400 text-sm">+20 bonus points</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <Building2 className="w-10 h-10 text-blue-400" />
+            <div>
+              <h1 className="text-2xl font-bold">Leagues Club Scanner</h1>
+              <p className="text-gray-400 text-sm">+20 bonus points</p>
+            </div>
           </div>
+          <Button 
+            onClick={() => window.location.href = '/AdminDashboard'}
+            variant="ghost" 
+            size="sm"
+            className="text-white hover:bg-white/10"
+          >
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            Dashboard
+          </Button>
         </div>
 
         {!scanning && !result && (
