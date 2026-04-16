@@ -39,6 +39,15 @@ export default function GateScan() {
 
   const checkInMutation = useMutation({
     mutationFn: async ({ membershipId, userId, membership }) => {
+      // Handle Day Pass check-in
+      if (membership.is_day_pass) {
+        await base44.entities.GameDayEntry.update(membership.id, {
+          status: 'used',
+          scanned_at: new Date().toISOString()
+        });
+        return { dayPass: true };
+      }
+
       const isSupporter = membership.tier_name?.includes('Supporter Pack');
       const isFamilyOrPremium = membership.tier_name?.includes('Family') || membership.tier_name?.includes('Premium');
       
@@ -170,33 +179,58 @@ export default function GateScan() {
     stopScanning();
     
     try {
-      // QR data format: JSON {"type":"membership","id":"...","user_id":"..."}
-      let qrCodeId;
+      // QR data format: JSON {"type":"membership","id":"...","user_id":"..."} or raw string
+      let qrCodeId, qrType;
       try {
         const parsed = JSON.parse(qrData);
-        if (parsed.type !== 'membership' && parsed.type !== 'day_pass') {
-          throw new Error('Not a membership QR');
-        }
         qrCodeId = parsed.id;
+        qrType = parsed.type;
       } catch {
-        // Fallback: legacy "membership:ID" format
+        // Fallback: legacy "membership:ID" format or raw ID
         qrCodeId = qrData.replace('membership:', '');
+        qrType = 'membership';
       }
 
+      // Try membership first
       const [membership] = await base44.entities.Membership.filter({ qr_code_id: qrCodeId });
       
-      if (!membership) {
-        toast.error('Invalid membership QR code');
-        setTimeout(startScanning, 2000);
+      if (membership) {
+        const [memberUser] = await base44.entities.User.filter({ id: membership.user_id });
+        setScannedMember(memberUser);
+        setMembershipData(membership);
         return;
       }
 
-      const [memberUser] = await base44.entities.User.filter({ id: membership.user_id });
-      
-      setScannedMember(memberUser);
-      setMembershipData(membership);
+      // Try Day Pass
+      const [dayPass] = await base44.entities.GameDayEntry.filter({ pass_qr_code: qrCodeId });
+
+      if (dayPass) {
+        if (dayPass.status === 'used') {
+          toast.error('Day Pass already used');
+          setTimeout(startScanning, 2500);
+          return;
+        }
+        if (dayPass.status === 'expired') {
+          toast.error('Day Pass has expired');
+          setTimeout(startScanning, 2500);
+          return;
+        }
+        // Show day pass as a pseudo-member
+        setScannedMember({ full_name: `${dayPass.first_name} ${dayPass.last_name}`.trim(), email: dayPass.email, photo_url: dayPass.photo_url });
+        setMembershipData({ 
+          ...dayPass, 
+          tier_name: 'Day Pass', 
+          status: 'active', 
+          qr_code_id: qrCodeId,
+          is_day_pass: true 
+        });
+        return;
+      }
+
+      toast.error('Invalid QR code');
+      setTimeout(startScanning, 2000);
     } catch (error) {
-      toast.error('Failed to verify membership');
+      toast.error('Failed to verify pass');
       setTimeout(startScanning, 2000);
     }
   };
