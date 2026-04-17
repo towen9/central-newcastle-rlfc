@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
         Open this link on your phone using <strong>Safari (iPhone)</strong> or <strong>Chrome (Android)</strong>:
       </p>
       <div style="text-align: center; margin-top: 12px;">
-        <a href="https://butcherboys.base44.app" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: bold;">
+        <a href="https://charlestown-rl-community-app-1e1650bd.base44.app" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: bold;">
           Open the App →
         </a>
       </div>
