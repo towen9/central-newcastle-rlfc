@@ -98,37 +98,86 @@ Deno.serve(async (req) => {
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: user_email,
-          subject: `Welcome to Central Newcastle RLFC, ${user_name?.split(' ')[0]}! 🏉 One step to go`,
+          subject: `Welcome to Central Newcastle RLFC, ${user_name?.split(' ')[0]}! 🏉 Action Required`,
           body: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
+
+  <!-- Header -->
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
     <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="Central Newcastle RLFC" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
-    <h1 style="color: white; margin: 16px 0 4px; font-size: 22px;">Welcome to the Butcher Boys!</h1>
-    <p style="color: #93c5fd; margin: 0; font-size: 14px;">${tierData.name} — Season 2026</p>
+    <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">Welcome to Central Newcastle RLFC!</h1>
+    <p style="color: #93c5fd; margin: 0; font-size: 14px;">${tierData.name} · Season 2026</p>
   </div>
+
+  <!-- Body -->
   <div style="padding: 32px 24px; background: white;">
-    <p style="color: #1e293b; font-size: 16px; margin: 0 0 16px;">Hi ${user_name?.split(' ')[0]},</p>
+    <p style="color: #1e293b; font-size: 16px; margin: 0 0 12px;">Hi ${user_name?.split(' ')[0]},</p>
     <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
-      Your <strong>${tierData.name}</strong> is confirmed and ready to go. 🎉
+      Your <strong>${tierData.name}</strong> is confirmed — welcome to the Butcher Boys family! 🎉<br/>
+      To use your digital pass at the gate on game day, you'll need to complete your setup in the app on your phone.
     </p>
-    <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-      <p style="color: #92400e; font-weight: bold; font-size: 15px; margin: 0 0 8px;">📸 One thing left to do</p>
-      <p style="color: #78350f; font-size: 14px; margin: 0; line-height: 1.5;">
-        To activate your digital pass and access the gate on game day, you need to <strong>upload a photo ID</strong> in the app. This takes less than 30 seconds.
+
+    <!-- Step 1 -->
+    <div style="background: #eff6ff; border-left: 4px solid #1a365d; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px;">
+      <p style="color: #1e3a5f; font-weight: bold; font-size: 15px; margin: 0 0 6px;">📱 Step 1 — Open on your phone</p>
+      <p style="color: #475569; font-size: 14px; margin: 0; line-height: 1.6;">
+        Open this link on your phone using <strong>Safari (iPhone)</strong> or <strong>Chrome (Android)</strong>:
+      </p>
+      <div style="text-align: center; margin-top: 12px;">
+        <a href="https://butcherboys.base44.app" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: bold;">
+          Open the App →
+        </a>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="background: #eff6ff; border-left: 4px solid #1a365d; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px;">
+      <p style="color: #1e3a5f; font-weight: bold; font-size: 15px; margin: 0 0 6px;">🔑 Step 2 — Log in with this email</p>
+      <p style="color: #475569; font-size: 14px; margin: 0; line-height: 1.6;">
+        Make sure you log in using <strong>${user_email}</strong> — the same email you used to purchase your membership.
       </p>
     </div>
-    <div style="text-align: center; margin-bottom: 28px;">
-      <a href="https://butcherboys.base44.app/Membership" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: bold;">
-        Open App & Upload Photo →
-      </a>
+
+    <!-- Step 3 -->
+    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px;">
+      <p style="color: #92400e; font-weight: bold; font-size: 15px; margin: 0 0 6px;">📸 Step 3 — Upload your photo</p>
+      <p style="color: #78350f; font-size: 14px; margin: 0; line-height: 1.6;">
+        You'll be prompted to upload a photo of yourself. This is required for identity verification at the gate. It only takes 30 seconds!
+      </p>
     </div>
+
+    <!-- Step 4 - Save to Home Screen -->
+    <div style="background: #f0fdf4; border-left: 4px solid #16a34a; border-radius: 8px; padding: 16px 20px; margin-bottom: 28px;">
+      <p style="color: #14532d; font-weight: bold; font-size: 15px; margin: 0 0 8px;">🏠 Step 4 — Save to your Home Screen (recommended)</p>
+      <p style="color: #166534; font-size: 14px; margin: 0 0 10px; line-height: 1.6;">
+        Save the app to your phone's home screen so it's easy to find on game day — just like a regular app!
+      </p>
+      <p style="color: #166534; font-size: 13px; font-weight: bold; margin: 0 0 4px;">On iPhone (Safari):</p>
+      <ol style="color: #166534; font-size: 13px; margin: 0 0 12px; padding-left: 20px; line-height: 1.8;">
+        <li>Open the app in <strong>Safari</strong></li>
+        <li>Tap the <strong>Share button</strong> (the box with an arrow at the bottom of the screen)</li>
+        <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+        <li>Tap <strong>"Add"</strong> — done!</li>
+      </ol>
+      <p style="color: #166534; font-size: 13px; font-weight: bold; margin: 0 0 4px;">On Android (Chrome):</p>
+      <ol style="color: #166534; font-size: 13px; margin: 0; padding-left: 20px; line-height: 1.8;">
+        <li>Open the app in <strong>Chrome</strong></li>
+        <li>Tap the <strong>three dots menu</strong> (top right)</li>
+        <li>Tap <strong>"Add to Home Screen"</strong></li>
+        <li>Tap <strong>"Add"</strong> — done!</li>
+      </ol>
+    </div>
+
     <p style="color: #94a3b8; font-size: 13px; text-align: center; margin: 0;">
-      If you already have the app installed, just open it and head to the Membership tab.
+      Questions? Reply to this email or contact the club directly.
     </p>
   </div>
-  <div style="background: #f1f5f9; padding: 16px 24px; text-align: center;">
-    <p style="color: #94a3b8; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Season 2026</p>
+
+  <!-- Footer -->
+  <div style="background: #1a365d; padding: 16px 24px; text-align: center;">
+    <p style="color: #93c5fd; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Season 2026</p>
   </div>
+
 </div>
           `
         });
