@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Beer, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ export default function BarScan() {
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
   const [videoStream, setVideoStream] = useState(null);
+  const scanningRef = useRef(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -32,6 +33,7 @@ export default function BarScan() {
         video: { facingMode: 'environment' } 
       });
       setVideoStream(stream);
+      scanningRef.current = true;
       setScanning(true);
       setResult(null);
       
@@ -46,6 +48,7 @@ export default function BarScan() {
   };
 
   const stopScanning = () => {
+    scanningRef.current = false;
     if (videoStream) {
       videoStream.getTracks().forEach(track => track.stop());
       setVideoStream(null);
@@ -58,7 +61,7 @@ export default function BarScan() {
     const context = canvas.getContext('2d');
 
     const scan = () => {
-      if (!scanning) return;
+      if (!scanningRef.current) return;
 
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
         canvas.width = video.videoWidth;
