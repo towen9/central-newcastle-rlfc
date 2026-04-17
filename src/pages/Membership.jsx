@@ -38,14 +38,6 @@ export default function Membership() {
     loadUser();
   }, []);
 
-  // When membership loads, sync user photo_url to membership if missing
-  useEffect(() => {
-    if (membership?.id && !membership.photo_url && user?.photo_url) {
-      base44.entities.Membership.update(membership.id, { photo_url: user.photo_url })
-        .then(() => queryClient.invalidateQueries(['membership', user.id]));
-    }
-  }, [membership?.id, membership?.photo_url, user?.photo_url]);
-
   const updatePhotoMutation = useMutation({
     mutationFn: async (photoUrl) => {
       await base44.auth.updateMe({ photo_url: photoUrl });
@@ -67,7 +59,7 @@ export default function Membership() {
     queryKey: ['membership', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const memberships = await base44.entities.Membership.filter({ user_id: user.id });
+      const memberships = await base44.entities.Membership.filter({ user_id: user.id, status: 'active' });
       return memberships[0] || null;
     },
     enabled: !!user?.id
@@ -86,6 +78,14 @@ export default function Membership() {
     queryKey: ['tiers'],
     queryFn: () => base44.entities.MembershipTier.filter({ is_active: true }, 'sort_order')
   });
+
+  // When membership loads, sync user photo_url to membership if missing
+  useEffect(() => {
+    if (membership?.id && !membership.photo_url && user?.photo_url) {
+      base44.entities.Membership.update(membership.id, { photo_url: user.photo_url })
+        .then(() => queryClient.invalidateQueries(['membership', user.id]));
+    }
+  }, [membership?.id, membership?.photo_url, user?.photo_url]);
 
   const currentTier = tiers.find(t => t.id === membership?.tier_id);
   const expiryDate = membership?.expiry_date ? new Date(membership.expiry_date) : null;
