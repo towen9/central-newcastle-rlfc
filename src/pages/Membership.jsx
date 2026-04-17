@@ -118,6 +118,30 @@ export default function Membership() {
       </div>
 
       <div className="px-5 py-6">
+        {/* Mandatory Photo Upload Gate */}
+        {membership && !user?.photo_url && (
+          <div className="fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-md p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Camera className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg">Photo ID Required</h3>
+                  <p className="text-sm text-gray-500">Required before you can access your digital pass</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Your membership pass requires a photo for identity verification at the gate. Please upload a clear photo of your face.
+              </p>
+              <PhotoUpload
+                currentPhotoUrl={user?.photo_url}
+                onPhotoUploaded={(url) => updatePhotoMutation.mutate(url)}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Payment Success Banner */}
         {paymentSuccess && (
           <motion.div
@@ -139,17 +163,17 @@ export default function Membership() {
           </motion.div>
         )}
 
-        {/* Photo Upload Required */}
-        {showPhotoUpload && (
+        {/* Photo update (shown inline only when user already has a photo and wants to update) */}
+        {showPhotoUpload && user?.photo_url && (
           <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-6">
             <div className="flex items-start gap-3 mb-4">
               <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <Camera className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-amber-900 mb-1">Photo ID Required</h3>
+                <h3 className="font-semibold text-amber-900 mb-1">Update Photo ID</h3>
                 <p className="text-sm text-amber-700">
-                  Upload your photo for gate verification at matches
+                  Upload a new photo for gate verification
                 </p>
               </div>
             </div>
