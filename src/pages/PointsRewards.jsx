@@ -84,6 +84,7 @@ export default function PointsRewards() {
   });
 
   const pointsBalance = membership?.points || 0;
+  const isRewardsEnabled = membership?.tier_name !== 'Supporter Pack' && membership?.tier_name !== 'Day Pass';
 
   const getRewardIcon = (type) => {
     switch(type) {
@@ -140,7 +141,25 @@ export default function PointsRewards() {
 
       {/* Content */}
       <div className="px-5 -mt-4">
-        {showHistory ? (
+        {!isRewardsEnabled ? (
+          <div className="pt-6">
+            <div className="bg-white rounded-2xl p-8 shadow-md text-center">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trophy className="w-8 h-8 text-amber-500" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Rewards Not Included</h2>
+              <p className="text-gray-500 text-sm mb-6">
+                The Supporter Pack doesn't include access to the rewards system. Upgrade to a Premium or Old Butchers membership to start earning and redeeming points.
+              </p>
+              <Link to="/JoinMembership">
+                <Button className="bg-[#1a365d] hover:bg-[#2c5282] w-full py-5 text-base">
+                  Upgrade Membership
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ) : showHistory ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
