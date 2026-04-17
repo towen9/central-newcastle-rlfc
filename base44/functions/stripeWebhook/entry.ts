@@ -94,6 +94,49 @@ Deno.serve(async (req) => {
 
       console.log('Membership created:', membership.id, '| Tier:', tierData.name);
 
+      // Send welcome email prompting photo upload
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: user_email,
+          subject: `Welcome to Central Newcastle RLFC, ${user_name?.split(' ')[0]}! 🏉 One step to go`,
+          body: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
+  <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
+    <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="Central Newcastle RLFC" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <h1 style="color: white; margin: 16px 0 4px; font-size: 22px;">Welcome to the Butcher Boys!</h1>
+    <p style="color: #93c5fd; margin: 0; font-size: 14px;">${tierData.name} — Season 2026</p>
+  </div>
+  <div style="padding: 32px 24px; background: white;">
+    <p style="color: #1e293b; font-size: 16px; margin: 0 0 16px;">Hi ${user_name?.split(' ')[0]},</p>
+    <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+      Your <strong>${tierData.name}</strong> is confirmed and ready to go. 🎉
+    </p>
+    <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <p style="color: #92400e; font-weight: bold; font-size: 15px; margin: 0 0 8px;">📸 One thing left to do</p>
+      <p style="color: #78350f; font-size: 14px; margin: 0; line-height: 1.5;">
+        To activate your digital pass and access the gate on game day, you need to <strong>upload a photo ID</strong> in the app. This takes less than 30 seconds.
+      </p>
+    </div>
+    <div style="text-align: center; margin-bottom: 28px;">
+      <a href="https://butcherboys.base44.app/Membership" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: bold;">
+        Open App & Upload Photo →
+      </a>
+    </div>
+    <p style="color: #94a3b8; font-size: 13px; text-align: center; margin: 0;">
+      If you already have the app installed, just open it and head to the Membership tab.
+    </p>
+  </div>
+  <div style="background: #f1f5f9; padding: 16px 24px; text-align: center;">
+    <p style="color: #94a3b8; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Season 2026</p>
+  </div>
+</div>
+          `
+        });
+        console.log('Welcome email sent to:', user_email);
+      } catch (emailError) {
+        console.error('Failed to send welcome email (non-fatal):', emailError.message);
+      }
+
       // Handle referral tracking (only for season memberships, not day passes)
       if (referral_code) {
         try {
