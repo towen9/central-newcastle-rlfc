@@ -94,6 +94,29 @@ export default function Membership() {
   const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
 
   return (
+    <>
+    {membership?.status === 'active' && !user?.photo_url && (
+      <div style={{position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '16px'}}>
+        <div className="bg-white rounded-2xl w-full max-w-md p-6" style={{marginBottom: 'env(safe-area-inset-bottom, 0px)'}}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Camera className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 text-lg">Photo ID Required</h3>
+              <p className="text-sm text-gray-500">Required before you can access your digital pass</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Your membership pass requires a photo for identity verification at the gate. Please upload a clear photo of your face.
+          </p>
+          <PhotoUpload
+            currentPhotoUrl={user?.photo_url}
+            onPhotoUploaded={(url) => updatePhotoMutation.mutate(url)}
+          />
+        </div>
+      </div>
+    )}
     <div className="bg-gray-50 pb-24" style={{minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch'}}>
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
@@ -118,29 +141,7 @@ export default function Membership() {
       </div>
 
       <div className="px-5 py-6">
-        {/* Mandatory Photo Upload Gate */}
-        {membership?.status === 'active' && !user?.photo_url && (
-          <div className="fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Camera className="w-6 h-6 text-amber-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-lg">Photo ID Required</h3>
-                  <p className="text-sm text-gray-500">Required before you can access your digital pass</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">
-                Your membership pass requires a photo for identity verification at the gate. Please upload a clear photo of your face.
-              </p>
-              <PhotoUpload
-                currentPhotoUrl={user?.photo_url}
-                onPhotoUploaded={(url) => updatePhotoMutation.mutate(url)}
-              />
-            </div>
-          </div>
-        )}
+
 
         {/* Payment Success Banner */}
         {paymentSuccess && (
@@ -401,5 +402,6 @@ export default function Membership() {
         }}
       />
     </div>
+    </>
   );
 }
