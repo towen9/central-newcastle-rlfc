@@ -13,6 +13,7 @@ export default function GateScan() {
   const [scannedMember, setScannedMember] = useState(null);
   const [membershipData, setMembershipData] = useState(null);
   const [checkInSuccess, setCheckInSuccess] = useState(false);
+  const [checkInDenied, setCheckInDenied] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -225,6 +226,21 @@ export default function GateScan() {
       console.log('Membership lookup result:', membership);
 
       if (membership) {
+        // Check if already checked in today
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const allCheckIns = await base44.entities.CheckIn.filter({ membership_id: membership.id });
+        const checkedInToday = allCheckIns.some(c => c.timestamp && new Date(c.timestamp) >= todayStart);
+        if (checkedInToday) {
+          stopScanning();
+          setCheckInDenied(membership.user_name || 'Member');
+          setTimeout(() => {
+            setCheckInDenied(false);
+            startScanning();
+          }, 3000);
+          return;
+        }
+
         let memberUser = null;
         if (membership.user_email) {
           const users = await base44.entities.User.filter({ email: membership.user_email });
@@ -285,6 +301,17 @@ export default function GateScan() {
         <p className="text-white text-4xl font-extrabold mb-2">✅ LET 'EM IN!</p>
         <p className="text-emerald-100 text-xl font-semibold">{scannedMember?.full_name}</p>
         <p className="text-emerald-200 text-sm mt-2">{membershipData?.tier_name}</p>
+      </div>
+    );
+  }
+
+  if (checkInDenied) {
+    return (
+      <div className="fixed inset-0 bg-red-600 flex flex-col items-center justify-center z-50">
+        <XCircle className="w-32 h-32 text-white mb-6" />
+        <p className="text-white text-4xl font-extrabold mb-2">🚫 DENY ENTRY</p>
+        <p className="text-red-100 text-xl font-semibold">{checkInDenied}</p>
+        <p className="text-red-200 text-sm mt-2">Already checked in today</p>
       </div>
     );
   }
@@ -430,7 +457,15 @@ export default function GateScan() {
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              {membershipData.status === 'active' ? (
+              {membershipData.already_checked_in ? (
+                <div className="bg-orange-50 border-2 border-orange-300 rounded-xl p-5 flex items-center gap-4">
+                  <XCircle className="w-10 h-10 text-orange-500 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-orange-800 text-lg">Already Checked In</p>
+                    <p className="text-sm text-orange-600">This pass was already used for entry today. Access denied.</p>
+                  </div>
+                </div>
+              ) : membershipData.status === 'active' ? (
                 <Button 
                   onClick={handleCheckIn}
                   disabled={checkInMutation.isPending}
