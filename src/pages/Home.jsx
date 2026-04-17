@@ -248,6 +248,10 @@ export default function Home() {
         onClose={() => setShowQR(false)}
         membership={membership}
         user={user}
+        onPhotoUploaded={async () => {
+          const userData = await base44.auth.me();
+          setUser(userData);
+        }}
       />
     </div>
   );

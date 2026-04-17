@@ -119,7 +119,7 @@ export default function Membership() {
 
       <div className="px-5 py-6">
         {/* Mandatory Photo Upload Gate */}
-        {membership && !user?.photo_url && (
+        {membership?.status === 'active' && !user?.photo_url && (
           <div className="fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4">
             <div className="bg-white rounded-2xl w-full max-w-md p-6">
               <div className="flex items-center gap-3 mb-4">
@@ -396,6 +396,9 @@ export default function Membership() {
         onClose={() => setShowQR(false)}
         membership={membership}
         user={user}
+        onPhotoUploaded={async (url) => {
+          await updatePhotoMutation.mutateAsync(url);
+        }}
       />
     </div>
   );

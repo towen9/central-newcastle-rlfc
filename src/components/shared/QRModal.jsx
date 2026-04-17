@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, Download, WifiOff } from 'lucide-react';
+import { X, Shield, Download, WifiOff, Camera } from 'lucide-react';
 import { format } from 'date-fns';
 import { OfflineCache } from '../offline/OfflineCache';
+import PhotoUpload from '../membership/PhotoUpload';
+import { base44 } from '@/api/base44Client';
 
-export default function QRModal({ isOpen, onClose, membership, user }) {
+export default function QRModal({ isOpen, onClose, membership, user, onPhotoUploaded }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  const needsPhoto = membership && !user?.photo_url;
 
   useEffect(() => {
     if (isOpen && membership?.qr_code_id && user?.id) {
@@ -53,6 +57,54 @@ export default function QRModal({ isOpen, onClose, membership, user }) {
   }, [isOpen, membership, user]);
 
   if (!isOpen) return null;
+
+  // Gate: photo required before showing the QR
+  if (needsPhoto) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="bg-white rounded-2xl w-full max-w-md p-6"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Camera className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg">Photo ID Required</h3>
+                  <p className="text-sm text-gray-500">Upload a photo to access your pass</p>
+                </div>
+              </div>
+              <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              A photo is required for identity verification at the gate. Please upload a clear photo of your face.
+            </p>
+            <PhotoUpload
+              currentPhotoUrl={null}
+              onPhotoUploaded={async (url) => {
+                await base44.auth.updateMe({ photo_url: url });
+                if (membership?.id) {
+                  await base44.entities.Membership.update(membership.id, { photo_url: url });
+                }
+                if (onPhotoUploaded) onPhotoUploaded(url);
+              }}
+            />
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
 
   return (
     <AnimatePresence>
