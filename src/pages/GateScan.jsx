@@ -18,6 +18,8 @@ export default function GateScan() {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const animationRef = useRef(null);
+  const handleQRCodeScannedRef = useRef(null);
+  const startScanningRef = useRef(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -111,7 +113,7 @@ export default function GateScan() {
         setCheckInSuccess(false);
         setScannedMember(null);
         setMembershipData(null);
-        startScanning();
+        startScanningRef.current?.();
       }, 2500);
     },
     onError: (error) => {
@@ -119,34 +121,19 @@ export default function GateScan() {
       setTimeout(() => {
         setScannedMember(null);
         setMembershipData(null);
-        startScanning();
+        startScanningRef.current?.();
       }, 3000);
     }
   });
 
-  const startScanning = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
-      setScanning(true);
-      scanQRCode();
-    } catch (error) {
-      toast.error('Camera access denied');
-    }
-  };
-
   const stopScanning = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
     setScanning(false);
   };
@@ -168,7 +155,7 @@ export default function GateScan() {
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       
       if (code) {
-        handleQRCodeScanned(code.data);
+        handleQRCodeScannedRef.current?.(code.data);
         return;
       }
     }
@@ -176,7 +163,36 @@ export default function GateScan() {
     animationRef.current = requestAnimationFrame(scanQRCode);
   };
 
-  const handleQRCodeScanned = async (qrData) => {
+  const startScanning = async () => {
+    try {
+      // Stop any existing stream first
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setScanning(true);
+      scanQRCode();
+    } catch (error) {
+      toast.error('Camera access denied');
+    }
+  };
+
+  // Keep ref always pointing to latest startScanning
+  startScanningRef.current = startScanning;
+
+  handleQRCodeScannedRef.current = async (qrData) => {
     stopScanning();
     
     try {
@@ -202,17 +218,17 @@ export default function GateScan() {
 
         if (!dayPass) {
           toast.error('Day Pass not found');
-          setTimeout(startScanning, 2000);
+          setTimeout(() => startScanningRef.current?.(), 2000);
           return;
         }
         if (dayPass.status === 'used') {
           toast.error('Day Pass already used');
-          setTimeout(startScanning, 2500);
+          setTimeout(() => startScanningRef.current?.(), 2500);
           return;
         }
         if (dayPass.status === 'expired') {
           toast.error('Day Pass has expired');
-          setTimeout(startScanning, 2500);
+          setTimeout(() => startScanningRef.current?.(), 2500);
           return;
         }
         setScannedMember({ full_name: `${dayPass.first_name} ${dayPass.last_name}`.trim() || dayPass.first_name, email: dayPass.email, photo_url: dayPass.photo_url });
@@ -232,11 +248,10 @@ export default function GateScan() {
         const allCheckIns = await base44.entities.CheckIn.filter({ membership_id: membership.id });
         const checkedInToday = allCheckIns.some(c => c.timestamp && new Date(c.timestamp) >= todayStart);
         if (checkedInToday) {
-          stopScanning();
           setCheckInDenied(membership.user_name || 'Member');
           setTimeout(() => {
             setCheckInDenied(false);
-            startScanning();
+            startScanningRef.current?.();
           }, 3000);
           return;
         }
@@ -255,11 +270,11 @@ export default function GateScan() {
       }
 
       toast.error('Invalid QR code');
-      setTimeout(startScanning, 2000);
+      setTimeout(() => startScanningRef.current?.(), 2000);
     } catch (error) {
       console.error('QR scan error:', error);
       toast.error('Failed to verify pass: ' + error.message);
-      setTimeout(startScanning, 2000);
+      setTimeout(() => startScanningRef.current?.(), 2000);
     }
   };
 
@@ -488,7 +503,7 @@ export default function GateScan() {
                 onClick={() => {
                   setScannedMember(null);
                   setMembershipData(null);
-                  startScanning();
+                  startScanningRef.current?.();
                 }}
                 variant="outline"
                 className="w-full py-6 text-lg"
