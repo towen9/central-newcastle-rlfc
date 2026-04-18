@@ -20,6 +20,7 @@ export default function GateScan() {
   const animationRef = useRef(null);
   const handleQRCodeScannedRef = useRef(null);
   const startScanningRef = useRef(null);
+  const isProcessingRef = useRef(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -154,7 +155,8 @@ export default function GateScan() {
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       
-      if (code) {
+      if (code && !isProcessingRef.current) {
+        isProcessingRef.current = true;
         handleQRCodeScannedRef.current?.(code.data);
         return;
       }
@@ -164,6 +166,7 @@ export default function GateScan() {
   };
 
   const startScanning = async () => {
+    isProcessingRef.current = false;
     try {
       // Stop any existing stream first
       if (streamRef.current) {
@@ -194,6 +197,7 @@ export default function GateScan() {
 
   handleQRCodeScannedRef.current = async (qrData) => {
     stopScanning();
+    isProcessingRef.current = true;
     
     try {
       console.log('QR scanned raw data:', qrData);
@@ -218,17 +222,17 @@ export default function GateScan() {
 
         if (!dayPass) {
           toast.error('Day Pass not found');
-          setTimeout(() => startScanningRef.current?.(), 2000);
+          setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2000);
           return;
         }
         if (dayPass.status === 'used') {
           toast.error('Day Pass already used');
-          setTimeout(() => startScanningRef.current?.(), 2500);
+          setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2500);
           return;
         }
         if (dayPass.status === 'expired') {
           toast.error('Day Pass has expired');
-          setTimeout(() => startScanningRef.current?.(), 2500);
+          setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2500);
           return;
         }
         setScannedMember({ full_name: `${dayPass.first_name} ${dayPass.last_name}`.trim() || dayPass.first_name, email: dayPass.email, photo_url: dayPass.photo_url });
@@ -270,11 +274,11 @@ export default function GateScan() {
       }
 
       toast.error('Invalid QR code');
-      setTimeout(() => startScanningRef.current?.(), 2000);
+      setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2000);
     } catch (error) {
       console.error('QR scan error:', error);
       toast.error('Failed to verify pass: ' + error.message);
-      setTimeout(() => startScanningRef.current?.(), 2000);
+      setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2000);
     }
   };
 
