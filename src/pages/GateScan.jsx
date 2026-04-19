@@ -255,6 +255,7 @@ export default function GateScan() {
           setCheckInDenied(membership.user_name || 'Member');
           setTimeout(() => {
             setCheckInDenied(false);
+            isProcessingRef.current = false;
             startScanningRef.current?.();
           }, 3000);
           return;
