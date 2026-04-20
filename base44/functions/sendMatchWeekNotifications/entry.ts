@@ -1,5 +1,11 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
-import { format, addDays, isSameDay, parseISO } from 'npm:date-fns';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { format, isSameDay, parseISO } from 'npm:date-fns';
+import webpush from 'npm:web-push@3.6.7';
+
+const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+const VAPID_PRIVATE_KEY = 'UUxhKMK7-T1N8WO9Jn5mDT5RqL9UB-s7D5qxGHxOWdg';
+
+webpush.setVapidDetails('mailto:admin@centralrlfc.com.au', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
 Deno.serve(async (req) => {
   try {
@@ -66,16 +72,37 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Send push notification
-    await base44.asServiceRole.functions.invoke('sendPushNotification', {
-      title: notificationTitle,
-      message: notificationBody,
-      targetGroup: 'members'
-    });
+    // Get active members with push enabled — no auth required, service role
+    const [usersWithPush, activeMemberships] = await Promise.all([
+      base44.asServiceRole.entities.User.filter({ push_enabled: true }),
+      base44.asServiceRole.entities.Membership.filter({ status: 'active' })
+    ]);
+    const memberUserIds = new Set(activeMemberships.map(m => m.user_id));
+    const targetUsers = usersWithPush.filter(u => memberUserIds.has(u.id) && u.push_subscription);
+
+    const ICON = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';
+    const payload = JSON.stringify({ title: notificationTitle, body: notificationBody, icon: ICON, badge: ICON, url: '/', timestamp: Date.now() });
+
+    let successCount = 0;
+    let failCount = 0;
+
+    await Promise.all(targetUsers.map(u =>
+      webpush.sendNotification(u.push_subscription, payload)
+        .then(() => successCount++)
+        .catch(err => {
+          failCount++;
+          if (err.statusCode === 410 || err.statusCode === 404) {
+            base44.asServiceRole.entities.User.update(u.id, { push_subscription: null });
+          }
+        })
+    ));
+
+    console.log(`Match notification sent: "${notificationTitle}" → ${successCount} delivered, ${failCount} failed`);
 
     return Response.json({ 
       success: true,
-      sent: true,
+      sent: successCount,
+      failed: failCount,
       title: notificationTitle,
       fixture: nextMatch.opponent
     });
