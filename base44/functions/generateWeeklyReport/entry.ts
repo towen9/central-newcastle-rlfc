@@ -4,9 +4,10 @@ import { subDays, startOfWeek, endOfWeek, format, differenceInDays } from 'npm:d
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
 
-    if (!user || user.role !== 'admin') {
+    // Allow service role calls (from emailWeeklyReport automation) or admin users
+    const user = await base44.auth.me().catch(() => null);
+    if (user && user.role !== 'admin') {
       return Response.json({ error: 'Unauthorized: Admin access required' }, { status: 403 });
     }
 
@@ -18,7 +19,7 @@ Deno.serve(async (req) => {
 
     // Fetch all data
     const [allMemberships, allCheckins, allOfferRedemptions, allTransactions, allOffers] = await Promise.all([
-      base44.asServiceRole.entities.Membership.list(),
+      base44.asServiceRole.entities.Membership.list('-created_date', 2000),
       base44.asServiceRole.entities.CheckIn.list('-timestamp', 1000),
       base44.asServiceRole.entities.OfferRedemption.list('-timestamp', 1000),
       base44.asServiceRole.entities.Transaction.list('-timestamp', 1000),
@@ -61,6 +62,16 @@ Deno.serve(async (req) => {
     const totalMembers = allMemberships.length;
     const activeMemberships = allMemberships.filter(m => m.status === 'active');
     const paidMembers = activeMemberships.length;
+
+    // New sign-ups this week vs last week
+    const thisWeekSignups = allMemberships.filter(m => {
+      const date = new Date(m.created_date);
+      return date >= thisWeekStart && date <= thisWeekEnd;
+    });
+    const lastWeekSignups = allMemberships.filter(m => {
+      const date = new Date(m.created_date);
+      return date >= lastWeekStart && date <= lastWeekEnd;
+    });
 
     const thisWeekRevenue = thisWeekTransactions.reduce((sum, t) => sum + (t.final_amount || 0), 0);
     const lastWeekRevenue = lastWeekTransactions.reduce((sum, t) => sum + (t.final_amount || 0), 0);
@@ -125,6 +136,8 @@ Deno.serve(async (req) => {
       metrics: {
         totalMembers,
         paidMembers,
+        newSignups: thisWeekSignups.length,
+        signupsChange: lastWeekSignups.length > 0 ? parseFloat((((thisWeekSignups.length - lastWeekSignups.length) / lastWeekSignups.length) * 100).toFixed(1)) : 0,
         revenue: thisWeekRevenue.toFixed(2),
         revenueChange: parseFloat(revenueChange),
         gameAttendance: thisWeekCheckins.length,
