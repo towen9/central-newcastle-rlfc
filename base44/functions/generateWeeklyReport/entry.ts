@@ -1,5 +1,6 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
-import { subDays, startOfWeek, endOfWeek, format, differenceInDays } from 'npm:date-fns';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { subDays, startOfWeek, endOfWeek, format } from 'npm:date-fns';
+import Stripe from 'npm:stripe@14.21.0';
 
 Deno.serve(async (req) => {
   try {
@@ -17,13 +18,28 @@ Deno.serve(async (req) => {
     const lastWeekStart = subDays(thisWeekStart, 7);
     const lastWeekEnd = subDays(thisWeekEnd, 7);
 
-    // Fetch all data
-    const [allMemberships, allCheckins, allOfferRedemptions, allTransactions, allOffers] = await Promise.all([
+    // Fetch Stripe payment intents for this week and last week
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+
+    const fetchStripeRevenue = async (start, end) => {
+      const charges = await stripe.paymentIntents.list({
+        created: { gte: Math.floor(start.getTime() / 1000), lte: Math.floor(end.getTime() / 1000) },
+        limit: 100
+      });
+      return charges.data
+        .filter(pi => pi.status === 'succeeded')
+        .reduce((sum, pi) => sum + (pi.amount_received / 100), 0);
+    };
+
+    // Fetch all data in parallel
+    const [allMemberships, allCheckins, allOfferRedemptions, allTransactions, allOffers, stripeThisWeek, stripeLastWeek] = await Promise.all([
       base44.asServiceRole.entities.Membership.list('-created_date', 2000),
       base44.asServiceRole.entities.CheckIn.list('-timestamp', 1000),
       base44.asServiceRole.entities.OfferRedemption.list('-timestamp', 1000),
       base44.asServiceRole.entities.Transaction.list('-timestamp', 1000),
-      base44.asServiceRole.entities.Offer.filter({ is_active: true })
+      base44.asServiceRole.entities.Offer.filter({ is_active: true }),
+      fetchStripeRevenue(thisWeekStart, thisWeekEnd),
+      fetchStripeRevenue(lastWeekStart, lastWeekEnd)
     ]);
 
     // Current week metrics
@@ -73,8 +89,12 @@ Deno.serve(async (req) => {
       return date >= lastWeekStart && date <= lastWeekEnd;
     });
 
+    // Bar/canteen transactions (in-venue)
     const thisWeekRevenue = thisWeekTransactions.reduce((sum, t) => sum + (t.final_amount || 0), 0);
     const lastWeekRevenue = lastWeekTransactions.reduce((sum, t) => sum + (t.final_amount || 0), 0);
+
+    // Stripe membership/day-pass sales
+    const stripeSalesChange = stripeLastWeek > 0 ? (((stripeThisWeek - stripeLastWeek) / stripeLastWeek) * 100).toFixed(1) : 0;
 
     // Top sponsor by offer clicks
     const sponsorClicks = {};
@@ -138,6 +158,8 @@ Deno.serve(async (req) => {
         paidMembers,
         newSignups: thisWeekSignups.length,
         signupsChange: lastWeekSignups.length > 0 ? parseFloat((((thisWeekSignups.length - lastWeekSignups.length) / lastWeekSignups.length) * 100).toFixed(1)) : 0,
+        stripeSales: stripeThisWeek.toFixed(2),
+        stripeSalesChange: parseFloat(stripeSalesChange),
         revenue: thisWeekRevenue.toFixed(2),
         revenueChange: parseFloat(revenueChange),
         gameAttendance: thisWeekCheckins.length,

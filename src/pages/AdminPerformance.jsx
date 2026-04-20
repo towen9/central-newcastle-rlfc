@@ -157,15 +157,29 @@ export default function AdminPerformance() {
                 </CardContent>
               </Card>
 
-              {/* Revenue */}
+              {/* Stripe Membership Sales */}
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-sm text-gray-500 mb-1">Revenue Generated</div>
+                  <div className="text-sm text-gray-500 mb-1">Membership Sales (Stripe)</div>
+                  <div className="text-3xl font-bold text-gray-900">${report.metrics.stripeSales}</div>
+                  <div className={`text-sm mt-2 flex items-center gap-1 ${report.metrics.stripeSalesChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {report.metrics.stripeSalesChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                    {report.metrics.stripeSalesChange >= 0 ? '+' : ''}{report.metrics.stripeSalesChange}% vs last week
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">Memberships &amp; day passes</div>
+                </CardContent>
+              </Card>
+
+              {/* Bar/Canteen Revenue */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-sm text-gray-500 mb-1">Bar &amp; Canteen Revenue</div>
                   <div className="text-3xl font-bold text-gray-900">${report.metrics.revenue}</div>
                   <div className={`text-sm mt-2 flex items-center gap-1 ${report.metrics.revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {report.metrics.revenueChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                     {report.metrics.revenueChange >= 0 ? '+' : ''}{report.metrics.revenueChange}% vs last week
                   </div>
+                  <div className="text-xs text-gray-400 mt-1">In-venue QR transactions</div>
                 </CardContent>
               </Card>
 
