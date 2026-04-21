@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,8 @@ export default function AdminPerformance() {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [report, setReport] = useState(null);
+
+  useEffect(() => { generateReport(); }, []);
 
   const generateReport = async () => {
     setLoading(true);
