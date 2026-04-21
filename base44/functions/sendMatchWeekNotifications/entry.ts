@@ -86,16 +86,24 @@ Deno.serve(async (req) => {
     let successCount = 0;
     let failCount = 0;
 
-    await Promise.all(targetUsers.map(u =>
-      webpush.sendNotification(u.push_subscription, payload)
+    await Promise.all(targetUsers.map(u => {
+      // push_subscription may be stored as a JSON string — parse it if so
+      let subscription = u.push_subscription;
+      if (typeof subscription === 'string') {
+        try { subscription = JSON.parse(subscription); } catch { return; }
+      }
+      if (!subscription || !subscription.endpoint) return;
+
+      return webpush.sendNotification(subscription, payload)
         .then(() => successCount++)
         .catch(err => {
           failCount++;
+          console.error(`Push failed for user ${u.id}: ${err.statusCode} ${err.message}`);
           if (err.statusCode === 410 || err.statusCode === 404) {
             base44.asServiceRole.entities.User.update(u.id, { push_subscription: null });
           }
-        })
-    ));
+        });
+    }));
 
     console.log(`Match notification sent: "${notificationTitle}" → ${successCount} delivered, ${failCount} failed`);
 
