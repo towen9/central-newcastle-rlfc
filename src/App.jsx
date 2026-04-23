@@ -15,6 +15,7 @@ import AdminBulkImportSponsors from './pages/AdminBulkImportSponsors';
 import MerchandiseScan from './pages/MerchandiseScan';
 import MerchQRPoster from './pages/MerchQRPoster';
 import MemberMerchStatus from './pages/MemberMerchStatus';
+import MembershipAssistant from './pages/MembershipAssistant';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -87,6 +88,7 @@ const AuthenticatedApp = () => {
       <Route path="/MerchandiseScan" element={<LayoutWrapper currentPageName="MerchandiseScan"><MerchandiseScan /></LayoutWrapper>} />
       <Route path="/MerchQRPoster" element={<MerchQRPoster />} />
       <Route path="/MemberMerchStatus" element={<LayoutWrapper currentPageName="MemberMerchStatus"><MemberMerchStatus /></LayoutWrapper>} />
+      <Route path="/MembershipAssistant" element={<MembershipAssistant />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </Suspense>
