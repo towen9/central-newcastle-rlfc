@@ -261,14 +261,12 @@ export default function GateScan() {
           return;
         }
 
-        let memberUser = null;
-        if (membership.user_email) {
-          const users = await base44.entities.User.filter({ email: membership.user_email });
-          memberUser = users[0] || null;
-        }
-        if (!memberUser) {
-          memberUser = { full_name: membership.user_name || 'Member', email: membership.user_email || '', photo_url: membership.photo_url || null };
-        }
+        const memberUser = {
+          id: membership.user_id,
+          full_name: membership.user_name || 'Member',
+          email: membership.user_email || '',
+          photo_url: membership.photo_url || null
+        };
         setScannedMember(memberUser);
         setMembershipData(membership);
         return;
@@ -287,7 +285,7 @@ export default function GateScan() {
     if (membershipData && scannedMember) {
       checkInMutation.mutate({
         membershipId: membershipData.id,
-        userId: scannedMember.id,
+        userId: scannedMember.id || membershipData.user_id,
         membership: membershipData
       });
     }
