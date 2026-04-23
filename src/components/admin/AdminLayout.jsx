@@ -24,7 +24,6 @@ const menuItems = [
   { icon: ShoppingBag, label: 'Transactions', page: 'AdminTransactions' },
   { icon: Percent, label: 'Discounts', page: 'AdminLocationDiscounts' },
   { icon: Share2, label: 'Referrals', page: 'AdminReferrals' },
-  { icon: ShoppingBag, label: 'Merch Scan', page: 'MerchandiseScan' },
 ];
 
 export default function AdminLayout({ children, title, currentPage }) {
@@ -90,6 +89,16 @@ export default function AdminLayout({ children, title, currentPage }) {
                 </Link>
               );
             })}
+            <Link to="/MerchandiseScan">
+              <button className={`relative flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
+                currentPage === 'MerchandiseScan'
+                  ? 'bg-[#1a365d] text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}>
+                <ShoppingBag className="w-4 h-4" />
+                Merch Scan
+              </button>
+            </Link>
           </div>
         </div>
       </div>
