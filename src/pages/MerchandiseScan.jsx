@@ -150,7 +150,7 @@ export default function MerchandiseScan() {
           user_id: member.user_id,
           membership_id: member.id,
           points: pointsEarned,
-          transaction_type: 'bar_purchase',
+          transaction_type: 'merchandise',
           description: `Merchandise purchase ($${finalAmt})`,
           location: 'Merchandise',
           timestamp: new Date().toISOString()

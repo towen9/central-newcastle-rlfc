@@ -45,11 +45,16 @@ Deno.serve(async (req) => {
     if (!membership) return Response.json({ type: 'error', detail: 'Invalid QR code' });
     if (membership.status !== 'active') return Response.json({ type: 'error', detail: 'Membership not active', name: membership.user_name });
 
-    // Check already checked in today
-    const todayStart = new Date();
+    // Check already checked in today (AEST = UTC+10/11)
+    const nowAEST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+    const todayStart = new Date(nowAEST);
     todayStart.setHours(0, 0, 0, 0);
     const todayCheckins = await base44.asServiceRole.entities.CheckIn.filter({ membership_id: membership.id });
-    const alreadyToday = todayCheckins.some(c => c.timestamp && new Date(c.timestamp) >= todayStart);
+    const alreadyToday = todayCheckins.some(c => {
+      if (!c.timestamp) return false;
+      const checkinAEST = new Date(new Date(c.timestamp).toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+      return checkinAEST >= todayStart;
+    });
     if (alreadyToday) {
       return Response.json({ type: 'already_used', name: membership.user_name || 'Member', detail: 'Already checked in today' });
     }
@@ -104,8 +109,9 @@ Deno.serve(async (req) => {
       });
     }
 
+    const newGamesRemaining = isSupporter ? Math.max(0, (membership.games_remaining ?? 5) - 1) : null;
     let detail = '';
-    if (isSupporter) detail = `${Math.max(0, (membership.games_remaining ?? 5) - 1)} entries remaining`;
+    if (isSupporter) detail = `${newGamesRemaining} entries remaining`;
     else if (pointsEarned > 0) detail = `+${pointsEarned} points earned`;
 
     return Response.json({
