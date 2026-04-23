@@ -24,6 +24,7 @@ const menuItems = [
   { icon: ShoppingBag, label: 'Transactions', page: 'AdminTransactions' },
   { icon: Percent, label: 'Discounts', page: 'AdminLocationDiscounts' },
   { icon: Share2, label: 'Referrals', page: 'AdminReferrals' },
+  { icon: ShoppingBag, label: 'Merch Scan', page: 'MerchandiseScan' },
 ];
 
 export default function AdminLayout({ children, title, currentPage }) {

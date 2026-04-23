@@ -12,6 +12,9 @@ import PlayerPassInvite from './pages/PlayerPassInvite';
 import AdminReferrals from './pages/AdminReferrals';
 import GateQRPoster from './pages/GateQRPoster';
 import AdminBulkImportSponsors from './pages/AdminBulkImportSponsors';
+import MerchandiseScan from './pages/MerchandiseScan';
+import MerchQRPoster from './pages/MerchQRPoster';
+import MemberMerchStatus from './pages/MemberMerchStatus';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -81,6 +84,9 @@ const AuthenticatedApp = () => {
       <Route path="/AdminReferrals" element={<LayoutWrapper currentPageName="AdminReferrals"><AdminReferrals /></LayoutWrapper>} />
       <Route path="/GateQRPoster" element={<GateQRPoster />} />
       <Route path="/AdminBulkImportSponsors" element={<LayoutWrapper currentPageName="AdminBulkImportSponsors"><AdminBulkImportSponsors /></LayoutWrapper>} />
+      <Route path="/MerchandiseScan" element={<LayoutWrapper currentPageName="MerchandiseScan"><MerchandiseScan /></LayoutWrapper>} />
+      <Route path="/MerchQRPoster" element={<MerchQRPoster />} />
+      <Route path="/MemberMerchStatus" element={<LayoutWrapper currentPageName="MemberMerchStatus"><MemberMerchStatus /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </Suspense>

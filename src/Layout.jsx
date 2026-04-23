@@ -5,7 +5,7 @@ import PushNotificationManager from './components/shared/PushNotificationManager
 const memberPages = ['Home', 'Membership', 'Benefits', 'Sponsors', 'Profile', 'CheckIn', 'Fixtures', 'News', 'PointsRewards'];
 const memberPages2 = ['OldButchers', 'OldButchersHonourRoll'];
 
-const adminPages = ['AdminDashboard', 'AdminMembers', 'AdminOffers', 'AdminRewards', 'AdminNews', 'AdminQRCodes', 'AdminSponsors', 'AdminFixtures', 'AdminEvents', 'AdminGameDay', 'AdminTransactions', 'AdminLocationDiscounts', 'AdminUsers', 'AdminBulkImport', 'AdminFixturesComms', 'AdminMonitoring', 'AdminPerformance', 'AdminPushNotifications', 'AdminSMSNotifications', 'AdminReferrals', 'GateScan', 'BarScan', 'GateStaffGuide', 'CanteenStaffGuide', 'TroubleshootingGuide', 'GateStaffLogin', 'CanteenStaffLogin', 'LeaguesClubScan'];
+const adminPages = ['AdminDashboard', 'AdminMembers', 'AdminOffers', 'AdminRewards', 'AdminNews', 'AdminQRCodes', 'AdminSponsors', 'AdminFixtures', 'AdminEvents', 'AdminGameDay', 'AdminTransactions', 'AdminLocationDiscounts', 'AdminUsers', 'AdminBulkImport', 'AdminFixturesComms', 'AdminMonitoring', 'AdminPerformance', 'AdminPushNotifications', 'AdminSMSNotifications', 'AdminReferrals', 'GateScan', 'BarScan', 'GateStaffGuide', 'CanteenStaffGuide', 'TroubleshootingGuide', 'GateStaffLogin', 'CanteenStaffLogin', 'LeaguesClubScan', 'MerchandiseScan'];
 
 export default function Layout({ children, currentPageName }) {
   const isAdminPage = adminPages.includes(currentPageName);
