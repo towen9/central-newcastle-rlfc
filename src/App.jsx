@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from 'react'
+import useAppVersionCheck from '@/hooks/useAppVersionCheck'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
@@ -97,6 +98,7 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  useAppVersionCheck();
 
   return (
     <AuthProvider>
