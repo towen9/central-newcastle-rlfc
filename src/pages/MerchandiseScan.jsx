@@ -17,6 +17,7 @@ export default function MerchandiseScan() {
   const animRef = useRef(null);
   const canvasRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const scanLoopRef = useRef(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -61,7 +62,7 @@ export default function MerchandiseScan() {
         videoRef.current.play();
       }
       setScanning(true);
-      requestAnimationFrame(scanLoop);
+      requestAnimationFrame(scanLoopRef.current);
     } catch {
       alert('Camera access denied. Use Safari on iPhone.');
     }
@@ -84,8 +85,9 @@ export default function MerchandiseScan() {
         return;
       }
     }
-    animRef.current = requestAnimationFrame(scanLoop);
+    animRef.current = requestAnimationFrame(scanLoopRef.current);
   };
+  scanLoopRef.current = scanLoop;
 
   const handleQRScanned = async (qrData) => {
     stopCamera();
