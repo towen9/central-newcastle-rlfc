@@ -223,19 +223,17 @@ export default function MerchandiseScan() {
           </>
         )}
 
-        {scanning && (
-          <div className="space-y-4">
-            <div className="relative bg-black rounded-2xl overflow-hidden" style={{ aspectRatio: '1' }}>
-              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-              <canvas ref={canvasRef} className="hidden" />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-56 h-56 border-4 border-white rounded-2xl opacity-80" />
-              </div>
-              <p className="absolute bottom-4 left-0 right-0 text-center text-white text-sm animate-pulse">Hold QR code inside the box</p>
+        <div className="space-y-4" style={{ display: scanning ? 'block' : 'none' }}>
+          <div className="relative bg-black rounded-2xl overflow-hidden" style={{ aspectRatio: '1' }}>
+            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+            <canvas ref={canvasRef} className="hidden" />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-56 h-56 border-4 border-white rounded-2xl opacity-80" />
             </div>
-            <button onClick={stopCamera} className="w-full h-12 border border-white/30 text-white rounded-xl font-medium active:bg-white/10">Cancel</button>
+            <p className="absolute bottom-4 left-0 right-0 text-center text-white text-sm animate-pulse">Hold QR code inside the box</p>
           </div>
-        )}
+          <button onClick={stopCamera} className="w-full h-12 border border-white/30 text-white rounded-xl font-medium active:bg-white/10">Cancel</button>
+        </div>
 
         {member && !result && (
           <div className="space-y-4">
