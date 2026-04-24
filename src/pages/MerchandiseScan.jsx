@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ShoppingBag, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard, Tag, AlertTriangle, Ban, Camera } from 'lucide-react';
+import { ShoppingBag, CheckCircle, XCircle, Camera, LogOut, LayoutDashboard, Tag, AlertTriangle, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -18,6 +18,7 @@ export default function MerchandiseScan() {
   const streamRef = useRef(null);
   const animationRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const startScanningRef = useRef(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -33,8 +34,9 @@ export default function MerchandiseScan() {
       }
     };
     loadUser();
-    return () => stopScanning();
   }, []);
+
+  useEffect(() => { return () => stopScanning(); }, []);
 
   const stopScanning = () => {
     if (streamRef.current) {
@@ -95,6 +97,8 @@ export default function MerchandiseScan() {
     }
   };
 
+  startScanningRef.current = startScanning;
+
   const handleQRScanned = async (qrData) => {
     stopScanning();
     try {
@@ -143,7 +147,7 @@ export default function MerchandiseScan() {
   };
 
   if (!user) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <ShoppingBag className="w-8 h-8 animate-pulse text-blue-400" />
     </div>
   );
@@ -164,7 +168,7 @@ export default function MerchandiseScan() {
           {result.pointsEarned > 0 && <p className="text-2xl font-bold text-blue-200 pt-2">+{result.pointsEarned} pts earned</p>}
           <p className="text-emerald-200 text-sm">Balance: {result.newBalance} pts</p>
         </div>
-        <Button onClick={startScanning} className="mt-8 w-full max-w-xs bg-white text-emerald-700 font-bold">Scan Next Member</Button>
+        <Button onClick={() => startScanningRef.current?.()} className="mt-8 w-full max-w-xs bg-white text-emerald-700 font-bold">Scan Next Member</Button>
         <Button onClick={() => window.location.href = '/AdminDashboard'} variant="ghost" className="mt-3 w-full max-w-xs text-white/70">Back to Dashboard</Button>
       </div>
     );
@@ -178,115 +182,108 @@ export default function MerchandiseScan() {
         {result.memberName && <p className="text-white text-lg font-semibold mb-1">{result.memberName}</p>}
         {result.tierName && <p className="text-white/70 text-sm mb-4">{result.tierName}</p>}
         <p className="text-white/80 text-center text-sm mb-8">{result.message}</p>
-        <Button onClick={startScanning} className="w-full max-w-xs bg-white text-red-700 font-bold">Try Again</Button>
+        <Button onClick={() => startScanningRef.current?.()} className="w-full max-w-xs bg-white text-red-700 font-bold">Try Again</Button>
         <Button onClick={() => window.location.href = '/AdminDashboard'} variant="ghost" className="mt-3 w-full max-w-xs text-white/70">Back to Dashboard</Button>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: '#111827' }}>
-      <div className="bg-[#1a365d] px-5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: '16px' }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <ShoppingBag className="w-8 h-8 text-white" />
-            <div>
-              <h1 className="text-xl font-bold text-white leading-tight">Merch Scanner</h1>
-              <p className="text-blue-200 text-xs">Premium & Old Butchers only</p>
+    <div style={{ minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: '#f9fafb' }}>
+      <div className="bg-[#1a365d] text-white" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <div className="px-5 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ShoppingBag className="w-10 h-10" />
+              <div>
+                <h1 className="text-xl font-bold">Merch Scanner</h1>
+                <p className="text-blue-200 text-sm">Premium & Old Butchers only</p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-1">
-            <Button variant="ghost" size="sm" onClick={() => window.location.href = '/AdminDashboard'} className="text-white hover:bg-white/20">
-              <LayoutDashboard className="w-4 h-4 mr-1" />Dashboard
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => base44.auth.logout()} className="text-white hover:bg-white/20">
-              <LogOut className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/AdminDashboard'} className="text-white hover:bg-white/20">
+                <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => base44.auth.logout()} className="text-white hover:bg-white/20">
+                <LogOut className="w-4 h-4 mr-2" />Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="px-5 py-6 space-y-4 max-w-md mx-auto">
-        {/* Camera view - always in DOM like GateScan */}
-        <div className="bg-white rounded-2xl overflow-hidden border border-gray-700">
+      <div className="px-5 py-6 space-y-4">
+        {/* Camera — always in DOM, same as GateScan */}
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200">
           <div className="relative aspect-square bg-black">
             <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
             <canvas ref={canvasRef} className="hidden" />
-            {!scanning && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <Camera className="w-16 h-16 text-white/50" />
-              </div>
-            )}
-            {scanning && (
-              <div className="absolute inset-0 border-4 border-blue-500/50">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-4 border-white rounded-2xl" />
-                <p className="absolute bottom-4 left-0 right-0 text-center text-white text-sm animate-pulse">Hold QR code inside the box</p>
-              </div>
-            )}
+            {!scanning && <div className="absolute inset-0 flex items-center justify-center bg-black/50"><Camera className="w-16 h-16 text-white/50" /></div>}
+            {scanning && <div className="absolute inset-0 border-4 border-blue-500/50"><div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-4 border-white rounded-2xl" /></div>}
           </div>
         </div>
 
         {!scanning && !member && (
           <>
-            <Button onClick={startScanning} className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-lg">
-              <Scan className="w-6 h-6 mr-2" /> Scan Member QR Code
+            <Button onClick={startScanning} className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-lg">
+              <Camera className="w-6 h-6 mr-3" />Scan Member QR Code
             </Button>
-            <div className="bg-gray-800 rounded-xl p-4 text-sm text-gray-400">
-              <p className="font-semibold text-white mb-2">✅ Eligible for 20% discount:</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
+              <p className="font-semibold mb-1">✅ Eligible for 20% discount:</p>
               <p>• Premium Membership</p>
               <p>• Old Butchers Membership</p>
               <p>• Sponsor Season Pass</p>
-              <p className="mt-3 text-orange-400 font-medium">⚠️ One use per season per member</p>
-              <p className="mt-1 text-gray-500">Supporter Pack & Day Pass — no discount</p>
+              <p className="mt-2 text-orange-600 font-medium">⚠️ One use per season per member</p>
+              <p className="mt-1 text-blue-500">Supporter Pack & Day Pass — no discount</p>
             </div>
           </>
         )}
 
         {scanning && (
-          <div className="text-center py-2">
-            <p className="text-gray-400 animate-pulse text-base">Scanning for QR code...</p>
-            <Button onClick={stopScanning} variant="outline" className="mt-4 border-gray-600 text-gray-300">Cancel</Button>
+          <div className="text-center py-4">
+            <p className="text-gray-600 animate-pulse text-base">Scanning for QR code...</p>
+            <Button onClick={stopScanning} variant="outline" className="mt-4">Cancel</Button>
           </div>
         )}
 
         {member && !result && (
           <div className="space-y-4">
-            <div className="bg-gray-800 rounded-2xl p-5">
+            <div className="bg-white rounded-2xl p-5 border border-gray-200">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Member</p>
-              <p className="text-2xl font-bold text-white">{member.memberName}</p>
-              <p className="text-blue-300 text-sm mt-1">{member.tierName}</p>
-              <p className="text-gray-400 text-sm">{member.points} pts balance</p>
+              <p className="text-2xl font-bold text-gray-900">{member.memberName}</p>
+              <p className="text-blue-600 text-sm mt-1">{member.tierName}</p>
+              <p className="text-gray-500 text-sm">{member.points} pts balance</p>
             </div>
             {member.discountUsed ? (
-              <div className="bg-orange-900/60 border border-orange-600 rounded-xl p-4 flex items-center gap-3">
-                <AlertTriangle className="w-6 h-6 text-orange-400 shrink-0" />
+              <div className="bg-orange-50 border border-orange-300 rounded-xl p-4 flex items-center gap-3">
+                <AlertTriangle className="w-6 h-6 text-orange-500 shrink-0" />
                 <div>
-                  <p className="font-semibold text-orange-300">Discount already used this season</p>
-                  <p className="text-orange-400 text-sm">Full price applies — still earns points</p>
+                  <p className="font-semibold text-orange-800">Discount already used this season</p>
+                  <p className="text-orange-600 text-sm">Full price applies — still earns points</p>
                 </div>
               </div>
             ) : (
-              <div className="bg-green-900/60 border border-green-600 rounded-xl p-4 flex items-center gap-3">
-                <Tag className="w-6 h-6 text-green-400 shrink-0" />
+              <div className="bg-green-50 border border-green-300 rounded-xl p-4 flex items-center gap-3">
+                <Tag className="w-6 h-6 text-green-600 shrink-0" />
                 <div>
-                  <p className="font-semibold text-green-300">{member.discountPct}% discount available!</p>
-                  <p className="text-green-400 text-sm">1 use per season — not yet redeemed ✅</p>
+                  <p className="font-semibold text-green-800">{member.discountPct}% discount available!</p>
+                  <p className="text-green-600 text-sm">1 use per season — not yet redeemed ✅</p>
                 </div>
               </div>
             )}
             <div>
-              <label className="text-sm text-gray-400 mb-2 block">Purchase Amount ($)</label>
-              <Input type="number" min="0" step="0.01" placeholder="0.00" value={purchaseAmount} onChange={e => setPurchaseAmount(e.target.value)} className="bg-gray-800 border-gray-600 text-white text-2xl h-14 text-center" />
+              <label className="text-sm text-gray-600 mb-2 block">Purchase Amount ($)</label>
+              <Input type="number" min="0" step="0.01" placeholder="0.00" value={purchaseAmount} onChange={e => setPurchaseAmount(e.target.value)} className="text-2xl h-14 text-center" />
             </div>
             {purchaseAmount && !isNaN(parseFloat(purchaseAmount)) && parseFloat(purchaseAmount) > 0 && (
-              <div className="bg-gray-800 rounded-xl p-4 space-y-2 text-sm">
-                <div className="flex justify-between text-gray-300"><span>Original</span><span>${parseFloat(purchaseAmount).toFixed(2)}</span></div>
-                {!member.discountUsed && <div className="flex justify-between text-green-400"><span>Discount ({member.discountPct}%)</span><span>-${(parseFloat(purchaseAmount) * member.discountPct / 100).toFixed(2)}</span></div>}
-                <div className="flex justify-between text-white font-bold border-t border-gray-600 pt-2">
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-sm">
+                <div className="flex justify-between text-gray-600"><span>Original</span><span>${parseFloat(purchaseAmount).toFixed(2)}</span></div>
+                {!member.discountUsed && <div className="flex justify-between text-green-600"><span>Discount ({member.discountPct}%)</span><span>-${(parseFloat(purchaseAmount) * member.discountPct / 100).toFixed(2)}</span></div>}
+                <div className="flex justify-between text-gray-900 font-bold border-t border-gray-200 pt-2">
                   <span>Final</span>
                   <span>${(member.discountUsed ? parseFloat(purchaseAmount) : parseFloat(purchaseAmount) * (1 - member.discountPct / 100)).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-blue-400">
+                <div className="flex justify-between text-blue-600">
                   <span>Points earned</span>
                   <span>+{Math.floor(member.discountUsed ? parseFloat(purchaseAmount) : parseFloat(purchaseAmount) * (1 - member.discountPct / 100))} pts</span>
                 </div>
@@ -298,10 +295,10 @@ export default function MerchandiseScan() {
                   <Tag className="w-5 h-5" /> Apply {member.discountPct}% Discount & Record
                 </button>
               )}
-              <button onClick={() => handleProcessPurchase(false)} disabled={processing || !purchaseAmount} className="w-full h-12 border border-white/30 text-white rounded-xl font-medium disabled:opacity-50 active:bg-white/10">
+              <button onClick={() => handleProcessPurchase(false)} disabled={processing || !purchaseAmount} className="w-full h-12 border border-gray-300 text-gray-700 rounded-xl font-medium disabled:opacity-50">
                 Full Price & Record
               </button>
-              <button onClick={() => { setMember(null); startScanning(); }} className="w-full h-10 text-gray-500 text-sm">
+              <button onClick={() => { setMember(null); startScanningRef.current?.(); }} className="w-full h-10 text-gray-400 text-sm">
                 Cancel — Scan Again
               </button>
             </div>
