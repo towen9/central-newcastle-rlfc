@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ShoppingBag, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard, Tag, AlertTriangle, Ban } from 'lucide-react';
+import { ShoppingBag, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard, Tag, AlertTriangle, Ban, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 import jsQR from 'jsqr';
 
 export default function MerchandiseScan() {
@@ -13,9 +14,9 @@ export default function MerchandiseScan() {
   const [purchaseAmount, setPurchaseAmount] = useState('');
   const [processing, setProcessing] = useState(false);
   const videoRef = useRef(null);
-  const streamRef = useRef(null);
-  const animRef = useRef(null);
   const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+  const animationRef = useRef(null);
   const isProcessingRef = useRef(false);
 
   useEffect(() => {
@@ -32,17 +33,17 @@ export default function MerchandiseScan() {
       }
     };
     loadUser();
-    return () => stopCamera();
+    return () => stopScanning();
   }, []);
 
-  const stopCamera = () => {
+  const stopScanning = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-    if (animRef.current) {
-      cancelAnimationFrame(animRef.current);
-      animRef.current = null;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
     setScanning(false);
   };
@@ -64,7 +65,7 @@ export default function MerchandiseScan() {
         return;
       }
     }
-    animRef.current = requestAnimationFrame(scanQRCode);
+    animationRef.current = requestAnimationFrame(scanQRCode);
   };
 
   const startScanning = async () => {
@@ -74,12 +75,12 @@ export default function MerchandiseScan() {
     setPurchaseAmount('');
     try {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
       }
-      if (animRef.current) {
-        cancelAnimationFrame(animRef.current);
-        animRef.current = null;
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       streamRef.current = stream;
@@ -89,13 +90,13 @@ export default function MerchandiseScan() {
       }
       setScanning(true);
       scanQRCode();
-    } catch {
-      alert('Camera access denied. Use Safari on iPhone.');
+    } catch (error) {
+      toast.error('Camera access denied');
     }
   };
 
   const handleQRScanned = async (qrData) => {
-    stopCamera();
+    stopScanning();
     try {
       let qrCode;
       try { const p = JSON.parse(qrData); qrCode = p.id; } catch { qrCode = qrData.replace('membership:', '').trim(); }
@@ -184,7 +185,7 @@ export default function MerchandiseScan() {
   }
 
   return (
-    <div style={{ minHeight: '100dvh', overflowY: 'auto', background: '#111827' }}>
+    <div style={{ minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: '#111827' }}>
       <div className="bg-[#1a365d] px-5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: '16px' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -195,23 +196,41 @@ export default function MerchandiseScan() {
             </div>
           </div>
           <div className="flex gap-1">
-            <button onClick={() => window.location.href = '/AdminDashboard'} className="flex items-center gap-1 bg-white/20 text-white rounded-xl px-3 py-2 text-sm font-medium active:bg-white/30" style={{ minHeight: '44px' }}>
-              <LayoutDashboard className="w-4 h-4" />
-              <span>Dashboard</span>
-            </button>
-            <button onClick={() => base44.auth.logout()} className="flex items-center bg-white/10 text-white rounded-xl px-3 py-2 active:bg-white/30" style={{ minHeight: '44px', minWidth: '44px' }}>
+            <Button variant="ghost" size="sm" onClick={() => window.location.href = '/AdminDashboard'} className="text-white hover:bg-white/20">
+              <LayoutDashboard className="w-4 h-4 mr-1" />Dashboard
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => base44.auth.logout()} className="text-white hover:bg-white/20">
               <LogOut className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       <div className="px-5 py-6 space-y-4 max-w-md mx-auto">
+        {/* Camera view - always in DOM like GateScan */}
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-700">
+          <div className="relative aspect-square bg-black">
+            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+            <canvas ref={canvasRef} className="hidden" />
+            {!scanning && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <Camera className="w-16 h-16 text-white/50" />
+              </div>
+            )}
+            {scanning && (
+              <div className="absolute inset-0 border-4 border-blue-500/50">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-4 border-white rounded-2xl" />
+                <p className="absolute bottom-4 left-0 right-0 text-center text-white text-sm animate-pulse">Hold QR code inside the box</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {!scanning && !member && (
           <>
-            <button onClick={startScanning} className="w-full h-16 bg-blue-600 active:bg-blue-800 text-white text-lg font-bold rounded-xl flex items-center justify-center gap-3">
-              <Scan className="w-6 h-6" /> Scan Member QR Code
-            </button>
+            <Button onClick={startScanning} className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-lg">
+              <Scan className="w-6 h-6 mr-2" /> Scan Member QR Code
+            </Button>
             <div className="bg-gray-800 rounded-xl p-4 text-sm text-gray-400">
               <p className="font-semibold text-white mb-2">✅ Eligible for 20% discount:</p>
               <p>• Premium Membership</p>
@@ -223,17 +242,12 @@ export default function MerchandiseScan() {
           </>
         )}
 
-        <div className="space-y-4" style={{ display: scanning ? 'block' : 'none' }}>
-          <div className="relative bg-black rounded-2xl overflow-hidden" style={{ aspectRatio: '1' }}>
-            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-            <canvas ref={canvasRef} className="hidden" />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-56 h-56 border-4 border-white rounded-2xl opacity-80" />
-            </div>
-            <p className="absolute bottom-4 left-0 right-0 text-center text-white text-sm animate-pulse">Hold QR code inside the box</p>
+        {scanning && (
+          <div className="text-center py-2">
+            <p className="text-gray-400 animate-pulse text-base">Scanning for QR code...</p>
+            <Button onClick={stopScanning} variant="outline" className="mt-4 border-gray-600 text-gray-300">Cancel</Button>
           </div>
-          <button onClick={stopCamera} className="w-full h-12 border border-white/30 text-white rounded-xl font-medium active:bg-white/10">Cancel</button>
-        </div>
+        )}
 
         {member && !result && (
           <div className="space-y-4">
