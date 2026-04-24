@@ -17,7 +17,6 @@ export default function MerchandiseScan() {
   const animRef = useRef(null);
   const canvasRef = useRef(null);
   const isProcessingRef = useRef(false);
-  const scanLoopRef = useRef(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -48,55 +47,52 @@ export default function MerchandiseScan() {
     setScanning(false);
   };
 
+  const scanQRCode = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code && !isProcessingRef.current) {
+        isProcessingRef.current = true;
+        handleQRScanned(code.data);
+        return;
+      }
+    }
+    animRef.current = requestAnimationFrame(scanQRCode);
+  };
+
   const startScanning = async () => {
     isProcessingRef.current = false;
     setResult(null);
     setMember(null);
     setPurchaseAmount('');
     try {
-      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+      if (animRef.current) {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = null;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
       setScanning(true);
-      // Wait for the video element to be in the DOM after setScanning(true)
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.setAttribute('playsinline', '');
-          videoRef.current.setAttribute('autoplay', '');
-          videoRef.current.muted = true;
-          videoRef.current.play().then(() => {
-            requestAnimationFrame(scanLoopRef.current);
-          }).catch(() => {
-            requestAnimationFrame(scanLoopRef.current);
-          });
-        }
-      }, 100);
+      scanQRCode();
     } catch {
       alert('Camera access denied. Use Safari on iPhone.');
     }
   };
-
-  const scanLoop = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas || isProcessingRef.current) return;
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      const ctx = canvas.getContext('2d');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code) {
-        isProcessingRef.current = true;
-        handleQRScanned(code.data);
-        return;
-      }
-    }
-    animRef.current = requestAnimationFrame(scanLoopRef.current);
-  };
-  scanLoopRef.current = scanLoop;
 
   const handleQRScanned = async (qrData) => {
     stopCamera();
@@ -230,7 +226,7 @@ export default function MerchandiseScan() {
         {scanning && (
           <div className="space-y-4">
             <div className="relative bg-black rounded-2xl overflow-hidden" style={{ aspectRatio: '1' }}>
-              <video ref={videoRef} className="w-full h-full object-cover" playsInline autoPlay muted />
+              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
               <canvas ref={canvasRef} className="hidden" />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-56 h-56 border-4 border-white rounded-2xl opacity-80" />
