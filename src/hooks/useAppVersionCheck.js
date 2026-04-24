@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 const VERSION_KEY = 'app_version_ts';
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const LAST_CHECK_KEY = 'app_version_last_check';
+const FORCE_RELOAD_STAMP = '2026-04-24-v2'; // bump this to force everyone to reload
 
 async function clearCachesAndReload() {
   if ('caches' in window) {
@@ -16,6 +17,16 @@ export default function useAppVersionCheck() {
   useEffect(() => {
     const check = async () => {
       try {
+        // Force reload if this stamp hasn't been seen yet
+        const seenStamp = localStorage.getItem('force_reload_stamp');
+        if (seenStamp !== FORCE_RELOAD_STAMP) {
+          localStorage.setItem('force_reload_stamp', FORCE_RELOAD_STAMP);
+          localStorage.removeItem(LAST_CHECK_KEY);
+          localStorage.removeItem(VERSION_KEY);
+          await clearCachesAndReload();
+          return;
+        }
+
         const lastCheck = parseInt(localStorage.getItem(LAST_CHECK_KEY) || '0', 10);
         const now = Date.now();
 
