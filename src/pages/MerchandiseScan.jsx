@@ -57,12 +57,21 @@ export default function MerchandiseScan() {
       if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
       setScanning(true);
-      requestAnimationFrame(scanLoopRef.current);
+      // Wait for the video element to be in the DOM after setScanning(true)
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.setAttribute('playsinline', '');
+          videoRef.current.setAttribute('autoplay', '');
+          videoRef.current.muted = true;
+          videoRef.current.play().then(() => {
+            requestAnimationFrame(scanLoopRef.current);
+          }).catch(() => {
+            requestAnimationFrame(scanLoopRef.current);
+          });
+        }
+      }, 100);
     } catch {
       alert('Camera access denied. Use Safari on iPhone.');
     }
@@ -221,7 +230,7 @@ export default function MerchandiseScan() {
         {scanning && (
           <div className="space-y-4">
             <div className="relative bg-black rounded-2xl overflow-hidden" style={{ aspectRatio: '1' }}>
-              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+              <video ref={videoRef} className="w-full h-full object-cover" playsInline autoPlay muted />
               <canvas ref={canvasRef} className="hidden" />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-56 h-56 border-4 border-white rounded-2xl opacity-80" />
