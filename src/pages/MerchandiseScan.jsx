@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ShoppingBag, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard, Tag, AlertTriangle } from 'lucide-react';
+import { ShoppingBag, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard, Tag, AlertTriangle, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import jsQR from 'jsqr';
@@ -12,98 +12,97 @@ export default function MerchandiseScan() {
   const [result, setResult] = useState(null);
   const [purchaseAmount, setPurchaseAmount] = useState('');
   const [processing, setProcessing] = useState(false);
-  const [videoStream, setVideoStream] = useState(null);
-  const scanningRef = useRef(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const animRef = useRef(null);
+  const canvasRef = useRef(null);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const userData = await base44.auth.me();
-        if (!userData || (userData.role !== 'admin' && userData.role !== 'canteen_staff')) {
-          window.location.href = '/CanteenStaffLogin';
+        if (!userData) {
+          await base44.auth.redirectToLogin();
           return;
         }
         setUser(userData);
       } catch {
-        window.location.href = '/CanteenStaffLogin';
+        await base44.auth.redirectToLogin();
       }
     };
     loadUser();
+    return () => stopCamera();
   }, []);
 
-  const startScanning = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      setVideoStream(stream);
-      scanningRef.current = true;
-      setScanning(true);
-      setResult(null);
-      setMember(null);
-      setPurchaseAmount('');
-      const video = document.getElementById('merchScanVideo');
-      video.srcObject = stream;
-      video.play();
-      scanQRCode(video);
-    } catch {
-      alert('Camera access denied');
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
     }
-  };
-
-  const stopScanning = () => {
-    scanningRef.current = false;
-    if (videoStream) {
-      videoStream.getTracks().forEach(t => t.stop());
-      setVideoStream(null);
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
     }
     setScanning(false);
   };
 
-  const scanQRCode = (video) => {
-    const canvas = document.getElementById('merchScanCanvas');
-    const ctx = canvas.getContext('2d');
-    const scan = () => {
-      if (!scanningRef.current) return;
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
-        if (code) { processScan(code.data); return; }
+  const startScanning = async () => {
+    isProcessingRef.current = false;
+    setResult(null);
+    setMember(null);
+    setPurchaseAmount('');
+    try {
+      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
       }
-      requestAnimationFrame(scan);
-    };
-    scan();
+      setScanning(true);
+      requestAnimationFrame(scanLoop);
+    } catch {
+      alert('Camera access denied. Use Safari on iPhone.');
+    }
   };
 
-  const processScan = async (qrData) => {
-    stopScanning();
-    try {
-      const memberships = await base44.entities.Membership.filter({ qr_code_id: qrData, status: 'active' });
-      if (!memberships || memberships.length === 0) {
-        setResult({ success: false, message: 'Invalid or inactive membership' });
+  const scanLoop = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || isProcessingRef.current) return;
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        isProcessingRef.current = true;
+        handleQRScanned(code.data);
         return;
       }
-      const m = memberships[0];
+    }
+    animRef.current = requestAnimationFrame(scanLoop);
+  };
 
-      // Load tier to get discount %
-      const tiers = await base44.entities.MembershipTier.filter({ name: m.tier_name });
-      const tier = tiers[0] || null;
-      const discountPct = tier?.merchandise_discount || 0;
-
-      // Check if discount already used this season (look for merch transactions with a discount)
-      const membershipStart = m.start_date ? new Date(m.start_date) : new Date(new Date().getFullYear(), 0, 1);
-      const allTransactions = await base44.entities.Transaction.filter({
-        membership_id: m.id,
-        transaction_type: 'merchandise'
-      });
-      const discountUsed = allTransactions.some(t =>
-        t.discount_amount > 0 && new Date(t.timestamp) >= membershipStart
-      );
-
-      setMember({ ...m, discountPct, discountUsed });
+  const handleQRScanned = async (qrData) => {
+    stopCamera();
+    try {
+      let qrCode;
+      try { const p = JSON.parse(qrData); qrCode = p.id; } catch { qrCode = qrData.replace('membership:', '').trim(); }
+      const res = await base44.functions.invoke('processMerchScan', { qrCode });
+      const data = res.data;
+      if (data.type === 'member_found') {
+        setMember(data);
+      } else if (data.type === 'no_discount') {
+        setResult({ success: false, blocked: true, memberName: data.memberName, tierName: data.tierName, message: data.message });
+      } else {
+        setResult({ success: false, message: data.message || 'Membership not found' });
+      }
     } catch (err) {
-      setResult({ success: false, message: 'Error loading membership: ' + err.message });
+      setResult({ success: false, message: 'Scan failed: ' + err.message });
     }
   };
 
@@ -112,230 +111,181 @@ export default function MerchandiseScan() {
       alert('Please enter a valid purchase amount');
       return;
     }
-    if (applyDiscount && member.discountUsed) {
-      alert('Discount already used this season');
-      return;
-    }
     setProcessing(true);
     try {
-      const original = parseFloat(parseFloat(purchaseAmount).toFixed(2));
-      const discountAmt = applyDiscount ? parseFloat((original * member.discountPct / 100).toFixed(2)) : 0;
-      const finalAmt = parseFloat((original - discountAmt).toFixed(2));
-
-      // Points: 1 point per dollar spent (final amount)
-      const pointsEarned = Math.floor(finalAmt);
-
-      await base44.entities.Transaction.create({
-        user_id: member.user_id,
-        membership_id: member.id,
-        member_name: member.user_name,
-        location: 'Merchandise',
-        item_description: 'Merchandise purchase',
-        original_amount: original,
-        discount_amount: discountAmt,
-        final_amount: finalAmt,
-        discount_reason: applyDiscount ? `${member.discountPct}% member discount` : '',
-        transaction_type: 'merchandise',
-        timestamp: new Date().toISOString(),
-        hour_of_day: new Date().getHours(),
-        day_of_week: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]
+      const res = await base44.functions.invoke('processMerchScan', {
+        qrCode: member.memberId,
+        purchaseAmount: parseFloat(purchaseAmount),
+        applyDiscount
       });
-
-      // Award points
-      if (pointsEarned > 0) {
-        await base44.entities.Membership.update(member.id, {
-          points: (member.points || 0) + pointsEarned
-        });
-        await base44.entities.PointsTransaction.create({
-          user_id: member.user_id,
-          membership_id: member.id,
-          points: pointsEarned,
-          transaction_type: 'merchandise',
-          description: `Merchandise purchase ($${finalAmt})`,
-          location: 'Merchandise',
-          timestamp: new Date().toISOString()
-        });
+      const data = res.data;
+      if (data.type === 'success') {
+        setResult({ success: true, ...data });
+        setMember(null);
+        setPurchaseAmount('');
+      } else {
+        setResult({ success: false, message: data.message });
+        setMember(null);
       }
-
-      setResult({
-        success: true,
-        memberName: member.user_name,
-        original,
-        discountAmt,
-        finalAmt,
-        pointsEarned,
-        newBalance: (member.points || 0) + pointsEarned,
-        discountApplied: applyDiscount
-      });
-      setMember(null);
-      setPurchaseAmount('');
     } catch (err) {
-      setResult({ success: false, message: 'Error processing purchase: ' + err.message });
+      setResult({ success: false, message: 'Error: ' + err.message });
     } finally {
       setProcessing(false);
     }
   };
 
-  if (!user) return <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">Loading...</div>;
+  if (!user) return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+      <ShoppingBag className="w-8 h-8 animate-pulse text-blue-400" />
+    </div>
+  );
+
+  if (result?.success) {
+    return (
+      <div className="fixed inset-0 bg-emerald-700 flex flex-col items-center justify-center z-50 px-6">
+        <CheckCircle className="w-24 h-24 text-white mb-4" />
+        <p className="text-white text-3xl font-extrabold mb-1">Purchase Recorded!</p>
+        <p className="text-emerald-100 text-xl font-semibold mb-6">{result.memberName}</p>
+        <div className="bg-white/10 rounded-2xl p-5 w-full max-w-xs space-y-2 text-center">
+          <p className="text-emerald-100 text-sm">{result.tierName}</p>
+          <div className="flex justify-between text-white"><span>Original</span><span>${result.original?.toFixed(2)}</span></div>
+          {result.discountApplied && (
+            <div className="flex justify-between text-emerald-200"><span>Discount ({result.discountPct}%)</span><span>-${result.discountAmt?.toFixed(2)}</span></div>
+          )}
+          <div className="flex justify-between text-white font-bold border-t border-white/20 pt-2"><span>Final</span><span>${result.finalAmt?.toFixed(2)}</span></div>
+          {result.pointsEarned > 0 && <p className="text-2xl font-bold text-blue-200 pt-2">+{result.pointsEarned} pts earned</p>}
+          <p className="text-emerald-200 text-sm">Balance: {result.newBalance} pts</p>
+        </div>
+        <Button onClick={startScanning} className="mt-8 w-full max-w-xs bg-white text-emerald-700 font-bold">Scan Next Member</Button>
+        <Button onClick={() => window.location.href = '/AdminDashboard'} variant="ghost" className="mt-3 w-full max-w-xs text-white/70">Back to Dashboard</Button>
+      </div>
+    );
+  }
+
+  if (result && !result.success) {
+    return (
+      <div className={`fixed inset-0 flex flex-col items-center justify-center z-50 px-6 ${result.blocked ? 'bg-orange-700' : 'bg-red-700'}`}>
+        {result.blocked ? <Ban className="w-24 h-24 text-white mb-4" /> : <XCircle className="w-24 h-24 text-white mb-4" />}
+        <p className="text-white text-2xl font-extrabold mb-2 text-center">{result.blocked ? 'No Discount' : 'Scan Failed'}</p>
+        {result.memberName && <p className="text-white text-lg font-semibold mb-1">{result.memberName}</p>}
+        {result.tierName && <p className="text-white/70 text-sm mb-4">{result.tierName}</p>}
+        <p className="text-white/80 text-center text-sm mb-8">{result.message}</p>
+        <Button onClick={startScanning} className="w-full max-w-xs bg-white text-red-700 font-bold">Try Again</Button>
+        <Button onClick={() => window.location.href = '/AdminDashboard'} variant="ghost" className="mt-3 w-full max-w-xs text-white/70">Back to Dashboard</Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+    <div style={{ minHeight: '100dvh', overflowY: 'auto', background: '#111827' }}>
+      <div className="bg-[#1a365d] px-5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: '16px' }}>
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <ShoppingBag className="w-10 h-10 text-blue-400" />
+            <ShoppingBag className="w-8 h-8 text-white" />
             <div>
-              <h1 className="text-2xl font-bold">Merch Scanner</h1>
-              <p className="text-gray-400 text-sm">Season discount + points</p>
+              <h1 className="text-xl font-bold text-white leading-tight">Merch Scanner</h1>
+              <p className="text-blue-200 text-xs">Premium & Old Butchers only</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button onClick={() => window.location.href = '/AdminDashboard'} variant="ghost" size="sm" className="text-white hover:bg-white/10">
-              <LayoutDashboard className="w-4 h-4 mr-1" /> Dashboard
-            </Button>
-            <Button onClick={() => base44.auth.logout('/CanteenStaffLogin')} variant="ghost" size="sm" className="text-white hover:bg-white/10">
+          <div className="flex gap-1">
+            <button onClick={() => window.location.href = '/AdminDashboard'} className="flex items-center gap-1 bg-white/20 text-white rounded-xl px-3 py-2 text-sm font-medium active:bg-white/30" style={{ minHeight: '44px' }}>
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Dashboard</span>
+            </button>
+            <button onClick={() => base44.auth.logout()} className="flex items-center bg-white/10 text-white rounded-xl px-3 py-2 active:bg-white/30" style={{ minHeight: '44px', minWidth: '44px' }}>
               <LogOut className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Start scan */}
-        {!scanning && !member && !result && (
-          <Button onClick={startScanning} className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-lg">
-            <Scan className="w-6 h-6 mr-2" />
-            Scan Member QR
-          </Button>
+      <div className="px-5 py-6 space-y-4 max-w-md mx-auto">
+        {!scanning && !member && (
+          <>
+            <button onClick={startScanning} className="w-full h-16 bg-blue-600 active:bg-blue-800 text-white text-lg font-bold rounded-xl flex items-center justify-center gap-3">
+              <Scan className="w-6 h-6" /> Scan Member QR Code
+            </button>
+            <div className="bg-gray-800 rounded-xl p-4 text-sm text-gray-400">
+              <p className="font-semibold text-white mb-2">✅ Eligible for 20% discount:</p>
+              <p>• Premium Membership</p>
+              <p>• Old Butchers Membership</p>
+              <p>• Sponsor Season Pass</p>
+              <p className="mt-3 text-orange-400 font-medium">⚠️ One use per season per member</p>
+              <p className="mt-1 text-gray-500">Supporter Pack & Day Pass — no discount</p>
+            </div>
+          </>
         )}
 
-        {/* Camera */}
         {scanning && (
           <div className="space-y-4">
-            <div className="relative bg-black rounded-lg overflow-hidden">
-              <video id="merchScanVideo" className="w-full" />
-              <div className="absolute inset-0 border-4 border-blue-400 opacity-50 pointer-events-none" />
+            <div className="relative bg-black rounded-2xl overflow-hidden" style={{ aspectRatio: '1' }}>
+              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+              <canvas ref={canvasRef} className="hidden" />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-56 h-56 border-4 border-white rounded-2xl opacity-80" />
+              </div>
+              <p className="absolute bottom-4 left-0 right-0 text-center text-white text-sm animate-pulse">Hold QR code inside the box</p>
             </div>
-            <canvas id="merchScanCanvas" className="hidden" />
-            <Button onClick={stopScanning} variant="outline" className="w-full text-white border-white/30">Cancel</Button>
+            <button onClick={stopCamera} className="w-full h-12 border border-white/30 text-white rounded-xl font-medium active:bg-white/10">Cancel</button>
           </div>
         )}
 
-        {/* Member loaded — enter purchase amount */}
         {member && !result && (
           <div className="space-y-4">
-            {/* Member info */}
-            <div className="bg-gray-800 rounded-xl p-5">
+            <div className="bg-gray-800 rounded-2xl p-5">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Member</p>
-              <p className="text-xl font-bold">{member.user_name}</p>
-              <p className="text-sm text-gray-400">{member.tier_name}</p>
+              <p className="text-2xl font-bold text-white">{member.memberName}</p>
+              <p className="text-blue-300 text-sm mt-1">{member.tierName}</p>
+              <p className="text-gray-400 text-sm">{member.points} pts balance</p>
             </div>
-
-            {/* Discount status */}
-            {member.discountPct > 0 ? (
-              member.discountUsed ? (
-                <div className="bg-orange-900/50 border border-orange-600 rounded-xl p-4 flex items-center gap-3">
-                  <AlertTriangle className="w-6 h-6 text-orange-400 shrink-0" />
-                  <div>
-                    <p className="font-semibold text-orange-300">{member.discountPct}% discount already used</p>
-                    <p className="text-orange-400 text-sm">Full price applies this season</p>
-                  </div>
+            {member.discountUsed ? (
+              <div className="bg-orange-900/60 border border-orange-600 rounded-xl p-4 flex items-center gap-3">
+                <AlertTriangle className="w-6 h-6 text-orange-400 shrink-0" />
+                <div>
+                  <p className="font-semibold text-orange-300">Discount already used this season</p>
+                  <p className="text-orange-400 text-sm">Full price applies — still earns points</p>
                 </div>
-              ) : (
-                <div className="bg-green-900/50 border border-green-600 rounded-xl p-4 flex items-center gap-3">
-                  <Tag className="w-6 h-6 text-green-400 shrink-0" />
-                  <div>
-                    <p className="font-semibold text-green-300">{member.discountPct}% discount available!</p>
-                    <p className="text-green-400 text-sm">1 use per season — not yet redeemed</p>
-                  </div>
-                </div>
-              )
+              </div>
             ) : (
-              <div className="bg-gray-700 rounded-xl p-4">
-                <p className="text-gray-400 text-sm">No merchandise discount on this tier</p>
+              <div className="bg-green-900/60 border border-green-600 rounded-xl p-4 flex items-center gap-3">
+                <Tag className="w-6 h-6 text-green-400 shrink-0" />
+                <div>
+                  <p className="font-semibold text-green-300">{member.discountPct}% discount available!</p>
+                  <p className="text-green-400 text-sm">1 use per season — not yet redeemed ✅</p>
+                </div>
               </div>
             )}
-
-            {/* Purchase amount */}
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Purchase Amount ($)</label>
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                value={purchaseAmount}
-                onChange={e => setPurchaseAmount(e.target.value)}
-                className="bg-gray-800 border-gray-600 text-white text-xl h-14"
-              />
+              <label className="text-sm text-gray-400 mb-2 block">Purchase Amount ($)</label>
+              <Input type="number" min="0" step="0.01" placeholder="0.00" value={purchaseAmount} onChange={e => setPurchaseAmount(e.target.value)} className="bg-gray-800 border-gray-600 text-white text-2xl h-14 text-center" />
             </div>
-
-            {/* Preview */}
             {purchaseAmount && !isNaN(parseFloat(purchaseAmount)) && parseFloat(purchaseAmount) > 0 && (
-              <div className="bg-gray-800 rounded-xl p-4 space-y-1 text-sm">
-                <div className="flex justify-between text-gray-400"><span>Original</span><span>${parseFloat(purchaseAmount).toFixed(2)}</span></div>
-                {member.discountPct > 0 && !member.discountUsed && (
-                  <div className="flex justify-between text-green-400"><span>Discount ({member.discountPct}%)</span><span>-${(parseFloat(purchaseAmount) * member.discountPct / 100).toFixed(2)}</span></div>
-                )}
-                <div className="flex justify-between font-bold text-white border-t border-gray-700 pt-2 mt-2">
+              <div className="bg-gray-800 rounded-xl p-4 space-y-2 text-sm">
+                <div className="flex justify-between text-gray-300"><span>Original</span><span>${parseFloat(purchaseAmount).toFixed(2)}</span></div>
+                {!member.discountUsed && <div className="flex justify-between text-green-400"><span>Discount ({member.discountPct}%)</span><span>-${(parseFloat(purchaseAmount) * member.discountPct / 100).toFixed(2)}</span></div>}
+                <div className="flex justify-between text-white font-bold border-t border-gray-600 pt-2">
+                  <span>Final</span>
+                  <span>${(member.discountUsed ? parseFloat(purchaseAmount) : parseFloat(purchaseAmount) * (1 - member.discountPct / 100)).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-blue-400">
                   <span>Points earned</span>
-                  <span>+{Math.floor((member.discountPct > 0 && !member.discountUsed ? parseFloat(purchaseAmount) * (1 - member.discountPct / 100) : parseFloat(purchaseAmount)))} pts</span>
+                  <span>+{Math.floor(member.discountUsed ? parseFloat(purchaseAmount) : parseFloat(purchaseAmount) * (1 - member.discountPct / 100))} pts</span>
                 </div>
               </div>
             )}
-
-            {/* Action buttons */}
-            <div className="space-y-2">
-              {member.discountPct > 0 && !member.discountUsed && (
-                <Button
-                  onClick={() => handleProcessPurchase(true)}
-                  disabled={processing || !purchaseAmount}
-                  className="w-full h-12 bg-green-600 hover:bg-green-700"
-                >
-                  <Tag className="w-4 h-4 mr-2" />
-                  Apply {member.discountPct}% Discount + Record
-                </Button>
+            <div className="space-y-3 pb-10">
+              {!member.discountUsed && (
+                <button onClick={() => handleProcessPurchase(true)} disabled={processing || !purchaseAmount} className="w-full h-14 bg-green-600 active:bg-green-800 disabled:opacity-50 text-white text-base font-bold rounded-xl flex items-center justify-center gap-2">
+                  <Tag className="w-5 h-5" /> Apply {member.discountPct}% Discount & Record
+                </button>
               )}
-              <Button
-                onClick={() => handleProcessPurchase(false)}
-                disabled={processing || !purchaseAmount}
-                variant={member.discountPct > 0 && !member.discountUsed ? 'outline' : 'default'}
-                className={`w-full h-12 ${member.discountPct > 0 && !member.discountUsed ? 'text-white border-white/30' : 'bg-blue-600 hover:bg-blue-700'}`}
-              >
-                Full Price + Record
-              </Button>
-              <Button onClick={() => setMember(null)} variant="ghost" className="w-full text-gray-400">Cancel</Button>
+              <button onClick={() => handleProcessPurchase(false)} disabled={processing || !purchaseAmount} className="w-full h-12 border border-white/30 text-white rounded-xl font-medium disabled:opacity-50 active:bg-white/10">
+                Full Price & Record
+              </button>
+              <button onClick={() => { setMember(null); startScanning(); }} className="w-full h-10 text-gray-500 text-sm">
+                Cancel — Scan Again
+              </button>
             </div>
-          </div>
-        )}
-
-        {/* Result */}
-        {result && (
-          <div className={`p-6 rounded-xl ${result.success ? 'bg-green-900' : 'bg-red-900'}`}>
-            {result.success ? (
-              <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            ) : (
-              <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            )}
-            <h2 className="text-xl font-bold text-center mb-4">{result.success ? 'Purchase Recorded!' : result.message}</h2>
-            {result.success && (
-              <div className="space-y-2 text-center">
-                <p className="text-lg font-semibold">{result.memberName}</p>
-                {result.discountApplied && (
-                  <p className="text-green-400">Discount applied: -${result.discountAmt.toFixed(2)}</p>
-                )}
-                <p className="text-white">Final: <span className="font-bold">${result.finalAmt.toFixed(2)}</span></p>
-                {result.pointsEarned > 0 && (
-                  <p className="text-2xl font-bold text-blue-400 mt-2">+{result.pointsEarned} points earned</p>
-                )}
-                <p className="text-gray-400 text-sm">Balance: {result.newBalance} pts</p>
-              </div>
-            )}
-            <Button
-              onClick={() => { setResult(null); startScanning(); }}
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-700"
-            >
-              Scan Next Member
-            </Button>
           </div>
         )}
       </div>
