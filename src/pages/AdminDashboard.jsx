@@ -328,6 +328,12 @@ export default function AdminDashboard() {
                   <p className="text-sm text-amber-700">Quick fixes for common issues</p>
                 </div>
               </Link>
+              <Link to={createPageUrl('StaffFAQ')}>
+                <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
+                  <h3 className="font-bold text-purple-900 mb-1">📋 Staff FAQ & Membership Guide</h3>
+                  <p className="text-sm text-purple-700">Printable reference — membership tiers & troubleshooting</p>
+                </div>
+              </Link>
             </div>
           </CardContent>
         </Card>

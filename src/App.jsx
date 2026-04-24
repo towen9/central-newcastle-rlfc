@@ -17,6 +17,7 @@ import MerchandiseScan from './pages/MerchandiseScan';
 import MerchQRPoster from './pages/MerchQRPoster';
 import MemberMerchStatus from './pages/MemberMerchStatus';
 import MembershipAssistant from './pages/MembershipAssistant';
+import StaffFAQ from './pages/StaffFAQ';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -90,6 +91,7 @@ const AuthenticatedApp = () => {
       <Route path="/MerchQRPoster" element={<MerchQRPoster />} />
       <Route path="/MemberMerchStatus" element={<LayoutWrapper currentPageName="MemberMerchStatus"><MemberMerchStatus /></LayoutWrapper>} />
       <Route path="/MembershipAssistant" element={<MembershipAssistant />} />
+      <Route path="/StaffFAQ" element={<LayoutWrapper currentPageName="StaffFAQ"><StaffFAQ /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </Suspense>
