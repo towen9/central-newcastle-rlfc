@@ -6,7 +6,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user || (user.role !== 'admin' && user.role !== 'canteen_staff')) {
+    if (!user || (user.role !== 'admin' && user.role !== 'canteen_staff' && user.role !== 'gate_staff')) {
       return Response.json({ type: 'error', message: 'Unauthorised' }, { status: 403 });
     }
 
