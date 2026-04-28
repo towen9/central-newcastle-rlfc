@@ -18,6 +18,7 @@ export default function MerchandiseScan() {
   const streamRef = useRef(null);
   const animationRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const pendingStreamRef = useRef(null);
   const startScanningRef = useRef(null);
 
   useEffect(() => {
@@ -42,6 +43,10 @@ export default function MerchandiseScan() {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
+    }
+    if (pendingStreamRef.current) {
+      pendingStreamRef.current.getTracks().forEach(track => track.stop());
+      pendingStreamRef.current = null;
     }
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
@@ -70,6 +75,21 @@ export default function MerchandiseScan() {
     animationRef.current = requestAnimationFrame(scanQRCode);
   };
 
+  // FIX: attach stream only after scanning=true has rendered the video element
+  useEffect(() => {
+    if (scanning && pendingStreamRef.current && videoRef.current) {
+      const video = videoRef.current;
+      const stream = pendingStreamRef.current;
+      streamRef.current = stream;
+      pendingStreamRef.current = null;
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play();
+        scanQRCode();
+      };
+    }
+  }, [scanning]);
+
   const startScanning = async () => {
     isProcessingRef.current = false;
     setResult(null);
@@ -85,15 +105,10 @@ export default function MerchandiseScan() {
         animationRef.current = null;
       }
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
+      pendingStreamRef.current = stream;
       setScanning(true);
-      scanQRCode();
     } catch (error) {
-      toast.error('Camera access denied');
+      toast.error('Camera access denied. Use Safari on iPhone.');
     }
   };
 
