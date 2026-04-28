@@ -17,15 +17,16 @@ export default function GateScan() {
   const streamRef = useRef(null);
   const animationRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const pendingStreamRef = useRef(null);
   const startScanningRef = useRef(null);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const userData = await base44.auth.me();
-        if (userData.role !== 'gate_staff' && userData.role !== 'admin') {
-          toast.error('Access denied - Gate staff only');
-          window.location.href = '/';
+        if (!userData) {
+          toast.error('Please log in');
+          await base44.auth.redirectToLogin();
           return;
         }
         setUser(userData);
@@ -41,6 +42,10 @@ export default function GateScan() {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
+    }
+    if (pendingStreamRef.current) {
+      pendingStreamRef.current.getTracks().forEach(track => track.stop());
+      pendingStreamRef.current = null;
     }
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
@@ -69,6 +74,21 @@ export default function GateScan() {
     animationRef.current = requestAnimationFrame(scanQRCode);
   };
 
+  // FIX: attach stream only after scanning=true has rendered the video element
+  useEffect(() => {
+    if (scanning && pendingStreamRef.current && videoRef.current) {
+      const video = videoRef.current;
+      const stream = pendingStreamRef.current;
+      streamRef.current = stream;
+      pendingStreamRef.current = null;
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play();
+        scanQRCode();
+      };
+    }
+  }, [scanning]);
+
   const startScanning = async () => {
     isProcessingRef.current = false;
     setScanResult(null);
@@ -82,15 +102,10 @@ export default function GateScan() {
         animationRef.current = null;
       }
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
+      pendingStreamRef.current = stream;
       setScanning(true);
-      scanQRCode();
     } catch (error) {
-      toast.error('Camera access denied');
+      toast.error('Camera access denied. Use Safari on iPhone.');
     }
   };
 
