@@ -50,13 +50,21 @@ Deno.serve(async (req) => {
     const todayStart = new Date(nowAEST);
     todayStart.setHours(0, 0, 0, 0);
     const todayCheckins = await base44.asServiceRole.entities.CheckIn.filter({ membership_id: membership.id });
-    const alreadyToday = todayCheckins.some(c => {
+    const todayCheckinsCount = todayCheckins.filter(c => {
       if (!c.timestamp) return false;
       const checkinAEST = new Date(new Date(c.timestamp).toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
       return checkinAEST >= todayStart;
-    });
-    if (alreadyToday) {
-      return Response.json({ type: 'already_used', name: membership.user_name || 'Member', detail: 'Already checked in today' });
+    }).length;
+
+    // Family memberships allow 2 entries per game day (2 adults), all others allow 1
+    const isFamily = membership.tier_name?.includes('Family');
+    const maxEntries = isFamily ? 2 : 1;
+
+    if (todayCheckinsCount >= maxEntries) {
+      const detail = isFamily
+        ? 'Both family entries already used today'
+        : 'Already checked in today';
+      return Response.json({ type: 'already_used', name: membership.user_name || 'Member', detail });
     }
 
     const isSupporter = membership.tier_name?.includes('Supporter Pack');
