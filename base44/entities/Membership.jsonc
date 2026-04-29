@@ -72,7 +72,7 @@
     },
     "years_played": {
       "type": "string",
-      "description": "Old Butchers: years played at the club e.g. 2010\u20132015"
+      "description": "Old Butchers: years played at the club e.g. 2010-2015"
     },
     "team_grade_played": {
       "type": "string",
@@ -81,6 +81,15 @@
     "photo_url": {
       "type": "string",
       "description": "Player selfie photo URL for identity verification"
+    },
+    "push_enabled": {
+      "type": "boolean",
+      "description": "Whether the member has enabled push notifications",
+      "default": false
+    },
+    "push_subscription": {
+      "type": "object",
+      "description": "Web push subscription object for sending notifications"
     }
   },
   "required": [
