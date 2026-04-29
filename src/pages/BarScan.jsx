@@ -8,8 +8,12 @@ export default function BarScan() {
   const [user, setUser] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
-  const [videoStream, setVideoStream] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+  const animationRef = useRef(null);
   const scanningRef = useRef(false);
+  const pendingStreamRef = useRef(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -27,99 +31,114 @@ export default function BarScan() {
     loadUser();
   }, []);
 
-  const startScanning = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      });
-      setVideoStream(stream);
-      scanningRef.current = true;
-      setScanning(true);
-      setResult(null);
-      
-      const video = document.getElementById('barScanVideo');
+  useEffect(() => { return () => stopScanning(); }, []);
+
+  // FIX: attach stream only after scanning=true has rendered the video element
+  useEffect(() => {
+    if (scanning && pendingStreamRef.current && videoRef.current) {
+      const video = videoRef.current;
+      const stream = pendingStreamRef.current;
+      streamRef.current = stream;
+      pendingStreamRef.current = null;
       video.srcObject = stream;
-      video.play();
-      
-      scanQRCode(video);
-    } catch (err) {
-      alert('Camera access denied');
+      video.onloadedmetadata = () => {
+        video.play();
+        scanningRef.current = true;
+        scanQRCode();
+      };
     }
-  };
+  }, [scanning]);
 
   const stopScanning = () => {
     scanningRef.current = false;
-    if (videoStream) {
-      videoStream.getTracks().forEach(track => track.stop());
-      setVideoStream(null);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (pendingStreamRef.current) {
+      pendingStreamRef.current.getTracks().forEach(track => track.stop());
+      pendingStreamRef.current = null;
+    }
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
     setScanning(false);
   };
 
-  const scanQRCode = (video) => {
-    const canvas = document.getElementById('barScanCanvas');
-    const context = canvas.getContext('2d');
+  const scanQRCode = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    const ctx = canvas.getContext('2d');
 
     const scan = () => {
       if (!scanningRef.current) return;
-
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height);
-        
         if (code) {
-          processScan(code.data);
+          handleQRScanned(code.data);
           return;
         }
       }
-      
-      requestAnimationFrame(scan);
+      animationRef.current = requestAnimationFrame(scan);
     };
-    
     scan();
   };
 
-  const processScan = async (qrData) => {
-    stopScanning();
-    
+  const startScanning = async () => {
+    setResult(null);
     try {
-      const membership = await base44.entities.Membership.filter({ qr_code_id: qrData, status: 'active' });
-      
-      if (!membership || membership.length === 0) {
-        setResult({ success: false, message: 'Invalid membership' });
-        return;
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      pendingStreamRef.current = stream;
+      setScanning(true);
+    } catch (err) {
+      alert('Camera access denied. Use Safari on iPhone.');
+    }
+  };
 
-      const member = membership[0];
-      
-      // Award 5 points per drink
-      const pointsEarned = 5;
-      
-      await base44.entities.Membership.update(member.id, {
-        points: (member.points || 0) + pointsEarned
-      });
+  const handleQRScanned = async (qrData) => {
+    stopScanning();
+    try {
+      // Route through backend function for reliable writes
+      const response = await base44.functions.invoke('processScan', { qrCode: qrData, scanType: 'bar' });
+      const data = response.data;
 
-      await base44.entities.PointsTransaction.create({
-        user_id: member.user_id,
-        membership_id: member.id,
-        points: pointsEarned,
-        transaction_type: 'bar_purchase',
-        description: 'Alcohol purchase at bar',
-        location: 'Bar',
-        timestamp: new Date().toISOString()
-      });
-
-      setResult({
-        success: true,
-        message: `${pointsEarned} points awarded!`,
-        memberName: member.user_name,
-        newBalance: (member.points || 0) + pointsEarned
-      });
-
+      if (data.type === 'success' || data.type === 'bar_success') {
+        setResult({ success: true, message: `${data.pointsEarned || 5} points awarded!`, memberName: data.name || data.memberName, newBalance: data.newBalance });
+      } else {
+        // Fallback: direct entity write if backend doesn't handle bar scans
+        const membership = await base44.entities.Membership.filter({ qr_code_id: qrData, status: 'active' });
+        if (!membership || membership.length === 0) {
+          setResult({ success: false, message: 'Invalid membership' });
+          return;
+        }
+        const member = membership[0];
+        const pointsEarned = 5;
+        await base44.entities.Membership.update(member.id, { points: (member.points || 0) + pointsEarned });
+        await base44.entities.PointsTransaction.create({
+          user_id: member.user_id,
+          membership_id: member.id,
+          points: pointsEarned,
+          transaction_type: 'bar_purchase',
+          description: 'Alcohol purchase at bar',
+          location: 'Bar',
+          timestamp: new Date().toISOString()
+        });
+        setResult({ success: true, message: `${pointsEarned} points awarded!`, memberName: member.user_name, newBalance: (member.points || 0) + pointsEarned });
+      }
     } catch (err) {
       setResult({ success: false, message: 'Error processing scan' });
     }
@@ -177,17 +196,11 @@ export default function BarScan() {
         {scanning && (
           <div className="space-y-4">
             <div className="relative bg-black rounded-lg overflow-hidden">
-              <video id="barScanVideo" className="w-full" />
+              <video ref={videoRef} className="w-full" playsInline muted />
               <div className="absolute inset-0 border-4 border-amber-400 opacity-50 pointer-events-none" />
             </div>
-            <canvas id="barScanCanvas" className="hidden" />
-            <Button 
-              onClick={stopScanning}
-              variant="outline"
-              className="w-full"
-            >
-              Cancel
-            </Button>
+            <canvas ref={canvasRef} className="hidden" />
+            <Button onClick={stopScanning} variant="outline" className="w-full">Cancel</Button>
           </div>
         )}
 
@@ -198,21 +211,15 @@ export default function BarScan() {
             ) : (
               <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
             )}
-            
             <h2 className="text-xl font-bold text-center mb-2">{result.message}</h2>
-            
             {result.success && (
               <div className="text-center space-y-2">
                 <p className="text-lg">{result.memberName}</p>
                 <p className="text-2xl font-bold text-amber-400">{result.newBalance} Points</p>
               </div>
             )}
-
             <Button 
-              onClick={() => {
-                setResult(null);
-                startScanning();
-              }}
+              onClick={() => { setResult(null); startScanning(); }}
               className="w-full mt-6 bg-amber-500 hover:bg-amber-600"
             >
               Scan Next Member
