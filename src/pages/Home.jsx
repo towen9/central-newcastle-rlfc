@@ -162,7 +162,7 @@ export default function Home() {
                   <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">2026 Zoom Energy Season Memberships</span>
                 </div>
                 <h3 className="text-white text-2xl font-extrabold mb-1 leading-tight">Join the Central Family</h3>
-                <p className="text-blue-200 text-sm mb-5">From $40 — season entry, rewards points, exclusive member perks & sponsor deals.</p>
+                <p className="text-blue-200 text-sm mb-5">From $40 — season entry, rewards points, exclusive member perks & sponsor deals</p>
                 <div className="flex gap-2 mb-5">
                   {['$40 Supporter', '$100 Family', '$120 Premium'].map((t) =>
                   <span key={t} className="bg-white/15 text-white text-xs px-2.5 py-1 rounded-full font-medium">{t}</span>
