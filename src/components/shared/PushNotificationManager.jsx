@@ -13,6 +13,17 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
+async function waitForUser(retries = 10, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const user = await base44.auth.me();
+      if (user && user.id) return user;
+    } catch (e) {}
+    await new Promise(res => setTimeout(res, delay));
+  }
+  return null;
+}
+
 export default function PushNotificationManager() {
   useEffect(() => {
     const initPush = async () => {
@@ -30,10 +41,15 @@ export default function PushNotificationManager() {
 
         const subscribePush = async () => {
           try {
-            // Check if already subscribed
-            let subscription = await registration.pushManager.getSubscription();
+            // Wait until user is confirmed logged in
+            const user = await waitForUser();
+            if (!user) {
+              console.warn('Push: no authenticated user found, skipping subscription save');
+              return;
+            }
 
-            // If not subscribed, create a new subscription
+            // Get or create push subscription
+            let subscription = await registration.pushManager.getSubscription();
             if (!subscription) {
               subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
@@ -41,23 +57,23 @@ export default function PushNotificationManager() {
               });
             }
 
-            // Always save/refresh subscription to user record
+            // Save to user record
             await base44.auth.updateMe({
               push_subscription: subscription.toJSON(),
               push_enabled: true
             });
 
-            console.log('Push subscription saved successfully');
+            console.log('Push subscription saved for user:', user.email);
           } catch (err) {
             console.error('Push subscription error:', err);
           }
         };
 
         if (permission === 'granted') {
-          // Already granted — silently subscribe
-          await subscribePush();
+          // Already granted — silently subscribe after a short delay
+          setTimeout(subscribePush, 2000);
         } else {
-          // Not asked yet — ask after 3 seconds
+          // Not asked yet — ask after 4 seconds
           const alreadyAsked = localStorage.getItem('push_asked');
           if (!alreadyAsked) {
             setTimeout(async () => {
@@ -65,9 +81,9 @@ export default function PushNotificationManager() {
               const result = await Notification.requestPermission();
               if (result === 'granted') {
                 await subscribePush();
-                toast.success('Push notifications enabled!');
+                toast.success('Notifications enabled! You\'ll get game day updates. 🏉');
               }
-            }, 3000);
+            }, 4000);
           }
         }
       } catch (error) {
