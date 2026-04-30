@@ -72,7 +72,7 @@
     },
     "years_played": {
       "type": "string",
-      "description": "Old Butchers: years played at the club e.g. 2010-2015"
+      "description": "Old Butchers: years played at the club e.g. 2010\u20132015"
     },
     "team_grade_played": {
       "type": "string",
@@ -84,16 +84,84 @@
     },
     "push_enabled": {
       "type": "boolean",
-      "description": "Whether the member has enabled push notifications",
-      "default": false
+      "default": false,
+      "description": "Whether the member has enabled push notifications"
     },
     "push_subscription": {
       "type": "object",
-      "description": "Web push subscription object for sending notifications"
+      "description": "Web push subscription object for browser push notifications"
     }
   },
   "required": [
     "user_id",
     "tier_id"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "system"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "gate_staff"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "canteen_staff"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "leagues_staff"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "system"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }
