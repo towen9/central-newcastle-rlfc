@@ -28,20 +28,22 @@ export default function AdminPushNotifications() {
     setSending(true);
 
     try {
-      const { data } = await base44.functions.invoke('sendPushNotification', formData);
+      const response = await fetch('/api/functions/sendPushNotification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
       
       if (data.success) {
-        toast.success(`Notification sent to ${data.sent} users`);
-        setFormData({
-          title: '',
-          body: '',
-          url: '',
-          targetGroup: 'all'
-        });
+        toast.success(`Notification sent to ${data.sent} of ${data.total} subscribers`);
+        setFormData({ title: '', body: '', url: '', targetGroup: 'all' });
       } else {
-        toast.error('Failed to send notification');
+        toast.error(data.error || 'Failed to send notification');
       }
     } catch (error) {
+      console.error('Push error:', error);
       toast.error('Error sending notification');
     } finally {
       setSending(false);
