@@ -28,9 +28,10 @@ export default function AdminPushNotifications() {
     setSending(true);
 
     try {
-      const response = await fetch('/api/functions/sendPushNotification', {
+      const response = await fetch('https://butcher-boy-c0b7e412.base44.app/functions/sendPushNotification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(formData)
       });
 
