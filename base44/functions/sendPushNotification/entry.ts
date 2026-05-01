@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import webpush from 'npm:web-push@3.6.7';
 
 const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
@@ -25,10 +25,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Title and body required' }, { status: 400 });
     }
 
-    // Get memberships with push subscriptions saved
     let memberships = await base44.asServiceRole.entities.Membership.filter({ push_enabled: true });
 
-    // Filter by target group
     if (targetGroup === 'members') {
       memberships = memberships.filter(m => m.status === 'active');
     } else if (targetGroup === 'daypass') {
@@ -53,9 +51,9 @@ Deno.serve(async (req) => {
 
       promises.push(
         webpush.sendNotification(member.push_subscription, payload)
-          .then(() => successCount++)
+          .then(() => { successCount++; })
           .catch((err) => {
-            console.error(`Failed to send to member ${member.id}:`, err);
+            console.error(`Failed to send to member ${member.id}:`, err.message);
             failCount++;
             if (err.statusCode === 410 || err.statusCode === 404) {
               base44.asServiceRole.entities.Membership.update(member.id, {
@@ -69,7 +67,7 @@ Deno.serve(async (req) => {
 
     await Promise.all(promises);
 
-    return Response.json({ 
+    return Response.json({
       success: true,
       sent: successCount,
       failed: failCount,
