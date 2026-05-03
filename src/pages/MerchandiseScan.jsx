@@ -244,7 +244,7 @@ export default function MerchandiseScan() {
               <Camera className="w-6 h-6 mr-3" />Scan Member QR Code
             </Button>
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
-              <p className="font-semibold mb-1">✅ Eligible for 20% discount:</p>
+              <p className="font-semibold mb-1">✅ Eligible for 10% discount:</p>
               <p>• Premium Membership</p>
               <p>• Old Butchers Membership</p>
               <p>• Sponsor Season Pass</p>
