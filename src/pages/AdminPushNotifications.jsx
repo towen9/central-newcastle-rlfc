@@ -28,14 +28,8 @@ export default function AdminPushNotifications() {
     setSending(true);
 
     try {
-      const response = await fetch('https://butcher-boy-c0b7e412.base44.app/functions/sendPushNotification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
+      const response = await base44.functions.invoke('sendPushNotification', formData);
+      const data = response.data;
       
       if (data.success) {
         toast.success(`Notification sent to ${data.sent} of ${data.total} subscribers`);
