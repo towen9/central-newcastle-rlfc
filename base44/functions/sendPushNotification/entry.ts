@@ -1,3 +1,4 @@
+// redeployed 2026-05-04 to pick up rotated VAPID keys
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import webpush from 'npm:web-push@3.6.7';
 
