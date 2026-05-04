@@ -59,8 +59,11 @@ export default function Membership() {
     queryKey: ['membership', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const memberships = await base44.entities.Membership.filter({ user_id: user.id, status: 'active' });
-      return memberships[0] || null;
+      // Check active first, fall back to pending (e.g. Sponsor pass awaiting approval)
+      const active = await base44.entities.Membership.filter({ user_id: user.id, status: 'active' });
+      if (active.length > 0) return active[0];
+      const pending = await base44.entities.Membership.filter({ user_id: user.id, status: 'pending' });
+      return pending[0] || null;
     },
     enabled: !!user?.id
   });

@@ -83,6 +83,10 @@ export default function JoinMembership() {
   });
 
   const handlePurchase = async (tier) => {
+    if (!user) {
+      toast.error('Please wait while we load your account details');
+      return;
+    }
     setSelectedTier(tier);
     setProcessing(true);
 
