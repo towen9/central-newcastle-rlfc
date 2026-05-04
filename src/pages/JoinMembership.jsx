@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Check, Loader2, ArrowLeft, Star, Users, Shield, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+
 import { toast } from 'sonner';
 
 const tierConfig = {
@@ -109,7 +109,7 @@ export default function JoinMembership() {
           total_checkins: 0
         });
         toast.success('Application submitted! Awaiting admin approval.');
-        window.location.href = createPageUrl('Membership');
+        window.location.href = '/Membership';
         return;
       }
 
@@ -121,7 +121,7 @@ export default function JoinMembership() {
       }
 
       if (window.self !== window.top) {
-        toast.error('Please open this page in a new tab to complete checkout');
+        alert('Checkout is only available from the published app, not the preview.');
         setProcessing(false);
         return;
       }
@@ -134,8 +134,8 @@ export default function JoinMembership() {
         tier_id: tier.id,
         price_id: priceId,
         referral_code: refCode || null,
-        success_url: `${window.location.origin}${createPageUrl('Membership')}?payment=success`,
-        cancel_url: `${window.location.origin}${createPageUrl('JoinMembership')}?payment=cancelled`
+        success_url: `${window.location.origin}/Membership?payment=success`,
+        cancel_url: `${window.location.origin}/JoinMembership?payment=cancelled`
       });
 
       if (data.checkout_url) {
@@ -152,7 +152,7 @@ export default function JoinMembership() {
       {/* Header */}
       <div className="bg-[#1a365d] pt-safe">
         <div className="px-5 py-6">
-          <Link to={createPageUrl('Membership')}>
+          <Link to="/Membership">
             <button className="flex items-center gap-2 text-blue-200 mb-4">
               <ArrowLeft className="w-5 h-5" />
               Back
