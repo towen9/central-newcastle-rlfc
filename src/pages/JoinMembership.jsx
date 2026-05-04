@@ -84,7 +84,7 @@ export default function JoinMembership() {
 
   const handlePurchase = async (tier) => {
     if (!user) {
-      toast.error('Please wait while we load your account details');
+      base44.auth.redirectToLogin(window.location.href);
       return;
     }
     setSelectedTier(tier);
@@ -230,7 +230,7 @@ export default function JoinMembership() {
 
                   <Button
                     onClick={() => handlePurchase(tier)}
-                    disabled={processing}
+                    disabled={processing && selectedTier?.id === tier.id}
                     className={`w-full py-6 text-base font-semibold ${config.buttonClass} text-white`}
                   >
                     {processing && selectedTier?.id === tier.id ? (
