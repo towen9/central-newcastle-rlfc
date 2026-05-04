@@ -57,6 +57,7 @@ export default function JoinMembership() {
   const [processing, setProcessing] = useState(false);
   const [user, setUser] = useState(null);
   const [highlightTier, setHighlightTier] = useState(null);
+  const [sponsorSubmitted, setSponsorSubmitted] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -108,8 +109,8 @@ export default function JoinMembership() {
           points: 0,
           total_checkins: 0
         });
-        toast.success('Application submitted! Awaiting admin approval.');
-        window.location.href = '/Membership';
+        setSponsorSubmitted(true);
+        setProcessing(false);
         return;
       }
 
@@ -228,22 +229,32 @@ export default function JoinMembership() {
                     ))}
                   </div>
 
-                  <Button
-                    onClick={() => handlePurchase(tier)}
-                    disabled={processing && selectedTier?.id === tier.id}
-                    className={`w-full py-6 text-base font-semibold ${config.buttonClass} text-white`}
-                  >
-                    {processing && selectedTier?.id === tier.id ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Processing...
-                      </>
-                    ) : tier.price === 0 ? (
-                      'Apply for Sponsor Pass →'
-                    ) : (
-                      `Join for $${tier.price} →`
-                    )}
-                  </Button>
+                  {tier.price === 0 && sponsorSubmitted ? (
+                    <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-4 text-center">
+                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Check className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <p className="font-semibold text-emerald-800 text-sm mb-1">Application Received!</p>
+                      <p className="text-emerald-700 text-xs leading-relaxed">Your application has been received. A club administrator will review and approve your account shortly.</p>
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={() => handlePurchase(tier)}
+                      disabled={processing && selectedTier?.id === tier.id}
+                      className={`w-full py-6 text-base font-semibold ${config.buttonClass} text-white`}
+                    >
+                      {processing && selectedTier?.id === tier.id ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : tier.price === 0 ? (
+                        'Apply for Sponsor Pass →'
+                      ) : (
+                        `Join for $${tier.price} →`
+                      )}
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             );
