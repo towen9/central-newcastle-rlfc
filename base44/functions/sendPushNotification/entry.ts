@@ -1,8 +1,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import webpush from 'npm:web-push@3.6.7';
 
-const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
-const VAPID_PRIVATE_KEY = 'UUxhKMK7-T1N8WO9Jn5mDT5RqL9UB-s7D5qxGHxOWdg';
+const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY');
+const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY');
+
+if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+  throw new Error('VAPID keys not configured');
+}
 
 webpush.setVapidDetails(
   'mailto:admin@centralrlfc.com.au',
