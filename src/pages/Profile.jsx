@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { subscribePush, unsubscribePush } from '@/lib/pushNotifications';
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -108,8 +109,46 @@ export default function Profile() {
     }, 500);
   };
 
+  // Push toggle state: true only if there's a real subscription saved on Membership
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+
+  useEffect(() => {
+    // Sync push toggle with actual membership subscription state
+    if (membership) {
+      setPushEnabled(!!(membership.push_subscription && Notification.permission === 'granted'));
+    }
+  }, [membership]);
+
+  const handlePushToggle = async (checked) => {
+    setPushLoading(true);
+    if (checked) {
+      try {
+        await subscribePush();
+        setPushEnabled(true);
+        toast.success("Notifications enabled! You'll get game day updates. 🏉");
+        queryClient.invalidateQueries({ queryKey: ['membership', user?.id] });
+      } catch (e) {
+        setPushEnabled(false);
+        if (e.message === 'PERMISSION_DENIED') {
+          toast.error('Notifications blocked. Enable in your device settings to receive updates.');
+        } else {
+          toast.error('Could not enable notifications: ' + e.message);
+        }
+      }
+    } else {
+      try {
+        await unsubscribePush();
+        setPushEnabled(false);
+        queryClient.invalidateQueries({ queryKey: ['membership', user?.id] });
+      } catch (e) {
+        toast.error('Could not disable notifications: ' + e.message);
+      }
+    }
+    setPushLoading(false);
+  };
+
   const consentSettings = [
-    { key: 'push_enabled', label: 'Push notifications', description: 'Match reminders and instant updates' },
     { key: 'marketing_email', label: 'Email updates', description: 'News, events, and announcements' },
     { key: 'sponsor_offers', label: 'Sponsor offers', description: 'Exclusive deals from partners' }
   ];
@@ -244,6 +283,20 @@ export default function Profile() {
           </div>
           
           <div className="divide-y divide-gray-50">
+            {/* Push notifications — uses real browser subscription, not a User boolean */}
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <p className="font-medium text-gray-900">Push notifications</p>
+                <p className="text-sm text-gray-500">Match reminders and instant updates</p>
+              </div>
+              <Switch
+                checked={pushEnabled}
+                disabled={pushLoading}
+                onCheckedChange={handlePushToggle}
+              />
+            </div>
+
+            {/* Email / sponsor toggles — write booleans to User entity */}
             {consentSettings.map((setting) => (
               <div key={setting.key} className="p-4 flex items-center justify-between">
                 <div>
