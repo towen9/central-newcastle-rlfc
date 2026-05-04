@@ -112,13 +112,22 @@ export default function Profile() {
   // Push toggle state: true only if there's a real subscription saved on Membership
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
+  const isPushSupported = typeof window !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    typeof Notification !== 'undefined';
 
   useEffect(() => {
-    // Sync push toggle with actual membership subscription state
-    // Guard: Notification may be undefined on iOS Safari or in some PWA contexts
-    const permission = typeof Notification !== 'undefined' ? Notification.permission : 'default';
-    if (membership) {
-      setPushEnabled(!!(membership.push_subscription && permission === 'granted'));
+    try {
+      // Sync push toggle with actual membership subscription state
+      // Guard: Notification may be undefined on iOS Safari or in some PWA contexts
+      const permission = typeof Notification !== 'undefined' ? Notification.permission : 'default';
+      if (membership) {
+        setPushEnabled(!!(membership.push_subscription && permission === 'granted'));
+      }
+    } catch (e) {
+      // Silently leave toggle OFF if any browser API is unavailable
+      setPushEnabled(false);
     }
   }, [membership]);
 
@@ -293,7 +302,7 @@ export default function Profile() {
               </div>
               <Switch
                 checked={pushEnabled}
-                disabled={pushLoading}
+                disabled={pushLoading || !isPushSupported}
                 onCheckedChange={handlePushToggle}
               />
             </div>

@@ -15,8 +15,15 @@ async function getRegistration() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || typeof Notification === 'undefined') {
     throw new Error('Push notifications are not supported in this browser.');
   }
-  const registration = await navigator.serviceWorker.register('/sw.js');
-  await navigator.serviceWorker.ready;
+  // Use getRegistration() to avoid re-registering; fall back to register() if none exists.
+  // Do NOT await navigator.serviceWorker.ready — it can hang indefinitely on iOS Safari.
+  let registration = await navigator.serviceWorker.getRegistration('/sw.js');
+  if (!registration) {
+    registration = await navigator.serviceWorker.register('/sw.js');
+  }
+  if (!registration || !registration.pushManager) {
+    throw new Error('Push notifications are not supported in this browser.');
+  }
   return registration;
 }
 
