@@ -12,7 +12,7 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 async function getRegistration() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || typeof Notification === 'undefined') {
     throw new Error('Push notifications are not supported in this browser.');
   }
   const registration = await navigator.serviceWorker.register('/sw.js');

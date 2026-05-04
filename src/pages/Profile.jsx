@@ -115,8 +115,10 @@ export default function Profile() {
 
   useEffect(() => {
     // Sync push toggle with actual membership subscription state
+    // Guard: Notification may be undefined on iOS Safari or in some PWA contexts
+    const permission = typeof Notification !== 'undefined' ? Notification.permission : 'default';
     if (membership) {
-      setPushEnabled(!!(membership.push_subscription && Notification.permission === 'granted'));
+      setPushEnabled(!!(membership.push_subscription && permission === 'granted'));
     }
   }, [membership]);
 
