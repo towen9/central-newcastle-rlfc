@@ -24,7 +24,7 @@ const teamLogos = {
 
 export default function Fixtures() {
   const [activeTab, setActiveTab] = useState('fixtures');
-  const [selectedGrade, setSelectedGrade] = useState('all');
+  const [selectedDivision, setSelectedDivision] = useState('mens');
 
   const { data: fixtures = [] } = useQuery({
     queryKey: ['fixtures'],
@@ -36,9 +36,9 @@ export default function Fixtures() {
     queryFn: () => base44.entities.Event.filter({ is_active: true }, 'date_time')
   });
 
-  const filteredFixtures = selectedGrade === 'all' 
-    ? fixtures 
-    : fixtures.filter(f => f.team_grade === selectedGrade);
+  const filteredFixtures = selectedDivision === 'all'
+    ? fixtures
+    : fixtures.filter(f => (f.division || 'mens') === selectedDivision);
 
   const upcomingFixtures = filteredFixtures.filter(f => 
     f.status === 'upcoming' || f.status === 'live' || isAfter(new Date(f.date_time), new Date())
@@ -47,8 +47,6 @@ export default function Fixtures() {
   const pastFixtures = filteredFixtures.filter(f => 
     f.status === 'completed' && isBefore(new Date(f.date_time), new Date())
   ).reverse();
-
-  const availableGrades = [...new Set(fixtures.map(f => f.team_grade).filter(Boolean))].sort();
 
   const upcomingEvents = events.filter(e => isAfter(new Date(e.date_time), new Date()));
 
@@ -86,18 +84,17 @@ export default function Fixtures() {
 
         {activeTab === 'fixtures' && (
           <div className="space-y-6">
-            {/* Grade Filter */}
+            {/* Division Filter */}
             <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Grade</label>
-              <Select value={selectedGrade} onValueChange={setSelectedGrade}>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Division</label>
+              <Select value={selectedDivision} onValueChange={setSelectedDivision}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select grade" />
+                  <SelectValue placeholder="Select division" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Grades</SelectItem>
-                  {availableGrades.map(grade => (
-                    <SelectItem key={grade} value={grade}>{grade}</SelectItem>
-                  ))}
+                  <SelectItem value="mens">Men's</SelectItem>
+                  <SelectItem value="womens">Women's</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                 </SelectContent>
               </Select>
             </div>

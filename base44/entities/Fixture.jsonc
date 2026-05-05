@@ -1,0 +1,96 @@
+{
+  "name": "Fixture",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "opponent": {
+      "type": "string"
+    },
+    "fixture_type": {
+      "type": "string",
+      "enum": [
+        "home",
+        "away"
+      ],
+      "default": "home"
+    },
+    "competition": {
+      "type": "string"
+    },
+    "team_grade": {
+      "type": "string",
+      "description": "e.g., First Grade, U18s, Women's"
+    },
+    "division": {
+      "type": "string",
+      "enum": [
+        "mens",
+        "womens"
+      ],
+      "default": "mens",
+      "description": "Men's or Women's division"
+    },
+    "date_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "venue": {
+      "type": "string"
+    },
+    "venue_address": {
+      "type": "string"
+    },
+    "result_home": {
+      "type": "number"
+    },
+    "result_away": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "upcoming",
+        "live",
+        "completed",
+        "cancelled",
+        "postponed"
+      ],
+      "default": "upcoming"
+    },
+    "ticket_url": {
+      "type": "string"
+    },
+    "entry_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable digital entry for this game"
+    },
+    "entry_price": {
+      "type": "number",
+      "default": 0,
+      "description": "Entry fee in dollars"
+    },
+    "sponsor_of_round": {
+      "type": "string",
+      "description": "Naming rights sponsor for this round"
+    },
+    "round_number": {
+      "type": "number",
+      "description": "Round number in competition"
+    },
+    "social_copy_preview": {
+      "type": "string",
+      "description": "Auto-generated social media preview copy"
+    },
+    "social_copy_postgame": {
+      "type": "string",
+      "description": "Auto-generated post-game summary copy"
+    }
+  },
+  "required": [
+    "opponent",
+    "date_time"
+  ]
+}
