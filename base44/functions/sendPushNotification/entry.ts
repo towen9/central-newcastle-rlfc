@@ -15,16 +15,33 @@ webpush.setVapidDetails(
   VAPID_PRIVATE_KEY
 );
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+    return new Response(null, { headers: CORS_HEADERS });
+  }
+
+  // Authenticate the caller
+  const userClient = createClientFromRequest(req);
+  let user;
+  try {
+    user = await userClient.auth.me();
+  } catch (err) {
+    return Response.json({ error: 'Authentication required' }, { status: 401, headers: CORS_HEADERS });
+  }
+
+  if (!user) {
+    return Response.json({ error: 'Authentication required' }, { status: 401, headers: CORS_HEADERS });
+  }
+
+  if (user.role !== 'admin') {
+    return Response.json({ error: 'Admin access required' }, { status: 403, headers: CORS_HEADERS });
   }
 
   try {
