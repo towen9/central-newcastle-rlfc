@@ -71,6 +71,19 @@ Deno.serve(async (req) => {
     const tier = tiers[0] || null;
     const discountPct = tier?.merchandise_discount || 0;
 
+    // Server-side guard: prevent second discounted transaction even if UI is bypassed
+    if (applyDiscount) {
+      const seasonStart = m.start_date ? new Date(m.start_date) : new Date(new Date().getFullYear(), 0, 1);
+      const transactions = await base44.asServiceRole.entities.Transaction.filter({
+        membership_id: m.id,
+        transaction_type: 'merchandise'
+      });
+      const discountAlreadyUsed = transactions.some(t => t.discount_amount > 0 && new Date(t.timestamp) >= seasonStart);
+      if (discountAlreadyUsed) {
+        return Response.json({ type: 'error', message: 'Merchandise discount already used this season' }, { status: 400 });
+      }
+    }
+
     const original = parseFloat(parseFloat(purchaseAmount).toFixed(2));
     const discountAmt = applyDiscount ? parseFloat((original * discountPct / 100).toFixed(2)) : 0;
     const finalAmt = parseFloat((original - discountAmt).toFixed(2));
