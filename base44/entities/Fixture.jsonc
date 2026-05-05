@@ -8,6 +8,10 @@
     "opponent": {
       "type": "string"
     },
+    "opponent_name": {
+      "type": "string",
+      "description": "Opponent team name (text)"
+    },
     "fixture_type": {
       "type": "string",
       "enum": [
@@ -87,6 +91,47 @@
     "social_copy_postgame": {
       "type": "string",
       "description": "Auto-generated post-game summary copy"
+    },
+    "score_us": {
+      "type": "number",
+      "default": 0,
+      "description": "Central Newcastle score"
+    },
+    "score_them": {
+      "type": "number",
+      "default": 0,
+      "description": "Opponent score"
+    },
+    "match_status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "live_first_half",
+        "half_time",
+        "live_second_half",
+        "full_time"
+      ],
+      "default": "scheduled",
+      "description": "Live match status (separate from fixture status)"
+    },
+    "kickoff_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Actual kickoff timestamp"
+    },
+    "half_time_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Half time timestamp"
+    },
+    "full_time_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Full time timestamp"
+    },
+    "timeline_summary": {
+      "type": "string",
+      "description": "Auto-generated timeline narrative"
     }
   },
   "required": [

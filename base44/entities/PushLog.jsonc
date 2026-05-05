@@ -1,0 +1,45 @@
+{
+  "name": "PushLog",
+  "type": "object",
+  "properties": {
+    "fixture": {
+      "type": "string",
+      "description": "Reference to Fixture \u2014 nullable"
+    },
+    "match_event": {
+      "type": "string",
+      "description": "Reference to MatchEvent \u2014 nullable"
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "all_members",
+        "attendees",
+        "segment"
+      ],
+      "description": "Target audience"
+    },
+    "segment_tag": {
+      "type": "string",
+      "description": "Tag for segment targeting \u2014 nullable"
+    },
+    "message": {
+      "type": "string",
+      "description": "Notification message body"
+    },
+    "recipients": {
+      "type": "number",
+      "description": "Number of recipients"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the push was sent"
+    }
+  },
+  "required": [
+    "audience",
+    "message",
+    "recipients"
+  ]
+}

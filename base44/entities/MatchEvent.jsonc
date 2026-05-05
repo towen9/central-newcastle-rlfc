@@ -1,0 +1,79 @@
+{
+  "name": "MatchEvent",
+  "type": "object",
+  "properties": {
+    "fixture": {
+      "type": "string",
+      "description": "Reference to Fixture"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "kickoff",
+        "try",
+        "conversion",
+        "penalty_goal",
+        "field_goal",
+        "sin_bin",
+        "send_off",
+        "half_time",
+        "second_half",
+        "full_time",
+        "moment"
+      ],
+      "description": "Type of match event"
+    },
+    "team": {
+      "type": "string",
+      "enum": [
+        "us",
+        "them"
+      ],
+      "description": "Which team"
+    },
+    "scorer": {
+      "type": "string",
+      "description": "Player name"
+    },
+    "player_number": {
+      "type": "number",
+      "description": "Jersey number"
+    },
+    "payload_text": {
+      "type": "string",
+      "description": "Custom message text"
+    },
+    "moment_audience": {
+      "type": "string",
+      "enum": [
+        "attendees",
+        "all_members"
+      ],
+      "default": "attendees",
+      "description": "Target audience for moment events"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this event occurred"
+    },
+    "game_clock_min": {
+      "type": "number",
+      "description": "Minute of game clock"
+    },
+    "pushed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether push notification has been sent"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Reference to User"
+    }
+  },
+  "required": [
+    "fixture",
+    "type",
+    "created_by"
+  ]
+}
