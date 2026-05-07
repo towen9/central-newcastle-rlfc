@@ -27,14 +27,18 @@ export default function PushNotificationManager() {
         if (!user) return;
 
         if (permission === 'granted') {
-          // Already granted — just ensure subscription is saved
-          setTimeout(async () => {
-            try {
-              await subscribePush();
-            } catch (e) {
-              console.warn('Push auto-subscribe error:', e.message);
-            }
-          }, 2000);
+          // Only restore subscription if user has push_enabled=true but subscription is missing
+          const memberships = await base44.entities.Membership.filter({ user_id: user.id, status: 'active' });
+          const membership = memberships?.[0];
+          if (membership?.push_enabled === true && !membership?.push_subscription) {
+            setTimeout(async () => {
+              try {
+                await subscribePush();
+              } catch (e) {
+                console.warn('Push auto-subscribe error:', e.message);
+              }
+            }, 2000);
+          }
         } else {
           // Not yet asked — prompt once
           const alreadyAsked = localStorage.getItem('push_asked');

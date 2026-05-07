@@ -72,7 +72,7 @@ export default function PushPromptModal() {
         await base44.auth.updateMe({ push_prompt_last_dismissed: new Date().toISOString() });
       }
     } catch (e) {
-      // Best effort
+      console.error('Failed to write push_prompt_last_dismissed:', e);
     }
   };
 
