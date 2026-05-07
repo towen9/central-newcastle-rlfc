@@ -63,16 +63,16 @@ function applyEventToFixture(event, fixture) {
 function buildMilestoneMessage(event, fixture, score, usAhead) {
   switch (event.type) {
     case 'kickoff':
-      return `We're underway at Birtley. Get loud, Butchers. 🐂`;
+      return `We're underway at St John. Get loud, Butchers. 🐂`;
     case 'half_time':
-      if (usAhead) return `Half time at Birtley. Boys lead ${score}. Strap in.`;
+      if (usAhead) return `Half time at St John. Boys lead ${score}. Strap in.`;
       if (fixture.score_us === fixture.score_them) return `Half time, all square at ${score}. 40 to go.`;
       return `Half time. ${score}. Plenty in this. Game's wide open.`;
     case 'second_half':
       return `Second half underway. ${score}. Game's not over.`;
     case 'full_time':
       if (usAhead) return `🏆 FULL TIME — Boys win it ${score}. Wear the blue with pride.`;
-      if (fixture.score_us === fixture.score_them) return `Full time. ${score}. Even-stevens at Birtley.`;
+      if (fixture.score_us === fixture.score_them) return `Full time. ${score}. Even-stevens at St John.`;
       return `Full time. ${score}. Heads up. Next week we go again.`;
   }
   return '';
