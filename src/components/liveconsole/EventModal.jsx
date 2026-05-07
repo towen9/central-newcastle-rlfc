@@ -91,7 +91,7 @@ export default function EventModal({ eventType, fixture, user, onClose, onSucces
   return (
     <div
       className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4"
-      onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}
+      
     >
       <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
         {/* Header */}
