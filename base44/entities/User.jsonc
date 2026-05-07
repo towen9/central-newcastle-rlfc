@@ -29,5 +29,6 @@
     "photo_url": {
       "type": "string"
     }
-  }
+  },
+  "required": []
 }
