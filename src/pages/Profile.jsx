@@ -39,7 +39,9 @@ export default function Profile() {
       const memberships = await base44.entities.Membership.filter({ user_id: user.id, status: 'active' });
       return memberships[0] || null;
     },
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const updateMutation = useMutation({
@@ -131,32 +133,28 @@ export default function Profile() {
     }
   }, [membership]);
 
-  const handlePushToggle = async (checked) => {
+  const handlePushToggle = async (newValue) => {
+    const previousValue = pushEnabled;
+    setPushEnabled(newValue); // optimistic
     setPushLoading(true);
-    if (checked) {
-      try {
+    try {
+      if (newValue) {
         await subscribePush();
-        setPushEnabled(true);
         toast.success("Notifications enabled! You'll get game day updates. 🏉");
-        queryClient.invalidateQueries({ queryKey: ['membership', user?.id] });
-      } catch (e) {
-        setPushEnabled(false);
-        if (e.message === 'PERMISSION_DENIED') {
-          toast.error('Notifications blocked. Enable in your device settings to receive updates.');
-        } else {
-          toast.error('Could not enable notifications: ' + e.message);
-        }
-      }
-    } else {
-      try {
+      } else {
         await unsubscribePush();
-        setPushEnabled(false);
-        queryClient.invalidateQueries({ queryKey: ['membership', user?.id] });
-      } catch (e) {
-        toast.error('Could not disable notifications: ' + e.message);
       }
+      await queryClient.invalidateQueries({ queryKey: ['membership', user?.id] });
+    } catch (err) {
+      setPushEnabled(previousValue); // revert on failure
+      if (err.message === 'PERMISSION_DENIED') {
+        toast.error('Notifications blocked. Enable in your device settings to receive updates.');
+      } else {
+        toast.error(err.message || 'Failed to update notifications');
+      }
+    } finally {
+      setPushLoading(false);
     }
-    setPushLoading(false);
   };
 
   const consentSettings = [

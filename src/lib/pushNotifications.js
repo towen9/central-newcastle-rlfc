@@ -70,25 +70,39 @@ export async function subscribePush() {
 
 /**
  * Unsubscribe from push and clear subscription from the user's active Membership.
+ * DB write runs first (source of truth). Browser unsubscribe is best-effort after.
  */
 export async function unsubscribePush() {
-  try {
-    const registration = await getRegistration();
-    const subscription = await registration.pushManager.getSubscription();
-    if (subscription) await subscription.unsubscribe();
-  } catch (e) {
-    // Best effort — still clear from DB
-    console.warn('Browser unsubscribe failed:', e);
-  }
-
   const user = await base44.auth.me();
   if (!user) return;
 
   const memberships = await base44.entities.Membership.filter({ user_id: user.id, status: 'active' });
+
+  // Always update DB first — this is the source of truth
   for (const m of memberships) {
-    await base44.entities.Membership.update(m.id, {
-      push_subscription: null,
-      push_enabled: false
-    });
+    try {
+      await base44.entities.Membership.update(m.id, {
+        push_subscription: null,
+        push_enabled: false
+      });
+    } catch (err) {
+      console.error('Failed to clear Membership push state:', err);
+      throw err; // bubble up so the toggle can revert
+    }
   }
+
+  // Best-effort browser unsubscribe — never let this block DB state
+  try {
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration && registration.pushManager) {
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) await subscription.unsubscribe();
+      }
+    }
+  } catch (err) {
+    console.warn('Browser-level unsubscribe failed (non-fatal):', err);
+  }
+
+  return { success: true };
 }
