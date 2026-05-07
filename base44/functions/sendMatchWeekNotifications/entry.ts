@@ -38,7 +38,10 @@ Deno.serve(async (req) => {
     // Sort by date
     nextWeekFixtures.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
     const nextMatch = nextWeekFixtures[0];
-    const matchDate = parseISO(nextMatch.date_time);
+    const matchDateUtc = parseISO(nextMatch.date_time);
+    // Convert to AEST (UTC+10) for display
+    const AEST_OFFSET_MS = 10 * 60 * 60 * 1000;
+    const matchDate = new Date(matchDateUtc.getTime() + AEST_OFFSET_MS);
     const daysUntil = Math.ceil((matchDate - now) / (1000 * 60 * 60 * 24));
 
     let notificationTitle = '';
