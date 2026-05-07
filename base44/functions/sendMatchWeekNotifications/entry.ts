@@ -2,8 +2,12 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { format, isSameDay, parseISO } from 'npm:date-fns';
 import webpush from 'npm:web-push@3.6.7';
 
-const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
-const VAPID_PRIVATE_KEY = 'UUxhKMK7-T1N8WO9Jn5mDT5RqL9UB-s7D5qxGHxOWdg';
+const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY');
+const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY');
+
+if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+  throw new Error('VAPID keys not configured');
+}
 
 webpush.setVapidDetails('mailto:admin@centralrlfc.com.au', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
@@ -12,10 +16,10 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
 
     const now = new Date();
-    
+
     // Find upcoming fixtures in the next 7 days
-    const upcomingFixtures = await base44.asServiceRole.entities.Fixture.filter({ 
-      status: 'upcoming' 
+    const upcomingFixtures = await base44.asServiceRole.entities.Fixture.filter({
+      status: 'upcoming'
     });
 
     const nextWeekFixtures = upcomingFixtures.filter(f => {
@@ -25,9 +29,9 @@ Deno.serve(async (req) => {
     });
 
     if (nextWeekFixtures.length === 0) {
-      return Response.json({ 
-        success: true, 
-        message: 'No upcoming fixtures in the next 7 days' 
+      return Response.json({
+        success: true,
+        message: 'No upcoming fixtures in the next 7 days'
       });
     }
 
@@ -47,14 +51,14 @@ Deno.serve(async (req) => {
       notificationBody = `${format(matchDate, 'EEEE')} v ${nextMatch.opponent}. ${format(matchDate, 'h:mma')} at ${nextMatch.venue || 'TBA'}`;
       shouldSend = true;
     }
-    
+
     // Thursday reminder (2 days before match)
     if (now.getDay() === 4 && daysUntil === 2) {
       notificationTitle = '⏰ Match Reminder';
       notificationBody = `This ${format(matchDate, 'EEEE')} v ${nextMatch.opponent}. ${format(matchDate, 'h:mma')} kick-off.`;
       shouldSend = true;
     }
-    
+
     // Game day alert (match day, 3 hours before kick-off)
     if (isSameDay(now, matchDate)) {
       const hoursUntil = (matchDate - now) / (1000 * 60 * 60);
@@ -66,48 +70,59 @@ Deno.serve(async (req) => {
     }
 
     if (!shouldSend) {
-      return Response.json({ 
-        success: true, 
-        message: 'No notifications scheduled at this time' 
+      return Response.json({
+        success: true,
+        message: 'No notifications scheduled at this time'
       });
     }
 
-    // Get active members with push enabled — no auth required, service role
-    const [usersWithPush, activeMemberships] = await Promise.all([
-      base44.asServiceRole.entities.User.filter({ push_enabled: true }),
-      base44.asServiceRole.entities.Membership.filter({ status: 'active' })
-    ]);
-    const memberUserIds = new Set(activeMemberships.map(m => m.user_id));
-    const targetUsers = usersWithPush.filter(u => memberUserIds.has(u.id) && u.push_subscription);
+    // Read from Membership — the source of truth for push subscriptions
+    const memberships = await base44.asServiceRole.entities.Membership.filter({
+      push_enabled: true,
+      status: 'active'
+    });
 
     const ICON = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';
-    const payload = JSON.stringify({ title: notificationTitle, body: notificationBody, icon: ICON, badge: ICON, url: '/', timestamp: Date.now() });
+    const payload = JSON.stringify({
+      title: notificationTitle,
+      body: notificationBody,
+      icon: ICON,
+      badge: ICON,
+      url: '/',
+      timestamp: Date.now()
+    });
 
     let successCount = 0;
     let failCount = 0;
 
-    await Promise.all(targetUsers.map(u => {
-      // push_subscription may be stored as a JSON string — parse it if so
-      let subscription = u.push_subscription;
-      if (typeof subscription === 'string') {
-        try { subscription = JSON.parse(subscription); } catch { return; }
-      }
-      if (!subscription || !subscription.endpoint) return;
+    const promises = [];
+    for (const member of memberships) {
+      if (!member.push_subscription) continue;
 
-      return webpush.sendNotification(subscription, payload)
-        .then(() => successCount++)
-        .catch(err => {
-          failCount++;
-          console.error(`Push failed for user ${u.id}: ${err.statusCode} ${err.message}`);
-          if (err.statusCode === 410 || err.statusCode === 404) {
-            base44.asServiceRole.entities.User.update(u.id, { push_subscription: null });
-          }
-        });
-    }));
+      promises.push(
+        webpush.sendNotification(member.push_subscription, payload)
+          .then(() => {
+            console.log(`Sent to ${member.user_name || member.id}`);
+            successCount++;
+          })
+          .catch(err => {
+            console.error(`Failed to send to ${member.id}: ${err.statusCode} ${err.message}`);
+            failCount++;
+            if (err.statusCode === 410 || err.statusCode === 404) {
+              base44.asServiceRole.entities.Membership.update(member.id, {
+                push_subscription: null,
+                push_enabled: false
+              });
+            }
+          })
+      );
+    }
+
+    await Promise.all(promises);
 
     console.log(`Match notification sent: "${notificationTitle}" → ${successCount} delivered, ${failCount} failed`);
 
-    return Response.json({ 
+    return Response.json({
       success: true,
       sent: successCount,
       failed: failCount,
