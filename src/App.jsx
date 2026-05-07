@@ -19,6 +19,7 @@ import MemberMerchStatus from './pages/MemberMerchStatus';
 import MembershipAssistant from './pages/MembershipAssistant';
 import StaffFAQ from './pages/StaffFAQ';
 import StaffFAQPrint from './pages/StaffFAQPrint';
+import AdminLiveConsole from './pages/AdminLiveConsole';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -94,6 +95,7 @@ const AuthenticatedApp = () => {
       <Route path="/MembershipAssistant" element={<MembershipAssistant />} />
       <Route path="/StaffFAQ" element={<LayoutWrapper currentPageName="StaffFAQ"><StaffFAQ /></LayoutWrapper>} />
       <Route path="/StaffFAQPrint" element={<StaffFAQPrint />} />
+      <Route path="/AdminLiveConsole" element={<LayoutWrapper currentPageName="AdminLiveConsole"><AdminLiveConsole /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </Suspense>
