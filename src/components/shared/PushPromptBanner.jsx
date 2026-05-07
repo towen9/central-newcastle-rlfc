@@ -16,9 +16,6 @@ export default function PushPromptBanner() {
         const u = await base44.auth.me();
         if (!u || cancelled) return;
 
-        // Don't show to admins
-        if (u.role === 'admin') return;
-
         // Check membership
         const memberships = await base44.entities.Membership.filter({ user_id: u.id, status: 'active' });
         if (!memberships || memberships.length === 0) return;

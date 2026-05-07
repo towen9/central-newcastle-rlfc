@@ -21,9 +21,6 @@ export default function PushPromptModal() {
         if (!u || cancelled) return;
         setUser(u);
 
-        // Don't show to admins
-        if (u.role === 'admin') return;
-
         // Check membership
         const memberships = await base44.entities.Membership.filter({ user_id: u.id, status: 'active' });
         if (!memberships || memberships.length === 0) return;
