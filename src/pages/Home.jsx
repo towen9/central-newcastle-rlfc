@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
 import DayPassCard from '../components/home/DayPassCard';
+import PushPromptBanner from '../components/shared/PushPromptBanner';
 
 export default function Home() {
   const [showQR, setShowQR] = useState(false);
@@ -143,6 +144,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Push banner */}
+      <PushPromptBanner />
 
       {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>

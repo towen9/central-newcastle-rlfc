@@ -1,0 +1,33 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user",
+        "gate_staff",
+        "canteen_staff",
+        "leagues_staff"
+      ],
+      "default": "user"
+    },
+    "push_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "push_subscription": {
+      "type": "object",
+      "description": "Web push subscription object"
+    },
+    "push_prompt_last_dismissed": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the user last dismissed the push notification prompt modal"
+    },
+    "photo_url": {
+      "type": "string"
+    }
+  }
+}

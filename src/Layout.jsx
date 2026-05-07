@@ -1,6 +1,7 @@
 import React from 'react';
 import BottomNav from './components/shared/BottomNav';
 import PushNotificationManager from './components/shared/PushNotificationManager';
+import PushPromptModal from './components/shared/PushPromptModal';
 
 const memberPages = ['Home', 'Membership', 'Benefits', 'Sponsors', 'Profile', 'CheckIn', 'Fixtures', 'News', 'PointsRewards'];
 const memberPages2 = ['OldButchers', 'OldButchersHonourRoll'];
@@ -86,6 +87,7 @@ export default function Layout({ children, currentPageName }) {
       {children}
       
       {showBottomNav && <BottomNav currentPage={currentPageName} />}
+      {!isAdminPage && <PushPromptModal />}
     </div>
   );
 }
