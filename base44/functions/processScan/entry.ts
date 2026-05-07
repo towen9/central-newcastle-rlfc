@@ -17,8 +17,8 @@ Deno.serve(async (req) => {
 
     // --- Day Pass ---
     if (qrCode.startsWith('DP')) {
-      const allPasses = await base44.asServiceRole.entities.GameDayEntry.list();
-      const dayPass = allPasses.find(p => p.pass_qr_code === qrCode);
+      const matches = await base44.asServiceRole.entities.GameDayEntry.filter({ pass_qr_code: qrCode });
+      const dayPass = matches[0] || null;
 
       if (!dayPass) return Response.json({ type: 'error', detail: 'Day Pass not found' });
       if (dayPass.status === 'used') return Response.json({ type: 'already_used', name: `${dayPass.first_name} ${dayPass.last_name}`, detail: 'Already used today' });

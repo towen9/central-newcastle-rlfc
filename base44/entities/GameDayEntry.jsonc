@@ -1,0 +1,149 @@
+{
+  "name": "GameDayEntry",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "mobile": {
+      "type": "string"
+    },
+    "postcode": {
+      "type": "string"
+    },
+    "event_id": {
+      "type": "string",
+      "description": "Reference to Fixture"
+    },
+    "event_title": {
+      "type": "string"
+    },
+    "entry_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payment_reference": {
+      "type": "string"
+    },
+    "payment_amount": {
+      "type": "number"
+    },
+    "pass_qr_code": {
+      "type": "string",
+      "description": "Unique single-use QR code"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "valid",
+        "used",
+        "expired"
+      ],
+      "default": "valid"
+    },
+    "opt_in_club": {
+      "type": "boolean",
+      "default": false
+    },
+    "opt_in_partners": {
+      "type": "boolean",
+      "default": false
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Linked if user upgrades to member"
+    },
+    "scanned_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "is_returning": {
+      "type": "boolean",
+      "default": false
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Pass holder photo for verification"
+    },
+    "day_pass_tag": {
+      "type": "boolean",
+      "default": true,
+      "description": "Tag for push notification targeting"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "email",
+    "mobile",
+    "postcode",
+    "event_id"
+  ],
+  "indexes": [
+    {
+      "fields": [
+        "pass_qr_code"
+      ],
+      "unique": true
+    }
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "gate_staff"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "gate_staff"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
