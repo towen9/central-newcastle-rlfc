@@ -55,6 +55,11 @@
       "type": "boolean",
       "default": false
     },
+    "completion_skipped": {
+      "type": "boolean",
+      "default": false,
+      "description": "User explicitly skipped the post-purchase details form"
+    },
     "user_id": {
       "type": "string",
       "description": "Linked if user upgrades to member"

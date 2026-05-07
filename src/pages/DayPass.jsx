@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import DayPassDetailsForm from '../components/daypass/DayPassDetailsForm';
 
 export default function DayPass() {
   const [user, setUser] = useState(null);
@@ -16,6 +17,7 @@ export default function DayPass() {
   const [verifying, setVerifying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [createdPass, setCreatedPass] = useState(null);
+  const [detailsStep, setDetailsStep] = useState(false);
   const [photoStep, setPhotoStep] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [cameraActive, setCameraActive] = useState(false);
@@ -102,7 +104,14 @@ export default function DayPass() {
         base44.functions.invoke('verifyDayPassPayment', { session_id: sessionId })
           .then((res) => {
             queryClient.invalidateQueries(['myDayPass']);
-            if (res?.data?.pass) setCreatedPass(res.data.pass);
+            if (res?.data?.pass) {
+              setCreatedPass(res.data.pass);
+              // Show details form unless already completed or skipped
+              const p = res.data.pass;
+              if (!p.mobile && !p.completion_skipped) {
+                setDetailsStep(true);
+              }
+            }
             setPaymentSuccess(true);
           })
           .catch((err) => {
@@ -163,6 +172,20 @@ export default function DayPass() {
   };
 
   if (verifying || paymentSuccess) {
+    // Details form step — shown after payment, before photo, if not already completed/skipped
+    if (paymentSuccess && !verifying && detailsStep && createdPass) {
+      const needsForm = !createdPass.mobile && !createdPass.completion_skipped;
+      if (needsForm) {
+        return (
+          <DayPassDetailsForm
+            pass={createdPass}
+            user={user}
+            onComplete={() => setDetailsStep(false)}
+          />
+        );
+      }
+    }
+
     // Photo capture step
     if (paymentSuccess && photoStep) {
       return (
