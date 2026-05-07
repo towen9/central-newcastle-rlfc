@@ -30,6 +30,8 @@ export default function EventModal({ eventType, fixture, user, onClose, onSucces
   const [momentText, setMomentText] = useState('');
   const [momentAudience, setMomentAudience] = useState('attendees');
   const [loading, setLoading] = useState(false);
+  const [finalScoreUs, setFinalScoreUs] = useState(String(fixture.score_us ?? 0));
+  const [finalScoreThem, setFinalScoreThem] = useState(String(fixture.score_them ?? 0));
 
   const label = EVENT_LABELS[eventType] || eventType;
   const opponent = fixture.opponent_name || fixture.opponent || 'Opponent';
@@ -39,8 +41,13 @@ export default function EventModal({ eventType, fixture, user, onClose, onSucces
   const isDiscipline = DISCIPLINE_TYPES.includes(eventType);
   const isMoment = eventType === 'moment';
   const isConversion = eventType === 'conversion';
+  const isFullTime = eventType === 'full_time';
 
-  const canSubmit = isMoment ? momentText.trim().length > 0 : true;
+  const parsedUs = parseInt(finalScoreUs, 10);
+  const parsedThem = parseInt(finalScoreThem, 10);
+  const finalScoreValid = !isNaN(parsedUs) && !isNaN(parsedThem) && parsedUs >= 0 && parsedThem >= 0;
+
+  const canSubmit = isMoment ? momentText.trim().length > 0 : isFullTime ? finalScoreValid : true;
 
   const handleConfirm = async () => {
     if (!canSubmit) return;
@@ -76,6 +83,13 @@ export default function EventModal({ eventType, fixture, user, onClose, onSucces
         eventData.moment_audience = momentAudience;
       }
 
+      // For full_time: update fixture score first if it differs from current
+      if (isFullTime) {
+        if (parsedUs !== (fixture.score_us ?? 0) || parsedThem !== (fixture.score_them ?? 0)) {
+          await base44.entities.Fixture.update(fixture.id, { score_us: parsedUs, score_them: parsedThem });
+        }
+      }
+
       const newEvent = await base44.entities.MatchEvent.create(eventData);
       await base44.functions.invoke('processMatchEvent', { eventId: newEvent.id });
 
@@ -102,11 +116,44 @@ export default function EventModal({ eventType, fixture, user, onClose, onSucces
           </button>
         </div>
 
-        {/* Milestone: simple confirm */}
-        {isMilestone && (
+        {/* Milestone: simple confirm (excludes full_time which has its own UI) */}
+        {isMilestone && !isFullTime && (
           <p className="text-gray-600 text-sm mb-6">
             Confirm <strong>{label}</strong>? This will push to all members.
           </p>
+        )}
+
+        {/* Full Time: editable score fields */}
+        {isFullTime && (
+          <div className="mb-6">
+            <p className="text-sm text-gray-600 mb-4">Final score (edit if needed):</p>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <label className="block text-xs font-semibold text-gray-500 mb-1 text-center">Central</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="200"
+                  value={finalScoreUs}
+                  onChange={e => setFinalScoreUs(e.target.value)}
+                  className="w-full border-2 border-gray-300 rounded-xl px-3 py-4 text-3xl font-black text-center focus:outline-none focus:border-[#1a365d]"
+                />
+              </div>
+              <span className="text-2xl font-bold text-gray-400 mt-5">—</span>
+              <div className="flex-1">
+                <label className="block text-xs font-semibold text-gray-500 mb-1 text-center truncate">{opponent}</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="200"
+                  value={finalScoreThem}
+                  onChange={e => setFinalScoreThem(e.target.value)}
+                  className="w-full border-2 border-gray-300 rounded-xl px-3 py-4 text-3xl font-black text-center focus:outline-none focus:border-[#1a365d]"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 text-center mt-3">Tap Send Final to broadcast the result.</p>
+          </div>
         )}
 
         {/* Score events: Us/Them toggle */}
@@ -251,7 +298,7 @@ export default function EventModal({ eventType, fixture, user, onClose, onSucces
             disabled={loading || !canSubmit}
             className="flex-1 py-6 text-base bg-[#1a365d] hover:bg-[#2c5282] text-white font-bold min-h-[60px]"
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isMoment ? 'Send' : 'Confirm')}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : isFullTime ? 'Send Final' : isMoment ? 'Send' : 'Confirm'}
           </Button>
         </div>
       </div>
