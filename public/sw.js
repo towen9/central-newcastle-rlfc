@@ -1,55 +1,65 @@
-// Central Newcastle RLFC - Service Worker
-// Handles push notifications and offline caching
-
-const CACHE_NAME = 'cnrlfc-v1';
+const CACHE_NAME = 'cnrlfc-v2';
+const urlsToCache = [
+  '/',
+  '/index.html',
+];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+  );
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(
+    caches.keys().then((names) =>
+      Promise.all(names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n)))
+    ).then(() => clients.claim())
+  );
 });
 
-// Handle incoming push notifications
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      if (response) {
+        return response;
+      }
+      return fetch(event.request);
+    })
+  );
+});
+
 self.addEventListener('push', (event) => {
   let data = {};
   try {
     data = event.data ? event.data.json() : {};
   } catch (e) {
-    data = { title: 'Central Newcastle RLFC', body: event.data ? event.data.text() : 'New notification' };
+    data = { title: 'Central Newcastle RLFC', body: event.data ? event.data.text() : '' };
   }
 
   const title = data.title || 'Central Newcastle RLFC';
   const options = {
     body: data.body || '',
-    icon: data.icon || 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg',
-    badge: data.badge || 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg',
+    icon: data.icon || '/icon-192.png',
+    badge: data.badge || '/icon-192.png',
     data: { url: data.url || '/' },
-    vibrate: [200, 100, 200],
     requireInteraction: false,
-    tag: 'cnrlfc-notification'
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Handle notification click — open the app
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
-
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // If app is already open, focus it and navigate
       for (const client of clientList) {
-        if ('focus' in client) {
-          client.focus();
-          client.navigate(url);
-          return;
+        if (client.url === url && 'focus' in client) {
+          return client.focus();
         }
       }
-      // Otherwise open a new window
       if (clients.openWindow) {
         return clients.openWindow(url);
       }
