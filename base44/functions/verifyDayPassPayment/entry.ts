@@ -76,6 +76,53 @@ Deno.serve(async (req) => {
     });
 
     console.log('Day Pass created via verify:', qrCode, '| User:', user.email);
+
+    // Best-effort: create/update a "Day Pass" tier Membership for comms reach.
+    // Failure here must NOT block the payment success response.
+    try {
+      const existingMemberships = await base44.asServiceRole.entities.Membership.filter({ user_id: user.id });
+
+      const PAID_TIERS = ['Premium Membership', 'Family Membership', 'Supporter Pack', 'Old Butchers Membership', 'Sponsor Season Pass'];
+      const hasPaidMembership = existingMemberships.some(m =>
+        PAID_TIERS.some(tier => m.tier_name?.includes(tier))
+      );
+
+      if (hasPaidMembership) {
+        // Paid tier already exists — don't touch it
+        console.log('Day Pass comms: user has paid membership, skipping Day Pass tier creation');
+      } else {
+        const existingDayPass = existingMemberships.find(m => m.tier_name === 'Day Pass');
+        if (existingDayPass) {
+          // Already has a Day Pass membership — just bump updated_date, preserve push fields
+          await base44.asServiceRole.entities.Membership.update(existingDayPass.id, {
+            status: 'active'
+          });
+          console.log('Day Pass comms: updated existing Day Pass membership', existingDayPass.id);
+        } else {
+          // No membership at all — create a new Day Pass one
+          const nameParts2 = (user.full_name || '').split(' ');
+          await base44.asServiceRole.entities.Membership.create({
+            user_id: user.id,
+            user_email: user.email,
+            user_name: user.full_name || user.email,
+            tier_id: 'day_pass',
+            tier_name: 'Day Pass',
+            status: 'active',
+            push_enabled: false,
+            push_subscription: null,
+            start_date: new Date().toISOString().split('T')[0],
+            stamps: 0,
+            points: 0,
+            total_checkins: 0,
+            games_used: 0
+          });
+          console.log('Day Pass comms: created new Day Pass membership for', user.email);
+        }
+      }
+    } catch (membershipErr) {
+      console.error('Day Pass comms: Membership create/update failed (non-fatal):', membershipErr.message);
+    }
+
     return Response.json({ pass });
 
   } catch (error) {
