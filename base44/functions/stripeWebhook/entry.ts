@@ -94,6 +94,20 @@ Deno.serve(async (req) => {
 
       console.log('Membership created:', membership.id, '| Tier:', tierData.name);
 
+      // Mark any existing Day Pass membership as converted so the cadence stops
+      try {
+        const existingMemberships = await base44.asServiceRole.entities.Membership.filter({ user_id: user_id });
+        const dayPassMembership = existingMemberships.find(m => m.tier_name === 'Day Pass' && m.id !== membership.id);
+        if (dayPassMembership) {
+          await base44.asServiceRole.entities.Membership.update(dayPassMembership.id, {
+            conversion_sequence_stage: 'converted'
+          });
+          console.log('Day Pass conversion stage set to converted for membership:', dayPassMembership.id);
+        }
+      } catch (convErr) {
+        console.error('Failed to mark Day Pass as converted (non-fatal):', convErr.message);
+      }
+
       // Send welcome email prompting photo upload
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({

@@ -90,6 +90,24 @@
     "push_subscription": {
       "type": "object",
       "description": "Web push subscription object for browser push notifications"
+    },
+    "conversion_sequence_stage": {
+      "type": "string",
+      "enum": [
+        "none",
+        "t24_sent",
+        "t72_sent",
+        "t7d_sent",
+        "converted",
+        "unsubscribed"
+      ],
+      "default": "none",
+      "description": "Day Pass conversion cadence tracking"
+    },
+    "conversion_sequence_last_sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the last conversion sequence message was sent"
     }
   },
   "required": [
