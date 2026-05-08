@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
+import { isPaidMember, isDayPassMember } from '@/lib/membershipTiers';
 
 const tabMenuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', page: 'AdminDashboard' },
@@ -90,10 +91,15 @@ export default function AdminDashboard() {
   });
 
   // Stats calculations
-  const activeMemberships = memberships.filter(m => m.status === 'active').length;
-  const thisMonthMemberships = memberships.filter(m => {
+  const activePaidMembers = memberships.filter(isPaidMember).length;
+  const activeDayPassAudience = memberships.filter(isDayPassMember).length;
+  const thisMonthPaidMemberships = memberships.filter(m => {
     const created = new Date(m.created_date);
-    return created >= startOfMonth(new Date()) && created <= endOfMonth(new Date());
+    return isPaidMember(m) && created >= startOfMonth(new Date()) && created <= endOfMonth(new Date());
+  }).length;
+  const thisMonthDayPass = memberships.filter(m => {
+    const created = new Date(m.created_date);
+    return isDayPassMember(m) && created >= startOfMonth(new Date()) && created <= endOfMonth(new Date());
   }).length;
 
   const weekAgo = subDays(new Date(), 7);
@@ -131,11 +137,18 @@ export default function AdminDashboard() {
 
   const stats = [
     { 
-      label: 'Active Members', 
-      value: activeMemberships, 
+      label: 'Active Paid Members', 
+      value: activePaidMembers, 
       icon: Users, 
-      color: 'bg-blue-500',
-      trend: `+${thisMonthMemberships} this month`
+      color: 'bg-[#1B3A6B]',
+      trend: `+${thisMonthPaidMemberships} paid this month`
+    },
+    { 
+      label: 'Day Pass Audience', 
+      value: activeDayPassAudience, 
+      icon: Ticket, 
+      color: 'bg-amber-500',
+      trend: `+${thisMonthDayPass} this month`
     },
     { 
       label: 'Check-ins (7 days)', 

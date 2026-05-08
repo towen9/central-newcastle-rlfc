@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import AdminLayout from '../components/admin/AdminLayout';
 import { format } from 'date-fns';
+import { isPaidMember, isDayPassMember } from '@/lib/membershipTiers';
 import { toast } from 'sonner';
 
 export default function AdminMembers() {
@@ -66,6 +67,8 @@ export default function AdminMembers() {
   });
 
   const pendingCount = memberships.filter(m => m.status === 'pending').length;
+  const activePaidCount = memberships.filter(isPaidMember).length;
+  const activeDayPassCount = memberships.filter(isDayPassMember).length;
 
   const filteredMemberships = memberships.filter(m => {
     const matchesSearch = 
@@ -325,14 +328,18 @@ export default function AdminMembers() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Total</p>
           <p className="text-2xl font-bold text-gray-900">{memberships.length}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-sm text-gray-500">Active</p>
-          <p className="text-2xl font-bold text-emerald-600">{memberships.filter(m => m.status === 'active').length}</p>
+          <p className="text-sm text-gray-500">Active Paid</p>
+          <p className="text-2xl font-bold text-[#1B3A6B]">{activePaidCount}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">Day Pass</p>
+          <p className="text-2xl font-bold text-amber-500">{activeDayPassCount}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Supporter</p>
