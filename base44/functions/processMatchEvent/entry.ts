@@ -157,9 +157,39 @@ function decidePush(event, fixture) {
 }
 
 async function sendPushToAudience(sb, audience, message, fixtureId, eventId) {
-  // For now, both audiences target all push-enabled members.
-  // "attendees" will be refined to CheckIn-based targeting in a future prompt.
-  const targets = await sb.entities.Membership.filter({ push_enabled: true });
+  let targets;
+
+  if (audience === 'all_members') {
+    // All push-enabled members regardless of fixture
+    targets = await sb.entities.Membership.filter({ push_enabled: true });
+  } else {
+    // attendees: all push-enabled members (paid + any tier)
+    //           PLUS Day Pass holders specifically for this fixture
+
+    const genericTargets = await sb.entities.Membership.filter({ push_enabled: true });
+
+    // Find Day Pass holders who bought a pass for THIS fixture
+    const fixtureEntries = await sb.entities.GameDayEntry.filter({ event_id: fixtureId });
+    const fixtureUserIds = fixtureEntries.map(e => e.user_id).filter(Boolean);
+
+    let dayPassTargets = [];
+    if (fixtureUserIds.length > 0) {
+      const allDayPassMembers = await sb.entities.Membership.filter({
+        tier_name: 'Day Pass',
+        push_enabled: true
+      });
+      dayPassTargets = allDayPassMembers.filter(m => fixtureUserIds.includes(m.user_id));
+    }
+
+    // Merge and dedupe by Membership.id (a user could appear in both arrays)
+    const seen = new Set();
+    targets = [...genericTargets, ...dayPassTargets].filter(m => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+  }
+
   const valid = targets.filter(m => m.push_subscription);
 
   const payload = JSON.stringify({
