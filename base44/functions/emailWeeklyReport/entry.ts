@@ -1,15 +1,86 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { subDays, startOfWeek, endOfWeek, format } from 'npm:date-fns';
+import { format } from 'npm:date-fns';
+
+// TODO: extract to shared util when Deno supports local imports across functions.
+// Returns decomposed Sydney local time for any UTC Date — handles AEST/AEDT automatically.
+function getSydneyTime(date = new Date()) {
+  const fmt = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    weekday: 'short',
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(date);
+  const obj = {};
+  for (const p of parts) obj[p.type] = p.value;
+  return {
+    year: parseInt(obj.year),
+    month: parseInt(obj.month),
+    day: parseInt(obj.day),
+    hour: parseInt(obj.hour),
+    minute: parseInt(obj.minute),
+    weekday: obj.weekday,
+  };
+}
+
+// Returns a UTC Date representing midnight of a given Sydney local date (y, m, d).
+function sydneyMidnightToUTC(year, month, day) {
+  const pad = (n) => String(n).padStart(2, '0');
+  const localStr = `${year}-${pad(month)}-${pad(day)}`;
+  for (const offsetHours of [10, 11]) {
+    const tryUTC = new Date(`${localStr}T00:00:00+0${offsetHours}:00`);
+    const verify = getSydneyTime(tryUTC);
+    if (verify.year === year && verify.month === month && verify.day === day && verify.hour === 0) {
+      return tryUTC;
+    }
+  }
+  return new Date(`${localStr}T00:00:00+10:00`);
+}
+
+// Returns { start, end } as UTC Dates for the Sydney Mon–Sun week containing `date`.
+function getSydneyWeekBounds(date = new Date()) {
+  const syd = getSydneyTime(date);
+  const weekdayOffsets = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+  const daysFromMonday = weekdayOffsets[syd.weekday] ?? 0;
+
+  const sydDateMs = Date.UTC(syd.year, syd.month - 1, syd.day);
+  const mondaySydMs = sydDateMs - daysFromMonday * 86400000;
+  const mondaySyd = new Date(mondaySydMs);
+
+  const weekStart = sydneyMidnightToUTC(
+    mondaySyd.getUTCFullYear(),
+    mondaySyd.getUTCMonth() + 1,
+    mondaySyd.getUTCDate()
+  );
+
+  const nextMondaySydMs = mondaySydMs + 7 * 86400000;
+  const nextMondaySyd = new Date(nextMondaySydMs);
+  const weekEnd = sydneyMidnightToUTC(
+    nextMondaySyd.getUTCFullYear(),
+    nextMondaySyd.getUTCMonth() + 1,
+    nextMondaySyd.getUTCDate()
+  );
+
+  return { start: weekStart, end: weekEnd };
+}
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
     const now = new Date();
-    const thisWeekStart = startOfWeek(now, { weekStartsOn: 1 });
-    const thisWeekEnd = endOfWeek(now, { weekStartsOn: 1 });
-    const lastWeekStart = subDays(thisWeekStart, 7);
-    const lastWeekEnd = subDays(thisWeekEnd, 7);
+
+    // Sydney-aware week boundaries
+    const { start: thisWeekStart, end: thisWeekEnd } = getSydneyWeekBounds(now);
+    const lastWeekStart = new Date(thisWeekStart.getTime() - 7 * 86400000);
+    const lastWeekEnd = thisWeekStart;
+
+    const filterByWindow = (items, dateField, start, end) =>
+      items.filter(i => { const d = new Date(i[dateField]); return d >= start && d < end; });
 
     // Fetch all data using service role (no auth required)
     const [allMemberships, allCheckins, allOfferRedemptions, allTransactions, allOffers, admins] = await Promise.all([
@@ -27,19 +98,14 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, error: 'No admin emails found' });
     }
 
-    // Filter by week
-    const filterByWeek = (items, dateField, start, end) =>
-      items.filter(i => { const d = new Date(i[dateField]); return d >= start && d <= end; });
+    const thisWeekCheckins = filterByWindow(allCheckins, 'timestamp', thisWeekStart, thisWeekEnd);
+    const lastWeekCheckins = filterByWindow(allCheckins, 'timestamp', lastWeekStart, lastWeekEnd);
+    const thisWeekRedemptions = filterByWindow(allOfferRedemptions, 'timestamp', thisWeekStart, thisWeekEnd);
+    const thisWeekTransactions = filterByWindow(allTransactions, 'timestamp', thisWeekStart, thisWeekEnd);
+    const lastWeekTransactions = filterByWindow(allTransactions, 'timestamp', lastWeekStart, lastWeekEnd);
+    const thisWeekSignups = filterByWindow(allMemberships, 'created_date', thisWeekStart, thisWeekEnd);
+    const lastWeekSignups = filterByWindow(allMemberships, 'created_date', lastWeekStart, lastWeekEnd);
 
-    const thisWeekCheckins = filterByWeek(allCheckins, 'timestamp', thisWeekStart, thisWeekEnd);
-    const lastWeekCheckins = filterByWeek(allCheckins, 'timestamp', lastWeekStart, lastWeekEnd);
-    const thisWeekRedemptions = filterByWeek(allOfferRedemptions, 'timestamp', thisWeekStart, thisWeekEnd);
-    const thisWeekTransactions = filterByWeek(allTransactions, 'timestamp', thisWeekStart, thisWeekEnd);
-    const lastWeekTransactions = filterByWeek(allTransactions, 'timestamp', lastWeekStart, lastWeekEnd);
-    const thisWeekSignups = filterByWeek(allMemberships, 'created_date', thisWeekStart, thisWeekEnd);
-    const lastWeekSignups = filterByWeek(allMemberships, 'created_date', lastWeekStart, lastWeekEnd);
-
-    // Metrics
     const totalMembers = allMemberships.length;
     const paidMembers = allMemberships.filter(m => m.status === 'active').length;
     const thisWeekRevenue = thisWeekTransactions.reduce((sum, t) => sum + (t.final_amount || 0), 0);
@@ -57,14 +123,14 @@ Deno.serve(async (req) => {
     });
     const topSponsor = Object.entries(sponsorClicks).sort((a, b) => b[1] - a[1])[0] || ['None', 0];
 
-    // Peak hour
+    // Peak hour — Sydney local hours, not UTC
     const hourlyActivity = {};
     thisWeekCheckins.forEach(c => {
-      const hour = new Date(c.timestamp).getHours();
+      const hour = getSydneyTime(new Date(c.timestamp)).hour;
       hourlyActivity[hour] = (hourlyActivity[hour] || 0) + 1;
     });
     const peakHour = Object.entries(hourlyActivity).sort((a, b) => b[1] - a[1])[0];
-    const peakTimeLabel = peakHour ? `${peakHour[0]}:00 - ${parseInt(peakHour[0]) + 1}:00` : 'N/A';
+    const peakTimeLabel = peakHour ? `${peakHour[0]}:00 - ${parseInt(peakHour[0]) + 1}:00 AEST` : 'N/A';
 
     // Insights
     const insights = [];
@@ -73,6 +139,11 @@ Deno.serve(async (req) => {
     if (parseFloat(attendanceChange) < -10) insights.push('Attendance declined vs last week');
     if (parseFloat(revenueChange) > 15) insights.push('Revenue growth exceeding expectations');
     if (peakHour) insights.push(`Peak gate scan time: ${peakTimeLabel}`);
+
+    // Period label in Sydney dates
+    const sydStart = getSydneyTime(thisWeekStart);
+    const sydEnd = getSydneyTime(new Date(thisWeekEnd.getTime() - 1));
+    const periodLabel = `${sydStart.day}/${sydStart.month} – ${sydEnd.day}/${sydEnd.month}/${sydEnd.year}`;
 
     const pct = (val) => `${parseFloat(val) >= 0 ? '+' : ''}${val}%`;
     const colorClass = (val) => parseFloat(val) >= 0 ? 'color:#22c55e' : 'color:#ef4444';
@@ -100,7 +171,7 @@ Deno.serve(async (req) => {
   <div class="header">
     <h1>📊 Central Newcastle RLFC</h1>
     <p>Weekly Performance Report — Week ${format(now, 'w')}, ${format(now, 'yyyy')}</p>
-    <p>${format(thisWeekStart, 'MMM d')} – ${format(thisWeekEnd, 'MMM d, yyyy')}</p>
+    <p>${periodLabel}</p>
   </div>
   <div class="content">
 
