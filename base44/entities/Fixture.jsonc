@@ -132,6 +132,21 @@
     "timeline_summary": {
       "type": "string",
       "description": "Auto-generated timeline narrative"
+    },
+    "wednesday_preview_sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the Wednesday preview push was sent \u2014 dedup guard"
+    },
+    "friday_reminder_sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the Friday reminder push was sent \u2014 dedup guard"
+    },
+    "matchday_alert_sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the matchday 2hr alert push was sent \u2014 dedup guard"
     }
   },
   "required": [
