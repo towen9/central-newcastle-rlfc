@@ -44,7 +44,21 @@ export default function MyDayPass() {
   }
 
   const fixtureDate = new Date(fixture.date_time);
-  const isValid = pass.status === 'valid' && fixtureDate >= new Date(new Date().setHours(0,0,0,0));
+
+  // TODO: extract to shared util — compare dates in Sydney time, not UTC.
+  // Using en-CA locale because it reliably returns YYYY-MM-DD, which string-compares correctly as dates.
+  function getSydneyDateString(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Australia/Sydney',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(date);
+    const obj = {};
+    for (const p of parts) obj[p.type] = p.value;
+    return `${obj.year}-${obj.month}-${obj.day}`;
+  }
+  const todaySydney = getSydneyDateString();
+  const fixtureSydney = getSydneyDateString(fixtureDate);
+  const isValid = pass.status === 'valid' && todaySydney <= fixtureSydney;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pb-24">
