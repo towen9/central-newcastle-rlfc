@@ -1,5 +1,32 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
-import { subDays, subHours, startOfWeek, endOfWeek } from 'npm:date-fns';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { subDays, subHours, startOfWeek } from 'npm:date-fns';
+
+
+// TODO: extract to shared util when Deno supports local imports across functions.
+// Returns decomposed Sydney local time for any UTC Date — handles AEST/AEDT automatically.
+function getSydneyTime(date = new Date()) {
+  const fmt = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    weekday: 'short',
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(date);
+  const obj = {};
+  for (const p of parts) obj[p.type] = p.value;
+  return {
+    year: parseInt(obj.year),
+    month: parseInt(obj.month),
+    day: parseInt(obj.day),
+    hour: parseInt(obj.hour),
+    minute: parseInt(obj.minute),
+    weekday: obj.weekday, // "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+  };
+}
 
 Deno.serve(async (req) => {
   try {
@@ -23,7 +50,7 @@ Deno.serve(async (req) => {
     const last24Hours = subHours(now, 24);
     const recentCheckins = checkins.filter(c => new Date(c.timestamp) >= last24Hours);
     
-    if (recentCheckins.length === 0 && now.getDay() !== 0) { // Not Sunday
+    if (recentCheckins.length === 0 && getSydneyTime(now).weekday !== 'Sun') { // Not Sunday (Sydney time)
       alerts.push({
         alert_type: 'technical',
         severity: 'high',

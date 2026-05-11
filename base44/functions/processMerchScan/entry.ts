@@ -1,6 +1,55 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const DISCOUNT_TIERS = ['Premium Membership', 'Old Butchers', 'Sponsor Season Pass'];
+// TODO: extract to shared util when Deno supports local imports across functions.
+// Returns decomposed Sydney local time for any UTC Date — handles AEST/AEDT automatically.
+function getSydneyTime(date = new Date()) {
+  const fmt = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    weekday: 'short',
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(date);
+  const obj = {};
+  for (const p of parts) obj[p.type] = p.value;
+  return {
+    year: parseInt(obj.year),
+    month: parseInt(obj.month),
+    day: parseInt(obj.day),
+    hour: parseInt(obj.hour),
+    minute: parseInt(obj.minute),
+    weekday: obj.weekday, // "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+  };
+}
+
+// Tier discount rules:
+// FLAT_TIERS:    10% always (no first-purchase bonus)
+// PREMIUM_TIERS: 20% on first MerchTransaction, 10% thereafter
+// Everything else: 0%
+const FLAT_TIERS = ['Supporter Pack', 'Family', 'Day Pass'];
+const PREMIUM_TIERS = ['Premium', 'Old Butchers', 'Sponsor Season Pass'];
+
+async function resolveDiscount(base44, membership) {
+  const tierName = membership.tier_name || '';
+
+  if (FLAT_TIERS.some(t => tierName.includes(t))) {
+    return 10;
+  }
+
+  if (PREMIUM_TIERS.some(t => tierName.includes(t))) {
+    const prevPurchases = await base44.asServiceRole.entities.MerchTransaction.filter({ user_id: membership.user_id });
+    const isFirstPurchase = prevPurchases.length === 0;
+    return isFirstPurchase ? 20 : 10;
+  }
+
+  // No matching tier
+  console.warn(`processMerchScan: unrecognised tier "${tierName}" for user ${membership.user_id} — applying 0% discount`);
+  return 0;
+}
 
 Deno.serve(async (req) => {
   try {
@@ -11,126 +60,123 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { qrCode, purchaseAmount, applyDiscount } = body;
+    const { qrCode, purchaseAmount } = body;
 
     if (!qrCode) return Response.json({ type: 'error', message: 'No QR code provided' }, { status: 400 });
 
     // --- LOOKUP PHASE (no purchaseAmount) ---
     if (purchaseAmount === undefined) {
       const memberships = await base44.asServiceRole.entities.Membership.filter({ qr_code_id: qrCode, status: 'active' });
+
+      // No active membership — return 0% so the UI can proceed without discount
       if (!memberships || memberships.length === 0) {
-        return Response.json({ type: 'error', message: 'Invalid or inactive membership QR code' });
-      }
-      const m = memberships[0];
-
-      // Load tier for discount %
-      const tiers = await base44.asServiceRole.entities.MembershipTier.filter({ name: m.tier_name });
-      const tier = tiers[0] || null;
-      const discountPct = tier?.merchandise_discount || 0;
-
-      // Tiers that get no discount at all
-      const hasDiscount = discountPct > 0 && DISCOUNT_TIERS.some(t => m.tier_name?.includes(t.split(' ')[0]));
-
-      if (!hasDiscount && discountPct === 0) {
+        console.warn(`processMerchScan lookup: no active membership for QR ${qrCode} — 0% discount`);
         return Response.json({
-          type: 'no_discount',
-          memberName: m.user_name,
-          tierName: m.tier_name,
-          message: `${m.tier_name} members do not receive a merchandise discount.`
+          type: 'no_membership',
+          memberName: null,
+          tierName: null,
+          discountPct: 0,
+          message: 'No active membership found. Full price applies.'
         });
       }
 
-      // Check if discount used this season
-      const seasonStart = m.start_date ? new Date(m.start_date) : new Date(new Date().getFullYear(), 0, 1);
-      const transactions = await base44.asServiceRole.entities.Transaction.filter({
-        membership_id: m.id,
-        transaction_type: 'merchandise'
-      });
-      const discountUsed = transactions.some(t => t.discount_amount > 0 && new Date(t.timestamp) >= seasonStart);
+      const m = memberships[0];
+      const discountPct = await resolveDiscount(base44, m);
 
       return Response.json({
         type: 'member_found',
         memberId: m.id,
+        userId: m.user_id,
         memberName: m.user_name,
         tierName: m.tier_name,
         discountPct,
-        discountUsed,
         points: m.points || 0
       });
     }
 
     // --- PROCESS PHASE (purchaseAmount provided) ---
-    // Re-fetch membership by id (qrCode is now the membership id)
+    // At this point qrCode is the membership id (passed back from lookup response)
     const memberships = await base44.asServiceRole.entities.Membership.filter({ id: qrCode, status: 'active' });
+
+    const now = new Date();
+    const syd = getSydneyTime(now);
+
+    let m = null;
+    let discountPct = 0;
+
     if (!memberships || memberships.length === 0) {
-      return Response.json({ type: 'error', message: 'Membership not found' });
-    }
-    const m = memberships[0];
-
-    const tiers = await base44.asServiceRole.entities.MembershipTier.filter({ name: m.tier_name });
-    const tier = tiers[0] || null;
-    const discountPct = tier?.merchandise_discount || 0;
-
-    // Server-side guard: prevent second discounted transaction even if UI is bypassed
-    if (applyDiscount) {
-      const seasonStart = m.start_date ? new Date(m.start_date) : new Date(new Date().getFullYear(), 0, 1);
-      const transactions = await base44.asServiceRole.entities.Transaction.filter({
-        membership_id: m.id,
-        transaction_type: 'merchandise'
-      });
-      const discountAlreadyUsed = transactions.some(t => t.discount_amount > 0 && new Date(t.timestamp) >= seasonStart);
-      if (discountAlreadyUsed) {
-        return Response.json({ type: 'error', message: 'Merchandise discount already used this season' }, { status: 400 });
-      }
+      // No membership — proceed at 0%, no points
+      console.warn(`processMerchScan process: no active membership id ${qrCode} — 0% discount`);
+    } else {
+      m = memberships[0];
+      discountPct = await resolveDiscount(base44, m);
     }
 
     const original = parseFloat(parseFloat(purchaseAmount).toFixed(2));
-    const discountAmt = applyDiscount ? parseFloat((original * discountPct / 100).toFixed(2)) : 0;
+    const discountAmt = parseFloat((original * discountPct / 100).toFixed(2));
     const finalAmt = parseFloat((original - discountAmt).toFixed(2));
-    const pointsEarned = Math.floor(finalAmt);
+    const pointsEarned = m ? Math.floor(finalAmt) : 0;
 
-    const now = new Date();
-    await base44.asServiceRole.entities.Transaction.create({
-      user_id: m.user_id,
-      membership_id: m.id,
-      member_name: m.user_name,
-      location: 'Merchandise',
-      item_description: 'Merchandise purchase',
+    // Record in dedicated MerchTransaction entity
+    await base44.asServiceRole.entities.MerchTransaction.create({
+      user_id: m?.user_id || 'unknown',
+      membership_id: m?.id || null,
+      member_name: m?.user_name || 'Guest',
+      tier_name: m?.tier_name || null,
       original_amount: original,
+      discount_pct: discountPct,
       discount_amount: discountAmt,
       final_amount: finalAmt,
-      discount_reason: applyDiscount ? `${discountPct}% member discount` : '',
-      transaction_type: 'merchandise',
+      points_earned: pointsEarned,
       timestamp: now.toISOString(),
-      hour_of_day: now.getHours(),
-      day_of_week: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()]
+      hour_of_day: syd.hour,          // Sydney local hour
+      day_of_week: syd.weekday        // Sydney local weekday e.g. "Wed"
     });
 
-    const newPoints = (m.points || 0) + pointsEarned;
-    if (pointsEarned > 0) {
-      await base44.asServiceRole.entities.Membership.update(m.id, { points: newPoints });
-      await base44.asServiceRole.entities.PointsTransaction.create({
+    // Also record in general Transaction ledger for revenue reporting
+    if (m) {
+      await base44.asServiceRole.entities.Transaction.create({
         user_id: m.user_id,
         membership_id: m.id,
-        points: pointsEarned,
-        transaction_type: 'attendance',
-        description: `Merchandise purchase ($${finalAmt})`,
+        member_name: m.user_name,
         location: 'Merchandise',
-        timestamp: now.toISOString()
+        item_description: 'Merchandise purchase',
+        original_amount: original,
+        discount_amount: discountAmt,
+        final_amount: finalAmt,
+        discount_reason: discountPct > 0 ? `${discountPct}% member discount` : '',
+        transaction_type: 'merchandise',
+        timestamp: now.toISOString(),
+        hour_of_day: syd.hour,
+        day_of_week: syd.weekday
       });
+
+      // Award points
+      if (pointsEarned > 0) {
+        const newPoints = (m.points || 0) + pointsEarned;
+        await base44.asServiceRole.entities.Membership.update(m.id, { points: newPoints });
+        await base44.asServiceRole.entities.PointsTransaction.create({
+          user_id: m.user_id,
+          membership_id: m.id,
+          points: pointsEarned,
+          transaction_type: 'attendance',
+          description: `Merchandise purchase ($${finalAmt})`,
+          location: 'Merchandise',
+          timestamp: now.toISOString()
+        });
+      }
     }
 
     return Response.json({
       type: 'success',
-      memberName: m.user_name,
-      tierName: m.tier_name,
+      memberName: m?.user_name || 'Guest',
+      tierName: m?.tier_name || null,
       original,
       discountAmt,
       discountPct,
       finalAmt,
-      discountApplied: applyDiscount,
       pointsEarned,
-      newBalance: newPoints
+      newBalance: m ? (m.points || 0) + pointsEarned : 0
     });
 
   } catch (error) {
