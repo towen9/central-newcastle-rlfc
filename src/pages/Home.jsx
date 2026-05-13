@@ -167,11 +167,6 @@ export default function Home() {
                 </div>
                 <h3 className="text-white text-2xl font-extrabold mb-1 leading-tight">Join the Central Family</h3>
                 <p className="text-blue-200 text-sm mb-5">From $40 — season entry, rewards points, exclusive member perks & sponsor deals</p>
-                <div className="flex gap-2 mb-5">
-                  {['$40 Supporter', '$100 Family', '$120 Premium'].map((t) =>
-                  <span key={t} className="bg-white/15 text-white text-xs px-2.5 py-1 rounded-full font-medium">{t}</span>
-                  )}
-                </div>
                 <Button
                   onClick={() => window.location.href = createPageUrl('JoinMembership')}
                   className="w-full bg-amber-400 hover:bg-amber-300 text-amber-900 py-6 text-base font-bold shadow-lg">

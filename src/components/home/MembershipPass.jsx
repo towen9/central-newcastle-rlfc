@@ -99,8 +99,8 @@ export default function MembershipPass({ membership, user, onShowQR }) {
             {isActive ? (
               <TierBadge tierName={tierName} />
             ) : (
-              <div className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-400/20 text-red-300">
-                {membership?.status?.toUpperCase() || 'NO MEMBERSHIP'}
+              <div className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.85)' }}>
+                Not a member yet
               </div>
             )}
             <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
