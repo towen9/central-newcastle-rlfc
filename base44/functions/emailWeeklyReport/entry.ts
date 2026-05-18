@@ -42,7 +42,7 @@ function sydneyMidnightToUTC(year, month, day) {
   const pad = (n) => String(n).padStart(2, '0');
   const localStr = `${year}-${pad(month)}-${pad(day)}`;
   for (const offsetHours of [10, 11]) {
-    const tryUTC = new Date(`${localStr}T00:00:00+0${offsetHours}:00`);
+    const tryUTC = new Date(`${localStr}T00:00:00+${String(offsetHours).padStart(2,'0')}:00`);
     const verify = getSydneyTime(tryUTC);
     if (verify.year === year && verify.month === month && verify.day === day && verify.hour === 0) {
       return tryUTC;

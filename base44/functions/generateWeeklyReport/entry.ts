@@ -46,7 +46,7 @@ function sydneyMidnightToUTC(year, month, day) {
     // Actually: Sydney local = UTC + offset => UTC = Sydney local - offset
     const check = getSydneyTime(new Date(Date.UTC(year, 0, 1))); // just init
     // Use simpler reliable method: construct as ISO and let Intl verify
-    const tryUTC = new Date(`${localStr}T00:00:00+0${offsetHours}:00`);
+    const tryUTC = new Date(`${localStr}T00:00:00+${String(offsetHours).padStart(2,'0')}:00`);
     const verify = getSydneyTime(tryUTC);
     if (verify.year === year && verify.month === month && verify.day === day && verify.hour === 0) {
       return tryUTC;
