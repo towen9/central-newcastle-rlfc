@@ -1,5 +1,15 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { format } from 'npm:date-fns';
+
+// Returns ISO week number for a given date
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+const FALLBACK_ADMIN_EMAIL = 'tyneowen@live.com';
 
 // TODO: extract to shared util when Deno supports local imports across functions.
 // Returns decomposed Sydney local time for any UTC Date — handles AEST/AEDT automatically.
@@ -68,6 +78,23 @@ function getSydneyWeekBounds(date = new Date()) {
   return { start: weekStart, end: weekEnd };
 }
 
+// Retry helper — attempts fn up to maxAttempts times with delayMs between each
+async function withRetry(fn, maxAttempts = 3, delayMs = 500) {
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      console.warn(`Attempt ${attempt}/${maxAttempts} failed: ${err.message}`);
+      if (attempt < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  throw lastError;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -80,7 +107,12 @@ Deno.serve(async (req) => {
     const lastWeekEnd = thisWeekStart;
 
     const filterByWindow = (items, dateField, start, end) =>
-      items.filter(i => { const d = new Date(i[dateField]); return d >= start && d < end; });
+      items.filter(i => {
+        const raw = i[dateField];
+        if (!raw) return false;
+        const d = new Date(raw);
+        return !isNaN(d.getTime()) && d >= start && d < end;
+      });
 
     // Fetch all data using service role (no auth required)
     const [allMemberships, allCheckins, allOfferRedemptions, allTransactions, allOffers, admins] = await Promise.all([
@@ -89,13 +121,13 @@ Deno.serve(async (req) => {
       base44.asServiceRole.entities.OfferRedemption.list('-timestamp', 1000),
       base44.asServiceRole.entities.Transaction.list('-timestamp', 1000),
       base44.asServiceRole.entities.Offer.filter({ is_active: true }),
-      base44.asServiceRole.entities.User.filter({ role: 'admin' })
+      withRetry(() => base44.asServiceRole.entities.User.filter({ role: 'admin' }))
     ]);
 
-    const adminEmails = admins.map(a => a.email).filter(Boolean);
+    let adminEmails = admins.map(a => a.email).filter(Boolean);
     if (adminEmails.length === 0) {
-      console.error('No admin emails found');
-      return Response.json({ success: false, error: 'No admin emails found' });
+      console.warn(`Admin query returned empty — falling back to hardcoded admin: ${FALLBACK_ADMIN_EMAIL}`);
+      adminEmails = [FALLBACK_ADMIN_EMAIL];
     }
 
     const thisWeekCheckins = filterByWindow(allCheckins, 'timestamp', thisWeekStart, thisWeekEnd);
@@ -170,7 +202,7 @@ Deno.serve(async (req) => {
 <body>
   <div class="header">
     <h1>📊 Central Newcastle RLFC</h1>
-    <p>Weekly Performance Report — Week ${format(now, 'w')}, ${format(now, 'yyyy')}</p>
+    <p>Weekly Performance Report — Week ${getISOWeek(now)}, ${now.getUTCFullYear()}</p>
     <p>${periodLabel}</p>
   </div>
   <div class="content">
@@ -219,7 +251,7 @@ Deno.serve(async (req) => {
     await Promise.all(adminEmails.map(email =>
       base44.asServiceRole.integrations.Core.SendEmail({
         to: email,
-        subject: `📊 Weekly Report — Week ${format(now, 'w')}: ${thisWeekSignups.length} new sign-ups, ${thisWeekCheckins.length} check-ins`,
+        subject: `📊 Weekly Report — Week ${getISOWeek(now)}: ${thisWeekSignups.length} new sign-ups, ${thisWeekCheckins.length} check-ins`,
         body: emailHTML
       })
     ));

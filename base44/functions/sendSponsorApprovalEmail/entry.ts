@@ -5,9 +5,25 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const { membership_id } = await req.json();
 
+    if (!membership_id) {
+      return Response.json({ error: 'membership_id is required' }, { status: 400 });
+    }
+
     const membership = await base44.asServiceRole.entities.Membership.get(membership_id);
     if (!membership) {
       return Response.json({ error: 'Membership not found' }, { status: 404 });
+    }
+
+    // Guard: only send if Sponsor Season Pass and active
+    if (membership.tier_name !== 'Sponsor Season Pass' || membership.status !== 'active') {
+      console.log(`Skipping: membership ${membership_id} is tier=${membership.tier_name} status=${membership.status}`);
+      return Response.json({ skipped: true, reason: 'membership not eligible' });
+    }
+
+    // Guard: dedup — only send once
+    if (membership.approval_email_sent_at) {
+      console.log(`Skipping: approval email already sent at ${membership.approval_email_sent_at} for membership ${membership_id}`);
+      return Response.json({ skipped: true, reason: 'approval email already sent' });
     }
 
     const toEmail = membership.user_email;
@@ -59,8 +75,13 @@ Deno.serve(async (req) => {
       `.trim()
     });
 
+    // Mark as sent — dedup guard for future triggers
+    await base44.asServiceRole.entities.Membership.update(membership_id, {
+      approval_email_sent_at: new Date().toISOString()
+    });
+
     console.log(`Sponsor approval email sent to ${toEmail} for membership ${membership_id}`);
-    return Response.json({ success: true });
+    return Response.json({ success: true, sent_to: toEmail });
   } catch (error) {
     console.error('Sponsor approval email error:', error);
     return Response.json({ error: error.message }, { status: 500 });
