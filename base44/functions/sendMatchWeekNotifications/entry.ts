@@ -103,78 +103,80 @@ Deno.serve(async (req) => {
 
     console.log(`sendMatchWeekNotifications: now=${now.toISOString()} Sydney=${sydNow.weekday} ${sydNow.hour}:${String(sydNow.minute).padStart(2,'0')}`);
 
-    // Load all upcoming fixtures
-    const upcomingFixtures = await sb.entities.Fixture.filter({ status: 'upcoming' });
+    // Load all scheduled fixtures
+    const upcomingFixtures = await sb.entities.Fixture.filter({ match_status: 'scheduled' });
 
     if (upcomingFixtures.length === 0) {
-      return Response.json({ success: true, message: 'No upcoming fixtures' });
+      return Response.json({ success: true, message: 'No scheduled fixtures' });
     }
 
-    // Sort ascending, pick the soonest
+    // Sort ascending — evaluate ALL qualifying fixtures
     upcomingFixtures.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
-    const nextMatch = upcomingFixtures[0];
-    const kickoff = new Date(nextMatch.date_time);
-    const hoursUntilKickoff = (kickoff - now) / (1000 * 60 * 60);
-    const daysUntilKickoff = hoursUntilKickoff / 24;
 
-    const opponent = nextMatch.opponent_name || nextMatch.opponent || 'the opposition';
-    const kickoffTimeStr = formatSydneyTime(kickoff);
-    const kickoffDay = getSydneyWeekday(kickoff); // e.g. "Sunday"
+    const results = [];
 
-    let fired = null;
+    for (const fixture of upcomingFixtures) {
+      const kickoff = new Date(fixture.date_time);
+      const hoursUntilKickoff = (kickoff - now) / (1000 * 60 * 60);
+      const daysUntilKickoff = hoursUntilKickoff / 24;
 
-    // --- WEDNESDAY PREVIEW ---
-    // Sydney weekday Wed, hour 18-18:59, fixture in 2–6 days, not already sent
-    if (
-      sydNow.weekday === 'Wed' &&
-      sydNow.hour === 18 &&
-      daysUntilKickoff >= 2 && daysUntilKickoff <= 6 &&
-      !nextMatch.wednesday_preview_sent_at
-    ) {
-      const title = `Game day this ${kickoffDay}`;
-      const body = `Central v ${opponent} at St John, ${kickoffTimeStr}. Loaded into your app. 🐂`;
-      const result = await sendPushToAll(sb, title, body);
-      await sb.entities.Fixture.update(nextMatch.id, { wednesday_preview_sent_at: now.toISOString() });
-      console.log(`Wednesday preview sent: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
-      fired = { type: 'wednesday_preview', ...result, title, fixture: opponent };
+      // Skip fixtures in the past
+      if (hoursUntilKickoff < -1) continue;
+
+      const opponent = fixture.opponent_name || fixture.opponent || 'the opposition';
+      const kickoffTimeStr = formatSydneyTime(kickoff);
+      const kickoffDay = getSydneyWeekday(kickoff);
+
+      // --- WEDNESDAY PREVIEW ---
+      if (
+        sydNow.weekday === 'Wed' &&
+        sydNow.hour === 18 &&
+        daysUntilKickoff >= 2 && daysUntilKickoff <= 6 &&
+        !fixture.wednesday_preview_sent_at
+      ) {
+        const title = `Game day this ${kickoffDay}`;
+        const body = `Central v ${opponent} at St John, ${kickoffTimeStr}. Loaded into your app. 🐂`;
+        const result = await sendPushToAll(sb, title, body);
+        await sb.entities.Fixture.update(fixture.id, { wednesday_preview_sent_at: now.toISOString() });
+        console.log(`Wednesday preview sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
+        results.push({ type: 'wednesday_preview', ...result, title, fixture: opponent });
+      }
+
+      // --- FRIDAY REMINDER ---
+      else if (
+        sydNow.weekday === 'Fri' &&
+        sydNow.hour === 19 &&
+        daysUntilKickoff >= 0 && daysUntilKickoff <= 3 &&
+        !fixture.friday_reminder_sent_at
+      ) {
+        const title = '48 hours to game day';
+        const body = `Boys take on ${opponent} this ${kickoffDay} at St John. Members get in free with their digital pass. See you there. 🐂`;
+        const result = await sendPushToAll(sb, title, body);
+        await sb.entities.Fixture.update(fixture.id, { friday_reminder_sent_at: now.toISOString() });
+        console.log(`Friday reminder sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
+        results.push({ type: 'friday_reminder', ...result, title, fixture: opponent });
+      }
+
+      // --- MATCHDAY 2HR ALERT ---
+      else if (
+        hoursUntilKickoff >= 1.5 && hoursUntilKickoff <= 2.5 &&
+        !fixture.matchday_alert_sent_at
+      ) {
+        const title = 'Game day at St John';
+        const body = `Kick-off in 2 hours. Central v ${opponent}. Digital pass ready in your app. Get loud. 🐂`;
+        const result = await sendPushToAll(sb, title, body);
+        await sb.entities.Fixture.update(fixture.id, { matchday_alert_sent_at: now.toISOString() });
+        console.log(`Matchday alert sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
+        results.push({ type: 'matchday_alert', ...result, title, fixture: opponent });
+      }
     }
 
-    // --- FRIDAY REMINDER ---
-    // Sydney weekday Fri, hour 19-19:59, fixture in 0–3 days, not already sent
-    else if (
-      sydNow.weekday === 'Fri' &&
-      sydNow.hour === 19 &&
-      daysUntilKickoff >= 0 && daysUntilKickoff <= 3 &&
-      !nextMatch.friday_reminder_sent_at
-    ) {
-      const title = '48 hours to game day';
-      const body = `Boys take on ${opponent} this ${kickoffDay} at St John. Members get in free with their digital pass. See you there. 🐂`;
-      const result = await sendPushToAll(sb, title, body);
-      await sb.entities.Fixture.update(nextMatch.id, { friday_reminder_sent_at: now.toISOString() });
-      console.log(`Friday reminder sent: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
-      fired = { type: 'friday_reminder', ...result, title, fixture: opponent };
-    }
-
-    // --- MATCHDAY 2HR ALERT ---
-    // Kickoff is 1.5–2.5 hours away (tolerant window for 6h cron), not already sent
-    else if (
-      hoursUntilKickoff >= 1.5 && hoursUntilKickoff <= 2.5 &&
-      !nextMatch.matchday_alert_sent_at
-    ) {
-      const title = 'Game day at St John';
-      const body = `Kick-off in 2 hours. Central v ${opponent}. Digital pass ready in your app. Get loud. 🐂`;
-      const result = await sendPushToAll(sb, title, body);
-      await sb.entities.Fixture.update(nextMatch.id, { matchday_alert_sent_at: now.toISOString() });
-      console.log(`Matchday alert sent: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
-      fired = { type: 'matchday_alert', ...result, title, fixture: opponent };
-    }
-
-    if (!fired) {
+    if (results.length === 0) {
       console.log('sendMatchWeekNotifications: no window matched, nothing sent');
-      return Response.json({ success: true, message: 'No notifications scheduled at this time', sydney: sydNow, hoursUntilKickoff: Math.round(hoursUntilKickoff * 10) / 10 });
+      return Response.json({ success: true, message: 'No notifications scheduled at this time', sydney: sydNow });
     }
 
-    return Response.json({ success: true, ...fired });
+    return Response.json({ success: true, fired: results, count: results.length });
 
   } catch (error) {
     console.error('Match week notification error:', error);
