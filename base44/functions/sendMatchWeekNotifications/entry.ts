@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
       // Skip fixtures in the past
       if (hoursUntilKickoff < -1) continue;
 
-      const opponent = fixture.opponent_name || fixture.opponent || 'the opposition';
+      const opponent = (fixture.opponent_name || fixture.opponent || 'the opposition').replace(/\s*DEC\s*$/i, '').trim();
       const venue = fixture.venue || 'St John Oval';
       const kickoffTimeStr = formatSydneyTime(kickoff);
       const kickoffDay = getSydneyWeekday(kickoff);
