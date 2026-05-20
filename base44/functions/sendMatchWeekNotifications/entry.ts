@@ -103,8 +103,8 @@ Deno.serve(async (req) => {
 
     console.log(`sendMatchWeekNotifications: now=${now.toISOString()} Sydney=${sydNow.weekday} ${sydNow.hour}:${String(sydNow.minute).padStart(2,'0')}`);
 
-    // Load scheduled men's fixtures only — women's fixtures do not trigger the push cadence
-    const upcomingFixtures = await sb.entities.Fixture.filter({ match_status: 'scheduled', division: 'mens' });
+    // Load scheduled DEC (first grade) men's fixtures only — women's and other grades do not trigger the push cadence
+    const upcomingFixtures = await sb.entities.Fixture.filter({ match_status: 'scheduled', division: 'mens', team_grade: 'DEC' });
 
     if (upcomingFixtures.length === 0) {
       return Response.json({ success: true, message: 'No scheduled fixtures' });
