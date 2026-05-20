@@ -127,6 +127,7 @@ Deno.serve(async (req) => {
       const venue = fixture.venue || 'St John Oval';
       const kickoffTimeStr = formatSydneyTime(kickoff);
       const kickoffDay = getSydneyWeekday(kickoff);
+      const isHome = fixture.fixture_type === 'home';
 
       // --- WEDNESDAY PREVIEW ---
       if (
@@ -136,10 +137,12 @@ Deno.serve(async (req) => {
         !fixture.wednesday_preview_sent_at
       ) {
         const title = `Game day this ${kickoffDay}`;
-        const body = `Central v ${opponent} at ${venue}, ${kickoffTimeStr}. Loaded into your app. 🐂`;
+        const body = isHome
+          ? `Central v ${opponent} at ${venue}, ${kickoffTimeStr}. Members get in free with their digital pass. Loaded into your app. 🐂`
+          : `Boys travel to ${venue} this ${kickoffDay}, ${kickoffTimeStr} to take on ${opponent}. Cheer the team on — follow live updates in the app. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { wednesday_preview_sent_at: now.toISOString() });
-        console.log(`Wednesday preview sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
+        console.log(`Wednesday preview sent for ${opponent} (${isHome ? 'home' : 'away'}): "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
         results.push({ type: 'wednesday_preview', ...result, title, fixture: opponent });
       }
 
@@ -151,10 +154,12 @@ Deno.serve(async (req) => {
         !fixture.friday_reminder_sent_at
       ) {
         const title = '48 hours to game day';
-        const body = `Boys take on ${opponent} this ${kickoffDay} at ${venue}. Members get in free with their digital pass. See you there. 🐂`;
+        const body = isHome
+          ? `Boys take on ${opponent} this ${kickoffDay} at ${venue}. Members get in free with their digital pass. See you there. 🐂`
+          : `Boys travel to ${venue} this ${kickoffDay} to take on ${opponent}. Cheer the team on — follow live updates in the app. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { friday_reminder_sent_at: now.toISOString() });
-        console.log(`Friday reminder sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
+        console.log(`Friday reminder sent for ${opponent} (${isHome ? 'home' : 'away'}): "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
         results.push({ type: 'friday_reminder', ...result, title, fixture: opponent });
       }
 
@@ -163,11 +168,13 @@ Deno.serve(async (req) => {
         hoursUntilKickoff >= 1.5 && hoursUntilKickoff <= 2.5 &&
         !fixture.matchday_alert_sent_at
       ) {
-        const title = `Game day at ${venue}`;
-        const body = `Kick-off in 2 hours. Central v ${opponent} at ${venue}. Digital pass ready in your app. Get loud. 🐂`;
+        const title = isHome ? `Game day at ${venue}` : `Game day in 2 hours`;
+        const body = isHome
+          ? `Kick-off in 2 hours. Central v ${opponent} at ${venue}. Digital pass ready in your app. Get loud. 🐂`
+          : `Boys kick off in 2 hours away at ${venue} vs ${opponent}. Follow the score live in the app. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { matchday_alert_sent_at: now.toISOString() });
-        console.log(`Matchday alert sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
+        console.log(`Matchday alert sent for ${opponent} (${isHome ? 'home' : 'away'}): "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
         results.push({ type: 'matchday_alert', ...result, title, fixture: opponent });
       }
     }
