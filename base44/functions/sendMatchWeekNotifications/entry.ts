@@ -124,6 +124,7 @@ Deno.serve(async (req) => {
       if (hoursUntilKickoff < -1) continue;
 
       const opponent = fixture.opponent_name || fixture.opponent || 'the opposition';
+      const venue = fixture.venue || 'St John Oval';
       const kickoffTimeStr = formatSydneyTime(kickoff);
       const kickoffDay = getSydneyWeekday(kickoff);
 
@@ -135,7 +136,7 @@ Deno.serve(async (req) => {
         !fixture.wednesday_preview_sent_at
       ) {
         const title = `Game day this ${kickoffDay}`;
-        const body = `Central v ${opponent} at St John, ${kickoffTimeStr}. Loaded into your app. 🐂`;
+        const body = `Central v ${opponent} at ${venue}, ${kickoffTimeStr}. Loaded into your app. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { wednesday_preview_sent_at: now.toISOString() });
         console.log(`Wednesday preview sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
@@ -150,7 +151,7 @@ Deno.serve(async (req) => {
         !fixture.friday_reminder_sent_at
       ) {
         const title = '48 hours to game day';
-        const body = `Boys take on ${opponent} this ${kickoffDay} at St John. Members get in free with their digital pass. See you there. 🐂`;
+        const body = `Boys take on ${opponent} this ${kickoffDay} at ${venue}. Members get in free with their digital pass. See you there. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { friday_reminder_sent_at: now.toISOString() });
         console.log(`Friday reminder sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
@@ -162,8 +163,8 @@ Deno.serve(async (req) => {
         hoursUntilKickoff >= 1.5 && hoursUntilKickoff <= 2.5 &&
         !fixture.matchday_alert_sent_at
       ) {
-        const title = 'Game day at St John';
-        const body = `Kick-off in 2 hours. Central v ${opponent}. Digital pass ready in your app. Get loud. 🐂`;
+        const title = `Game day at ${venue}`;
+        const body = `Kick-off in 2 hours. Central v ${opponent} at ${venue}. Digital pass ready in your app. Get loud. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { matchday_alert_sent_at: now.toISOString() });
         console.log(`Matchday alert sent for ${opponent}: "${title}" → ${result.successCount} delivered, ${result.failCount} failed`);
