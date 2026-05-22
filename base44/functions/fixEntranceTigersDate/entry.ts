@@ -1,5 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// One-off admin utility: fix fixture dates and statuses.
+// Kept for audit trail — safe to run again (idempotent).
 Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -7,41 +9,41 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Find the Round 6 DEC fixture
-    const fixtures = await base44.asServiceRole.entities.Fixture.filter({
-        round_number: 6,
-        division: 'mens',
-        team_grade: 'DEC'
+    const results = {};
+
+    // 1. Ensure Round 6 men's DEC fixture has the correct date
+    const mensDEC = await base44.asServiceRole.entities.Fixture.filter({
+        round_number: 6, division: 'mens', team_grade: 'DEC'
     });
-
-    const fixture = fixtures.find(f => f.opponent && f.opponent.includes('Entrance Tigers'));
-
-    if (!fixture) {
-        return Response.json({ error: 'Fixture not found' }, { status: 404 });
+    const r6 = mensDEC.find(f => f.opponent && f.opponent.includes('Entrance Tigers'));
+    if (r6) {
+        await base44.asServiceRole.entities.Fixture.update(r6.id, {
+            date_time: '2026-05-23T04:00:00Z'
+        });
+        results.round6_date = '2026-05-23T04:00:00Z';
+        results.round6_id = r6.id;
     }
 
-    // Update ONLY date_time — nothing else
-    await base44.asServiceRole.entities.Fixture.update(fixture.id, {
-        date_time: '2026-05-23T04:00:00Z'
+    // 2. Mark this week's women's Wests WT fixture as postponed
+    const womensFixture = await base44.asServiceRole.entities.Fixture.filter({
+        division: 'womens', status: 'upcoming'
     });
+    // The fixture with wednesday_preview_sent_at set and date ~23 May
+    const westsWT = womensFixture.find(f => f.opponent === 'Wests WT' && f.wednesday_preview_sent_at);
+    if (westsWT) {
+        await base44.asServiceRole.entities.Fixture.update(westsWT.id, {
+            match_status: 'postponed'
+        });
+        results.womens_postponed = {
+            id: westsWT.id,
+            opponent: westsWT.opponent,
+            date_time: westsWT.date_time,
+            match_status: 'postponed',
+            wednesday_preview_sent_at: westsWT.wednesday_preview_sent_at,
+            friday_reminder_sent_at: westsWT.friday_reminder_sent_at ?? null,
+            matchday_alert_sent_at: westsWT.matchday_alert_sent_at ?? null
+        };
+    }
 
-    // Re-fetch to confirm final state
-    const updated = await base44.asServiceRole.entities.Fixture.filter({
-        round_number: 6,
-        division: 'mens',
-        team_grade: 'DEC'
-    });
-    const final = updated.find(f => f.opponent && f.opponent.includes('Entrance Tigers'));
-
-    // Current Sydney time
-    const nowSydney = new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney', hour12: false });
-
-    return Response.json({
-        confirmed_date_time: final.date_time,
-        wednesday_preview_sent_at: final.wednesday_preview_sent_at ?? null,
-        friday_reminder_sent_at: final.friday_reminder_sent_at ?? null,
-        matchday_alert_sent_at: final.matchday_alert_sent_at ?? null,
-        match_status: final.match_status,
-        current_sydney_time: nowSydney
-    });
+    return Response.json({ success: true, results });
 });

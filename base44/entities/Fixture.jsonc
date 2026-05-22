@@ -109,7 +109,8 @@
         "live_first_half",
         "half_time",
         "live_second_half",
-        "full_time"
+        "full_time",
+        "postponed"
       ],
       "default": "scheduled",
       "description": "Live match status (separate from fixture status)"

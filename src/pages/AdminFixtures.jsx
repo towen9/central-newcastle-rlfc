@@ -50,6 +50,7 @@ export default function AdminFixtures() {
   const [showResultModal, setShowResultModal] = useState(false);
   const [resultFixture, setResultFixture] = useState(null);
   const [results, setResults] = useState({ home: '', away: '' });
+  const [postponeConfirm, setPostponeConfirm] = useState(null); // fixture to confirm postpone/restore
   const queryClient = useQueryClient();
 
   const { data: fixtures = [] } = useQuery({
@@ -131,6 +132,13 @@ export default function AdminFixtures() {
     postponed: 'bg-purple-100 text-purple-700'
   };
 
+  const matchStatusBadge = (fixture) => {
+    if (fixture.match_status === 'postponed') {
+      return <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Postponed</span>;
+    }
+    return null;
+  };
+
   return (
     <AdminLayout title="Fixtures" currentPage="AdminFixtures">
       <div className="flex justify-between items-center mb-6">
@@ -160,8 +168,9 @@ export default function AdminFixtures() {
               <tr key={fixture.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-gray-900 flex items-center flex-wrap">
                       Central Newcastle vs {fixture.opponent}
+                      {matchStatusBadge(fixture)}
                     </p>
                     <p className="text-sm text-gray-500">
                       {fixture.team_grade} • {fixture.competition}
@@ -212,21 +221,24 @@ export default function AdminFixtures() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => openEdit(fixture)}>
-                        <Edit2 className="w-4 h-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => openResultModal(fixture)}>
-                        <Trophy className="w-4 h-4 mr-2" />
-                        Enter Result
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => deleteMutation.mutate(fixture.id)}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => openEdit(fixture)}>
+                       <Edit2 className="w-4 h-4 mr-2" />
+                       Edit
+                     </DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => openResultModal(fixture)}>
+                       <Trophy className="w-4 h-4 mr-2" />
+                       Enter Result
+                     </DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => setPostponeConfirm(fixture)}>
+                       {fixture.match_status === 'postponed' ? '✅ Restore to Scheduled' : '⏸ Mark Postponed'}
+                     </DropdownMenuItem>
+                     <DropdownMenuItem 
+                       onClick={() => deleteMutation.mutate(fixture.id)}
+                       className="text-red-600"
+                     >
+                       <Trash2 className="w-4 h-4 mr-2" />
+                       Delete
+                     </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </td>
@@ -380,6 +392,44 @@ export default function AdminFixtures() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Postpone Confirm Dialog */}
+      <Dialog open={!!postponeConfirm} onOpenChange={() => setPostponeConfirm(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {postponeConfirm?.match_status === 'postponed' ? 'Restore Fixture' : 'Mark Postponed'}
+            </DialogTitle>
+          </DialogHeader>
+          {postponeConfirm && (
+            <div className="space-y-4">
+              <p className="text-gray-600">
+                {postponeConfirm.match_status === 'postponed'
+                  ? `Restore "${postponeConfirm.opponent}" to scheduled?`
+                  : `Mark "${postponeConfirm.opponent}" as postponed?`}
+              </p>
+              <p className="text-sm text-gray-500">
+                {postponeConfirm.match_status === 'postponed'
+                  ? 'match_status will be set back to "scheduled". Dedup fields are not reset.'
+                  : 'match_status will be set to "postponed". No pushes will fire and autoComplete will skip it. Dedup fields are not touched.'}
+              </p>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={() => setPostponeConfirm(null)} className="flex-1">Cancel</Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => {
+                    const newStatus = postponeConfirm.match_status === 'postponed' ? 'scheduled' : 'postponed';
+                    updateMutation.mutate({ id: postponeConfirm.id, data: { match_status: newStatus } });
+                    setPostponeConfirm(null);
+                  }}
+                >
+                  {postponeConfirm.match_status === 'postponed' ? 'Restore' : 'Mark Postponed'}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 

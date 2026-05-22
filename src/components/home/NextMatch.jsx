@@ -10,7 +10,7 @@ export default function NextMatch() {
   const { data: fixtures = [] } = useQuery({
     queryKey: ['upcomingFixtures'],
     queryFn: async () => {
-      const all = await base44.entities.Fixture.filter({ status: 'upcoming' });
+      const all = await base44.entities.Fixture.filter({ match_status: 'scheduled', division: 'mens', team_grade: 'DEC' });
       return all.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
     },
     staleTime: 0,
@@ -19,7 +19,16 @@ export default function NextMatch() {
 
   const nextMatch = fixtures[0];
 
-  if (!nextMatch) return null;
+  if (!nextMatch) return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      <Card className="bg-gradient-to-br from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-white overflow-hidden relative">
+        <div className="relative p-4 flex items-center gap-3">
+          <Trophy className="w-5 h-5 opacity-60" />
+          <p className="text-sm opacity-80">No upcoming fixtures scheduled</p>
+        </div>
+      </Card>
+    </motion.div>
+  );
 
   const matchDate = new Date(nextMatch.date_time);
   const daysUntil = differenceInDays(matchDate, startOfToday());
