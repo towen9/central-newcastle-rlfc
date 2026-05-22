@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
         daysUntilKickoff >= 0 && daysUntilKickoff <= 3 &&
         !fixture.friday_reminder_sent_at
       ) {
-        const title = '48 hours to game day';
+        const title = 'Game day this weekend';
         const body = isHome
           ? `Boys take on ${opponent} this ${kickoffDay} at ${venue}. Members get in free with their digital pass. See you there. 🐂`
           : `Boys travel to ${venue} this ${kickoffDay} to take on ${opponent}. Cheer the team on — follow live updates in the app. 🐂`;
