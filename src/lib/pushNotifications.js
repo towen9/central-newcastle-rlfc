@@ -1,6 +1,6 @@
 import { base44 } from '@/api/base44Client';
 
-const VAPID_PUBLIC_KEY = 'BC02Y6zwim7MDGS6zSWDcibtuPhE7a2hA3mv4BfQVVi4FeFxM30701hOBN7IpHAVDMSvjV7XgkEO4exj5FcCo2Q';
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
 
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
