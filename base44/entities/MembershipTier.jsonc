@@ -1,0 +1,103 @@
+{
+  "name": "MembershipTier",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Tier name"
+    },
+    "price": {
+      "type": "number",
+      "description": "Annual price in dollars"
+    },
+    "price_period": {
+      "type": "string",
+      "enum": [
+        "season",
+        "year",
+        "lifetime"
+      ],
+      "default": "season"
+    },
+    "description": {
+      "type": "string"
+    },
+    "benefits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of included benefits"
+    },
+    "games_included": {
+      "type": "number",
+      "description": "Number of home games included. 0 = unlimited/season pass"
+    },
+    "merchandise_discount": {
+      "type": "number",
+      "description": "Merchandise discount percentage (e.g. 20 for 20%)"
+    },
+    "rewards_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this tier earns points/rewards"
+    },
+    "events_access": {
+      "type": "boolean",
+      "default": false,
+      "description": "Access to members-only events"
+    },
+    "hat_included": {
+      "type": "boolean",
+      "default": false,
+      "description": "Includes Premium Supporter Hat"
+    },
+    "family_passes": {
+      "type": "number",
+      "default": 1,
+      "description": "Number of digital passes issued (for family tiers)"
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "description": "Stripe price ID for this tier"
+    },
+    "max_family_members": {
+      "type": "number",
+      "description": "Max linked members for family tiers"
+    },
+    "is_admin_only": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "price"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

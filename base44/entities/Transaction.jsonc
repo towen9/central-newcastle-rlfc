@@ -1,0 +1,74 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "membership_id": {
+      "type": "string"
+    },
+    "member_name": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "description": "Bar, Canteen, Merchandise, etc."
+    },
+    "location_qr_id": {
+      "type": "string"
+    },
+    "item_description": {
+      "type": "string",
+      "description": "What was purchased"
+    },
+    "original_amount": {
+      "type": "number"
+    },
+    "discount_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "final_amount": {
+      "type": "number"
+    },
+    "discount_reason": {
+      "type": "string",
+      "description": "Member discount, promo, etc."
+    },
+    "stamps_awarded": {
+      "type": "number",
+      "default": 0
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hour_of_day": {
+      "type": "number",
+      "description": "0-23 for analytics"
+    },
+    "day_of_week": {
+      "type": "string"
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "food_drink",
+        "merchandise",
+        "tickets",
+        "other"
+      ],
+      "default": "food_drink"
+    },
+    "payment_method": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "membership_id",
+    "location",
+    "final_amount"
+  ]
+}

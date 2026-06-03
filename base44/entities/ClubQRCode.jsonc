@@ -1,0 +1,34 @@
+{
+  "name": "ClubQRCode",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "e.g., Clubhouse, Canteen, Bar"
+    },
+    "location": {
+      "type": "string"
+    },
+    "qr_id": {
+      "type": "string",
+      "description": "Unique identifier for this QR"
+    },
+    "qr_type": {
+      "type": "string",
+      "enum": [
+        "checkin",
+        "event",
+        "redemption"
+      ],
+      "default": "checkin"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "qr_id"
+  ]
+}

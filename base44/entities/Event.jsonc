@@ -1,0 +1,60 @@
+{
+  "name": "Event",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "social",
+        "fundraiser",
+        "training",
+        "presentation",
+        "community",
+        "other"
+      ],
+      "default": "social"
+    },
+    "date_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "venue": {
+      "type": "string"
+    },
+    "venue_address": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "registration_url": {
+      "type": "string"
+    },
+    "is_members_only": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "date_time"
+  ]
+}

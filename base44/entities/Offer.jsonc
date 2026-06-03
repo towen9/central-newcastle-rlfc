@@ -1,0 +1,90 @@
+{
+  "name": "Offer",
+  "type": "object",
+  "properties": {
+    "sponsor_id": {
+      "type": "string"
+    },
+    "sponsor_name": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "food_drink",
+        "fitness_health",
+        "retail",
+        "trades_services",
+        "family_kids",
+        "other"
+      ],
+      "default": "other"
+    },
+    "redemption_type": {
+      "type": "string",
+      "enum": [
+        "qr_scan",
+        "show_code",
+        "in_store"
+      ],
+      "default": "show_code"
+    },
+    "offer_code": {
+      "type": "string"
+    },
+    "terms": {
+      "type": "string"
+    },
+    "redemption_limit_per_member": {
+      "type": "number",
+      "description": "Max redemptions per member (0 = unlimited)"
+    },
+    "redemption_period": {
+      "type": "string",
+      "enum": [
+        "day",
+        "week",
+        "month",
+        "total"
+      ],
+      "default": "month"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "views_count": {
+      "type": "number",
+      "default": 0
+    },
+    "redemptions_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "sponsor_id",
+    "title"
+  ]
+}

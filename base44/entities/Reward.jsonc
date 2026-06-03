@@ -1,0 +1,77 @@
+{
+  "name": "Reward",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "points_required": {
+      "type": "number",
+      "description": "Points needed to redeem"
+    },
+    "stamps_required": {
+      "type": "number",
+      "description": "Legacy stamps system"
+    },
+    "reward_type": {
+      "type": "string",
+      "enum": [
+        "voucher",
+        "item",
+        "entry",
+        "discount",
+        "beer_mid",
+        "beer_full",
+        "merchandise",
+        "prize_draw"
+      ],
+      "default": "voucher"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "expiry_days": {
+      "type": "number",
+      "description": "Days until reward expires after unlock"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    },
+    "stock_available": {
+      "type": "number",
+      "description": "Remaining quantity, null = unlimited"
+    }
+  },
+  "required": [
+    "title",
+    "points_required"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "data.is_active": true
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

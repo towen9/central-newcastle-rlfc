@@ -1,0 +1,69 @@
+{
+  "name": "LocationDiscount",
+  "type": "object",
+  "properties": {
+    "location": {
+      "type": "string",
+      "description": "Bar, Canteen, Merchandise"
+    },
+    "location_qr_id": {
+      "type": "string",
+      "description": "Links to ClubQRCode"
+    },
+    "discount_type": {
+      "type": "string",
+      "enum": [
+        "percentage",
+        "fixed_amount"
+      ],
+      "default": "percentage"
+    },
+    "discount_value": {
+      "type": "number",
+      "description": "10 for 10% or 5 for $5 off"
+    },
+    "minimum_purchase": {
+      "type": "number",
+      "default": 0
+    },
+    "stamps_per_purchase": {
+      "type": "number",
+      "default": 1,
+      "description": "Stamps awarded per transaction"
+    },
+    "stamps_threshold": {
+      "type": "number",
+      "description": "Stamps needed for free item (e.g., 10 drinks = 1 free)"
+    },
+    "applicable_tiers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Which membership tiers get this discount"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "valid_days": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Days of week when active"
+    },
+    "valid_hours_start": {
+      "type": "string",
+      "description": "HH:mm format"
+    },
+    "valid_hours_end": {
+      "type": "string",
+      "description": "HH:mm format"
+    }
+  },
+  "required": [
+    "location",
+    "discount_value"
+  ]
+}

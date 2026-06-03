@@ -1,0 +1,35 @@
+{
+  "name": "OfferRedemption",
+  "type": "object",
+  "properties": {
+    "offer_id": {
+      "type": "string"
+    },
+    "offer_title": {
+      "type": "string"
+    },
+    "sponsor_id": {
+      "type": "string"
+    },
+    "sponsor_name": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "membership_id": {
+      "type": "string"
+    },
+    "redemption_code": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "offer_id",
+    "user_id"
+  ]
+}

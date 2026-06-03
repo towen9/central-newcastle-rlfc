@@ -1,0 +1,48 @@
+{
+  "name": "PointsTransaction",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "membership_id": {
+      "type": "string"
+    },
+    "points": {
+      "type": "number",
+      "description": "Positive for earning, negative for spending"
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "attendance",
+        "bar_purchase",
+        "leagues_club",
+        "redemption",
+        "bonus",
+        "admin_adjustment"
+      ],
+      "default": "attendance"
+    },
+    "description": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "related_id": {
+      "type": "string",
+      "description": "Link to CheckIn, Transaction, or Reward redemption"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_id",
+    "membership_id",
+    "points",
+    "transaction_type"
+  ]
+}

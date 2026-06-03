@@ -1,0 +1,63 @@
+{
+  "name": "MonitoringAlert",
+  "type": "object",
+  "properties": {
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "technical",
+        "financial",
+        "engagement"
+      ],
+      "description": "Category of alert"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "title": {
+      "type": "string",
+      "description": "Alert headline"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed explanation"
+    },
+    "metric_value": {
+      "type": "string",
+      "description": "Current metric value"
+    },
+    "threshold_value": {
+      "type": "string",
+      "description": "Expected threshold"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "resolved",
+        "acknowledged"
+      ],
+      "default": "active"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notified_admins": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "alert_type",
+    "title",
+    "description"
+  ]
+}
