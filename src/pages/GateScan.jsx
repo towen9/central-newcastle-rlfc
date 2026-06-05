@@ -150,8 +150,15 @@ export default function GateScan() {
         setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2500);
       }
     } catch (err) {
-      toast.error('Scan failed: ' + err.message);
-      setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2000);
+      const isOffline = !navigator.onLine || err.message?.toLowerCase().includes('network') || err.message?.toLowerCase().includes('fetch');
+      if (isOffline) {
+        toast.error('⚠️ No internet connection. Check your network and try again.');
+        // Don't auto-restart on network errors — wait for staff to tap manually
+        isProcessingRef.current = false;
+      } else {
+        toast.error('Scan failed: ' + err.message);
+        setTimeout(() => { isProcessingRef.current = false; startScanningRef.current?.(); }, 2000);
+      }
     }
   };
 

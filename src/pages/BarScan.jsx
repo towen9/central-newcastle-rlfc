@@ -119,25 +119,7 @@ export default function BarScan() {
       if (data.type === 'success' || data.type === 'bar_success') {
         setResult({ success: true, message: `${data.pointsEarned || 5} points awarded!`, memberName: data.name || data.memberName, newBalance: data.newBalance });
       } else {
-        // Fallback: direct entity write if backend doesn't handle bar scans
-        const membership = await base44.entities.Membership.filter({ qr_code_id: qrData, status: 'active' });
-        if (!membership || membership.length === 0) {
-          setResult({ success: false, message: 'Invalid membership' });
-          return;
-        }
-        const member = membership[0];
-        const pointsEarned = 5;
-        await base44.entities.Membership.update(member.id, { points: (member.points || 0) + pointsEarned });
-        await base44.entities.PointsTransaction.create({
-          user_id: member.user_id,
-          membership_id: member.id,
-          points: pointsEarned,
-          transaction_type: 'bar_purchase',
-          description: 'Alcohol purchase at bar',
-          location: 'Bar',
-          timestamp: new Date().toISOString()
-        });
-        setResult({ success: true, message: `${pointsEarned} points awarded!`, memberName: member.user_name, newBalance: (member.points || 0) + pointsEarned });
+        setResult({ success: false, message: data.detail || data.message || 'Entry denied' });
       }
     } catch (err) {
       setResult({ success: false, message: 'Error processing scan' });

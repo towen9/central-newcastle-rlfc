@@ -42,8 +42,9 @@ async function resolveDiscount(base44, membership) {
 
   if (PREMIUM_TIERS.some(t => tierName.includes(t))) {
     const prevPurchases = await base44.asServiceRole.entities.MerchTransaction.filter({ user_id: membership.user_id });
-    const isFirstPurchase = prevPurchases.length === 0;
-    return isFirstPurchase ? 20 : 10;
+    // First purchase = any previous MerchTransaction where a discount was applied
+    const hasUsedDiscount = prevPurchases.some(p => p.discount_pct > 0);
+    return hasUsedDiscount ? 10 : 20;
   }
 
   // No matching tier
@@ -83,6 +84,13 @@ Deno.serve(async (req) => {
       const m = memberships[0];
       const discountPct = await resolveDiscount(base44, m);
 
+      // discountUsed: true when a premium-tier member has already used their 20% this season
+      const isPremiumTier = PREMIUM_TIERS.some(t => (m.tier_name || '').includes(t));
+      let discountUsed = false;
+      if (isPremiumTier && discountPct < 20) {
+        discountUsed = true;
+      }
+
       return Response.json({
         type: 'member_found',
         memberId: m.id,
@@ -90,6 +98,7 @@ Deno.serve(async (req) => {
         memberName: m.user_name,
         tierName: m.tier_name,
         discountPct,
+        discountUsed,
         points: m.points || 0
       });
     }

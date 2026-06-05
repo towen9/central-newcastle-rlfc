@@ -68,13 +68,14 @@ Deno.serve(async (req) => {
     }
 
     const isSupporter = membership.tier_name?.includes('Supporter Pack');
-    const isFamilyOrPremium = membership.tier_name?.includes('Family') || membership.tier_name?.includes('Premium');
+    // Award points to Family, Premium, and Old Butchers members
+    const isFamilyOrPremium = membership.tier_name?.includes('Family') || membership.tier_name?.includes('Premium') || membership.tier_name?.includes('Old Butchers');
 
     // Block Supporter Pack if no games remaining
     if (isSupporter) {
       const remaining = membership.games_remaining ?? 5;
       if (remaining <= 0) {
-        return Response.json({ type: 'error', detail: 'All 5 game entries used for this Supporter Pack', name: membership.user_name });
+        return Response.json({ type: 'error', detail: 'All game entries used for this Supporter Pack', name: membership.user_name });
       }
     }
 

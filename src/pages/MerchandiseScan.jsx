@@ -176,7 +176,7 @@ export default function MerchandiseScan() {
         <div className="bg-white/10 rounded-2xl p-5 w-full max-w-xs space-y-2 text-center">
           <p className="text-emerald-100 text-sm">{result.tierName}</p>
           <div className="flex justify-between text-white"><span>Original</span><span>${result.original?.toFixed(2)}</span></div>
-          {result.discountApplied && (
+          {result.discountPct > 0 && (
             <div className="flex justify-between text-emerald-200"><span>Discount ({result.discountPct}%)</span><span>-${result.discountAmt?.toFixed(2)}</span></div>
           )}
           <div className="flex justify-between text-white font-bold border-t border-white/20 pt-2"><span>Final</span><span>${result.finalAmt?.toFixed(2)}</span></div>
@@ -244,12 +244,11 @@ export default function MerchandiseScan() {
               <Camera className="w-6 h-6 mr-3" />Scan Member QR Code
             </Button>
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
-              <p className="font-semibold mb-1">✅ Eligible for 10% discount:</p>
-              <p>• Premium Membership</p>
-              <p>• Old Butchers Membership</p>
-              <p>• Sponsor Season Pass</p>
-              <p className="mt-2 text-orange-600 font-medium">⚠️ One use per season per member</p>
-              <p className="mt-1 text-blue-500">Supporter Pack & Day Pass — no discount</p>
+              <p className="font-semibold mb-1">✅ Merch discounts:</p>
+              <p>• Premium / Old Butchers / Sponsor — <strong>20% first order</strong>, then 10%</p>
+              <p>• Supporter Pack / Family — <strong>10% always</strong></p>
+              <p className="mt-2 text-orange-600 font-medium">⚠️ 20% is one-use per season — backend enforced</p>
+              <p className="mt-1 text-blue-500">Day Pass — no discount</p>
             </div>
           </>
         )}
