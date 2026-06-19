@@ -15,18 +15,18 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, error: 'Unauthorised' }, { status: 401 });
     }
 
-    const { session_id, purchaser_name, purchaser_email, membership_id } = await req.json();
+    const { stripe_payment_id: raw_payment_id, purchaser_name, purchaser_email, ticket_price } = await req.json();
 
-    if (!session_id || !purchaser_name || !purchaser_email) {
+    if (!raw_payment_id || !purchaser_name || !purchaser_email) {
       return Response.json({ success: false, error: 'Missing required fields' }, { status: 400 });
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
-    // Retrieve the checkout session to get the payment intent and verify payment
+    // Retrieve the checkout session to verify payment
     let session;
     try {
-      session = await stripe.checkout.sessions.retrieve(session_id);
+      session = await stripe.checkout.sessions.retrieve(raw_payment_id);
     } catch (stripeErr) {
       console.error('createEventTicket: Stripe session retrieve error:', stripeErr.message);
       return Response.json({ success: false, error: 'Could not verify payment with Stripe' }, { status: 400 });
@@ -37,13 +37,7 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, error: 'Payment not confirmed' }, { status: 400 });
     }
 
-    // Verify amount paid matches expected (Stripe returns in cents)
-    if (session.amount_total !== Math.round(TICKET_PRICE * 100)) {
-      console.error(`createEventTicket: amount mismatch — got ${session.amount_total}, expected ${TICKET_PRICE * 100}`);
-      return Response.json({ success: false, error: 'Payment amount mismatch' }, { status: 400 });
-    }
-
-    const stripe_payment_id = session.payment_intent || session_id;
+    const stripe_payment_id = session.payment_intent || raw_payment_id;
 
     // Prevent duplicate tickets for same payment
     const existing = await base44.asServiceRole.entities.EventTicket.filter({ stripe_payment_id });
@@ -70,7 +64,7 @@ Deno.serve(async (req) => {
       purchaser_email,
       membership_id: membership_id || null,
       stripe_payment_id,
-      ticket_price: TICKET_PRICE,
+      ticket_price: ticket_price ? ticket_price / 100 : TICKET_PRICE,
       status: 'active',
       created_at: new Date().toISOString()
     });

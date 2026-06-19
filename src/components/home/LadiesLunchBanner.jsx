@@ -17,7 +17,7 @@ export default function LadiesLunchBanner({ onDismiss }) {
           Ladies Long Lunch
         </span>
         <p className="text-blue-200 text-sm mb-1">Saturday 1 August · Part of Old Butchers Day</p>
-        <p className="text-white/60 text-xs mb-4">Fully catered · Free drinks · Limited tickets</p>
+        <p className="text-white/60 text-xs mb-4">Fully catered · Free drinks · Limited tickets · A$90</p>
         <Link to="/EventTicket">
           <button className="w-full bg-pink-500 hover:bg-pink-400 text-white py-3.5 rounded-lg text-sm font-bold shadow-lg transition-colors">
             Buy Tickets →

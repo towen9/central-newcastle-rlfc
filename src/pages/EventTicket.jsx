@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import { Ticket, Calendar, MapPin, Check, Loader2, ArrowLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
-
+const TICKET_PRICE_ID = 'price_1TjqdoLsW4v58VGVk0YiI9PK';
+const TICKET_PRICE_DISPLAY = 'A$90';
+const TICKET_PRICE_AMOUNT = 9000;
 const TICKET_PRICE = 90;
 const EVENT_NAME = 'Ladies Long Lunch — Old Butchers Day 2026';
 const EVENT_DATE = 'Saturday 1 August 2026';
@@ -16,6 +17,7 @@ export default function EventTicket() {
   const [step, setStep] = useState('info'); // info | verifying | confirmed
   const [ticket, setTicket] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   // Form fields
   const [firstName, setFirstName] = useState('');
@@ -57,10 +59,10 @@ export default function EventTicket() {
       if (sessionId) {
         setStep('verifying');
         base44.functions.invoke('createEventTicket', {
-          session_id: sessionId,
+          stripe_payment_id: sessionId,
           purchaser_name: pName,
           purchaser_email: pEmail,
-          membership_id: membershipId
+          ticket_price: TICKET_PRICE_AMOUNT
         }).then(res => {
           if (res?.data?.success) {
             setTicket(res.data);
@@ -68,11 +70,11 @@ export default function EventTicket() {
             // Prevent back navigation to payment
             window.history.pushState(null, '', window.location.href);
           } else {
-            toast.error(res?.data?.error || 'Could not confirm ticket. Contact club staff.');
+            setErrorMsg(res?.data?.error || 'Could not confirm ticket. Contact club staff.');
             setStep('info');
           }
         }).catch(() => {
-          toast.error('Network error — please contact club staff with your payment confirmation.');
+          setErrorMsg('Network error — please contact club staff with your payment confirmation.');
           setStep('info');
         });
       }
@@ -80,9 +82,10 @@ export default function EventTicket() {
   }, []);
 
   const handlePurchase = async () => {
-    if (!firstName.trim() || !lastName.trim()) { toast.error('Please enter your full name'); return; }
-    if (!email.trim()) { toast.error('Please enter your email'); return; }
-    if (email.toLowerCase() !== emailConfirm.toLowerCase()) { toast.error('Emails do not match'); return; }
+    setErrorMsg('');
+    if (!firstName.trim() || !lastName.trim()) { setErrorMsg('Please enter your full name'); return; }
+    if (!email.trim()) { setErrorMsg('Please enter your email'); return; }
+    if (email.toLowerCase() !== emailConfirm.toLowerCase()) { setErrorMsg('Emails do not match'); return; }
 
     if (!user) {
       base44.auth.redirectToLogin(window.location.href);
@@ -112,10 +115,11 @@ export default function EventTicket() {
       if (data.checkout_url) {
         window.location.href = data.checkout_url;
       } else {
-        throw new Error(data.error || 'No checkout URL');
+        setErrorMsg(data.error || 'Could not start checkout. Please try again.');
+        setProcessing(false);
       }
     } catch (err) {
-      toast.error('Failed to start checkout. Please try again.');
+      setErrorMsg('Failed to start checkout. Please try again.');
       setProcessing(false);
     }
   };
@@ -319,6 +323,12 @@ export default function EventTicket() {
           </div>
         </div>
 
+        {errorMsg && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 text-center">
+            {errorMsg}
+          </div>
+        )}
+
         <Button
           onClick={handlePurchase}
           disabled={processing}
@@ -327,7 +337,7 @@ export default function EventTicket() {
           {processing ? (
             <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Processing...</>
           ) : (
-            `Buy Ticket — $${TICKET_PRICE} →`
+            `Buy Ticket — ${TICKET_PRICE_DISPLAY} →`
           )}
         </Button>
 
