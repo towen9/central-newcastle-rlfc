@@ -56,6 +56,8 @@ export default function EventTicket() {
 
       window.history.replaceState({}, '', window.location.pathname);
 
+      console.log('EventTicket: payment=success, sessionId=', sessionId, 'pName=', pName, 'pEmail=', pEmail);
+
       if (sessionId) {
         setStep('verifying');
         base44.functions.invoke('createEventTicket', {
@@ -64,17 +66,20 @@ export default function EventTicket() {
           purchaser_email: pEmail,
           ticket_price: TICKET_PRICE_AMOUNT
         }).then(res => {
+          console.log('EventTicket: createEventTicket response', res?.data);
           if (res?.data?.success) {
             setTicket(res.data);
             setStep('confirmed');
-            // Prevent back navigation to payment
             window.history.pushState(null, '', window.location.href);
           } else {
-            setErrorMsg(res?.data?.error || 'Could not confirm ticket. Contact club staff.');
+            const errDetail = res?.data?.error || 'No error detail returned';
+            console.error('EventTicket: ticket creation failed:', errDetail);
+            setErrorMsg(`Ticket error: ${errDetail}`);
             setStep('info');
           }
-        }).catch(() => {
-          setErrorMsg('Network error — please contact club staff with your payment confirmation.');
+        }).catch((err) => {
+          console.error('EventTicket: network/invoke error:', err);
+          setErrorMsg(`Network error: ${err?.message || 'unknown'}. Please contact club staff with your payment confirmation.`);
           setStep('info');
         });
       }

@@ -1,7 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import Stripe from 'npm:stripe';
 
-const TICKET_PRICE = 90;
 const EVENT_NAME = 'Ladies Long Lunch — Old Butchers Day 2026';
 const EVENT_DATE = 'Saturday 1 August 2026';
 
@@ -9,40 +7,44 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Must be authenticated — any logged-in user can purchase
     const user = await base44.auth.me();
     if (!user) {
       return Response.json({ success: false, error: 'Unauthorised' }, { status: 401 });
     }
 
-    const { stripe_payment_id: raw_payment_id, purchaser_name, purchaser_email, ticket_price } = await req.json();
-
-    if (!raw_payment_id || !purchaser_name || !purchaser_email) {
-      return Response.json({ success: false, error: 'Missing required fields' }, { status: 400 });
-    }
-
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
-
-    // Retrieve the checkout session to verify payment
-    let session;
+    let body;
     try {
-      session = await stripe.checkout.sessions.retrieve(raw_payment_id);
-    } catch (stripeErr) {
-      console.error('createEventTicket: Stripe session retrieve error:', stripeErr.message);
-      return Response.json({ success: false, error: 'Could not verify payment with Stripe' }, { status: 400 });
+      body = await req.json();
+    } catch (parseErr) {
+      console.error('createEventTicket: failed to parse request body:', parseErr.message);
+      return Response.json({ success: false, error: 'Invalid request body' }, { status: 400 });
     }
 
-    if (session.payment_status !== 'paid') {
-      console.error('createEventTicket: session not paid, status:', session.payment_status);
-      return Response.json({ success: false, error: 'Payment not confirmed' }, { status: 400 });
-    }
+    const { stripe_payment_id, purchaser_name, purchaser_email, ticket_price, membership_id } = body;
 
-    const stripe_payment_id = session.payment_intent || raw_payment_id;
+    console.log('createEventTicket: received', { stripe_payment_id, purchaser_name, purchaser_email, ticket_price });
+
+    if (!stripe_payment_id) {
+      return Response.json({ success: false, error: 'Missing stripe_payment_id' }, { status: 400 });
+    }
+    if (!purchaser_name) {
+      return Response.json({ success: false, error: 'Missing purchaser_name' }, { status: 400 });
+    }
+    if (!purchaser_email) {
+      return Response.json({ success: false, error: 'Missing purchaser_email' }, { status: 400 });
+    }
 
     // Prevent duplicate tickets for same payment
-    const existing = await base44.asServiceRole.entities.EventTicket.filter({ stripe_payment_id });
+    let existing;
+    try {
+      existing = await base44.asServiceRole.entities.EventTicket.filter({ stripe_payment_id });
+    } catch (dupErr) {
+      console.error('createEventTicket: duplicate check failed:', dupErr.message);
+      return Response.json({ success: false, error: `Duplicate check failed: ${dupErr.message}` }, { status: 500 });
+    }
+
     if (existing && existing.length > 0) {
-      console.log('createEventTicket: duplicate prevented for payment', stripe_payment_id);
+      console.log('createEventTicket: returning existing ticket for', stripe_payment_id);
       const dup = existing[0];
       return Response.json({
         success: true,
@@ -55,23 +57,29 @@ Deno.serve(async (req) => {
 
     // Generate unique ticket ID
     const ticket_id = crypto.randomUUID();
+    const ticket_price_dollars = ticket_price ? ticket_price / 100 : 90;
 
-    await base44.asServiceRole.entities.EventTicket.create({
-      ticket_id,
-      event_name: EVENT_NAME,
-      event_date: EVENT_DATE,
-      purchaser_name,
-      purchaser_email,
-      membership_id: membership_id || null,
-      stripe_payment_id,
-      ticket_price: ticket_price ? ticket_price / 100 : TICKET_PRICE,
-      status: 'active',
-      created_at: new Date().toISOString()
-    });
+    try {
+      await base44.asServiceRole.entities.EventTicket.create({
+        ticket_id,
+        event_name: EVENT_NAME,
+        event_date: EVENT_DATE,
+        purchaser_name,
+        purchaser_email,
+        membership_id: membership_id || null,
+        stripe_payment_id,
+        ticket_price: ticket_price_dollars,
+        status: 'active',
+        created_at: new Date().toISOString()
+      });
+    } catch (createErr) {
+      console.error('createEventTicket: entity create failed:', createErr.message);
+      return Response.json({ success: false, error: `Ticket creation failed: ${createErr.message}` }, { status: 500 });
+    }
 
     console.log('createEventTicket: ticket created', ticket_id, 'for', purchaser_email);
 
-    // Send confirmation email
+    // Send confirmation email (non-fatal)
     try {
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: purchaser_email,
@@ -111,7 +119,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('createEventTicket error:', error);
+    console.error('createEventTicket: unhandled error:', error.message, error.stack);
     return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 });
