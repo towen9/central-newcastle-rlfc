@@ -2,7 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import Stripe from 'npm:stripe';
 
 // Live price ID for Ladies Long Lunch ticket ($55 AUD)
-const EVENT_TICKET_PRICE_ID = 'price_1TjqWvLsW4v58VGV1gMsa1hN';
+const EVENT_TICKET_PRICE_ID = 'price_1TjqdoLsW4v58VGVk0YiI9PK';
 
 Deno.serve(async (req) => {
   try {

@@ -112,8 +112,8 @@ export default function EventReport() {
         {/* Revenue */}
         <div className="bg-[#1a365d] rounded-2xl p-4 text-white">
           <p className="text-blue-200 text-sm mb-1">Total Revenue</p>
-          <p className="text-3xl font-extrabold">${(sold.length * 55).toFixed(2)}</p>
-          <p className="text-blue-300 text-xs mt-1">{sold.length} × $55.00 AUD</p>
+          <p className="text-3xl font-extrabold">${(sold.length * 90).toFixed(2)}</p>
+          <p className="text-blue-300 text-xs mt-1">{sold.length} × $90.00 AUD</p>
         </div>
 
         {/* Export */}

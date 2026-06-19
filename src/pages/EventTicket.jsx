@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
-const TICKET_PRICE = 55;
+const TICKET_PRICE = 90;
 const EVENT_NAME = 'Ladies Long Lunch — Old Butchers Day 2026';
 const EVENT_DATE = 'Saturday 1 August 2026';
 const LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';

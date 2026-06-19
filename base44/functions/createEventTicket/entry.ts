@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import Stripe from 'npm:stripe';
 
-const TICKET_PRICE = 55;
+const TICKET_PRICE = 90;
 const EVENT_NAME = 'Ladies Long Lunch — Old Butchers Day 2026';
 const EVENT_DATE = 'Saturday 1 August 2026';
 
