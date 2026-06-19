@@ -1,0 +1,117 @@
+{
+  "name": "EventTicket",
+  "type": "object",
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "description": "Unique ticket identifier (UUID)"
+    },
+    "event_name": {
+      "type": "string",
+      "default": "Ladies Long Lunch \u2014 Old Butchers Day 2026"
+    },
+    "event_date": {
+      "type": "string",
+      "default": "Saturday 1 August 2026"
+    },
+    "purchaser_name": {
+      "type": "string"
+    },
+    "purchaser_email": {
+      "type": "string"
+    },
+    "membership_id": {
+      "type": "string",
+      "description": "Optional link to Membership entity if buyer is a member"
+    },
+    "stripe_payment_id": {
+      "type": "string"
+    },
+    "ticket_price": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "used",
+        "refunded"
+      ],
+      "default": "active"
+    },
+    "scanned_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp when ticket was scanned"
+    },
+    "scanned_by": {
+      "type": "string",
+      "description": "Email of staff who scanned"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "purchaser_name",
+    "purchaser_email",
+    "stripe_payment_id",
+    "ticket_price"
+  ],
+  "indexes": [
+    {
+      "fields": [
+        "ticket_id"
+      ],
+      "unique": true
+    },
+    {
+      "fields": [
+        "stripe_payment_id"
+      ],
+      "unique": true
+    }
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "gate_staff"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "gate_staff"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

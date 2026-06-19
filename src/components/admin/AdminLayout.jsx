@@ -25,6 +25,7 @@ const menuItems = [
   { icon: Percent, label: 'Discounts', page: 'AdminLocationDiscounts' },
   { icon: Share2, label: 'Referrals', page: 'AdminReferrals' },
   { icon: Radio, label: 'Live Console', page: 'AdminLiveConsole' },
+  { icon: Ticket, label: 'Ladies Lunch', page: 'EventReport' },
 ];
 
 export default function AdminLayout({ children, title, currentPage }) {
