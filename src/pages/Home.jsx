@@ -14,9 +14,11 @@ import QRModal from '../components/shared/QRModal';
 import PullToRefresh from '../components/shared/PullToRefresh';
 import DayPassCard from '../components/home/DayPassCard';
 import PushPromptBanner from '../components/shared/PushPromptBanner';
+import LadiesLunchBanner from '../components/home/LadiesLunchBanner';
 
 export default function Home() {
   const [showQR, setShowQR] = useState(false);
+  const [dismissedLunch, setDismissedLunch] = useState(false);
   const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
 
@@ -151,6 +153,11 @@ export default function Home() {
       {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 pt-4 pb-32 space-y-3">
+        {/* Ladies Long Lunch Banner */}
+        {!dismissedLunch && new Date() < new Date('2026-08-01') && (
+          <LadiesLunchBanner onDismiss={() => setDismissedLunch(true)} />
+        )}
+
         {/* Non-member CTAs */}
         {!membership && !dayPass && user &&
           <div className="space-y-3">
