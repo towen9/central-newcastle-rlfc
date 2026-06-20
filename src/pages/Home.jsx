@@ -16,6 +16,7 @@ import DayPassCard from '../components/home/DayPassCard';
 import PushPromptBanner from '../components/shared/PushPromptBanner';
 import LadiesLunchBanner from '../components/home/LadiesLunchBanner';
 import PushOptInCard from '../components/home/PushOptInCard';
+import SupporterPackAlert from '../components/home/SupporterPackAlert';
 
 export default function Home() {
   const [showQR, setShowQR] = useState(false);
@@ -222,6 +223,9 @@ export default function Home() {
 
             }
         </div>
+
+        {/* Supporter Pack alert */}
+        {membership && <SupporterPackAlert membership={membership} />}
 
         {/* Push Opt-In */}
         <PushOptInCard />

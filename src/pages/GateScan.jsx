@@ -11,6 +11,8 @@ export default function GateScan() {
   const [scanResult, setScanResult] = useState(null);
   const [checkInSuccess, setCheckInSuccess] = useState(false);
   const [checkInDenied, setCheckInDenied] = useState(false);
+  const [checkInLastEntry, setCheckInLastEntry] = useState(false);
+  const [checkInExhausted, setCheckInExhausted] = useState(false);
   const [scanCount, setScanCount] = useState(0);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -136,6 +138,20 @@ export default function GateScan() {
           isProcessingRef.current = false;
           startScanningRef.current?.();
         }, 2500);
+      } else if (result.type === 'supporter_last_entry') {
+        setScanResult(result);
+        setCheckInLastEntry(true);
+        setScanCount(c => c + 1);
+        setTimeout(() => {
+          setCheckInLastEntry(false);
+          setScanResult(null);
+          isProcessingRef.current = false;
+          startScanningRef.current?.();
+        }, 4000);
+      } else if (result.type === 'supporter_exhausted') {
+        setScanResult(result);
+        setCheckInExhausted(true);
+        // No auto-dismiss — staff must acknowledge
       } else if (result.type === 'already_used') {
         setScanResult(result);
         setCheckInDenied(true);
@@ -185,6 +201,41 @@ export default function GateScan() {
         <p className="text-emerald-200 text-base mt-1">{scanResult.passType}</p>
         <p className="text-emerald-200 text-sm mt-1">{scanResult.detail}</p>
         <p className="text-emerald-300 text-xs mt-4">✅ {scanCount} scanned today</p>
+      </div>
+    );
+  }
+
+  if (checkInLastEntry && scanResult) {
+    return (
+      <div className="fixed inset-0 bg-amber-500 flex flex-col items-center justify-center z-50 px-6 text-center">
+        <p className="text-white text-6xl mb-4">⚠️</p>
+        <p className="text-white text-3xl font-extrabold mb-3">LAST ENTRY</p>
+        {scanResult.photo && <img src={scanResult.photo} alt="" className="w-24 h-24 rounded-full object-cover border-4 border-white mb-3" />}
+        <p className="text-amber-100 text-2xl font-semibold">{scanResult.name}</p>
+        <p className="text-amber-100 text-base mt-3 max-w-xs">{scanResult.detail}</p>
+        <p className="text-amber-200 text-sm mt-4">✅ Entry granted — auto-continue in 4s</p>
+      </div>
+    );
+  }
+
+  if (checkInExhausted && scanResult) {
+    return (
+      <div className="fixed inset-0 bg-red-700 flex flex-col items-center justify-center z-50 px-6 text-center">
+        <p className="text-white text-6xl mb-4">❌</p>
+        <p className="text-white text-3xl font-extrabold mb-3">NO ENTRIES REMAINING</p>
+        <p className="text-red-100 text-2xl font-semibold">{scanResult.name}</p>
+        <p className="text-red-100 text-base mt-3 max-w-sm">{scanResult.detail}</p>
+        <Button
+          onClick={() => {
+            setCheckInExhausted(false);
+            setScanResult(null);
+            isProcessingRef.current = false;
+            startScanningRef.current?.();
+          }}
+          className="mt-8 bg-white text-red-700 font-bold px-8 py-4 text-lg hover:bg-red-50"
+        >
+          Acknowledge &amp; Continue
+        </Button>
       </div>
     );
   }

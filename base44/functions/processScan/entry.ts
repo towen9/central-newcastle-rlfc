@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
     if (isSupporter) {
       const remaining = membership.games_remaining ?? 5;
       if (remaining <= 0) {
-        return Response.json({ type: 'error', detail: 'All game entries used for this Supporter Pack', name: membership.user_name });
+        return Response.json({ type: 'supporter_exhausted', name: membership.user_name || 'Member', detail: 'No entries remaining — Supporter Pack has been used. Please see a club volunteer to purchase a Day Pass ($8) or upgrade your membership.' });
       }
     }
 
@@ -119,9 +119,21 @@ Deno.serve(async (req) => {
     }
 
     const newGamesRemaining = isSupporter ? Math.max(0, (membership.games_remaining ?? 5) - 1) : null;
+    const wasLastEntry = isSupporter && (membership.games_remaining ?? 5) === 1;
+
     let detail = '';
     if (isSupporter) detail = `${newGamesRemaining} entries remaining`;
     else if (pointsEarned > 0) detail = `+${pointsEarned} points earned`;
+
+    if (wasLastEntry) {
+      return Response.json({
+        type: 'supporter_last_entry',
+        name: membership.user_name || 'Member',
+        passType: membership.tier_name,
+        photo: membership.photo_url || null,
+        detail: 'This is their final included game. Upgrade to a Premium membership to keep coming all season.'
+      });
+    }
 
     return Response.json({
       type: 'success',
