@@ -54,6 +54,12 @@ export default function DayPass() {
     }
   });
 
+  const { data: dayPassTiers = [] } = useQuery({
+    queryKey: ['dayPassTier'],
+    queryFn: () => base44.entities.MembershipTier.filter({ is_active: true }, 'sort_order')
+  });
+  const dayPassTier = dayPassTiers.find(tier => tier.name?.toLowerCase().includes('day pass'));
+
   const { data: existingPass } = useQuery({
     queryKey: ['myDayPass', user?.id],
     queryFn: async () => {
@@ -492,8 +498,13 @@ export default function DayPass() {
                           <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                           Processing...
                         </>
+                      ) : dayPassTier ? (
+                        `Buy Day Pass - $${dayPassTier.price}`
                       ) : (
-                        `Buy Day Pass${fixture.entry_price ? ` - $${fixture.entry_price}` : ''}`
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Loading price...
+                        </>
                       )}
                     </Button>
                   </div>

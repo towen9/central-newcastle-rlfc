@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card } from '@/components/ui/card';
 import { Calendar, MapPin, Trophy } from 'lucide-react';
-import { format, differenceInDays, startOfToday } from 'date-fns';
+import { format, differenceInCalendarDays } from 'date-fns';
 import { motion } from 'framer-motion';
 
 export default function NextMatch() {
@@ -31,7 +31,7 @@ export default function NextMatch() {
   );
 
   const matchDate = new Date(nextMatch.date_time);
-  const daysUntil = differenceInDays(matchDate, startOfToday());
+  const daysUntil = differenceInCalendarDays(matchDate, new Date());
 
   return (
     <motion.div
