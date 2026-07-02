@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ShieldCheck } from 'lucide-react';
+import { Bell, ShieldCheck, Settings } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
@@ -60,6 +60,11 @@ export default function Layout({ children, currentPageName }) {
               <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
                 <Bell className="w-4 h-4 text-white" />
               </div>
+              <Link to={createPageUrl('Profile')}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
+                  <Settings className="w-4 h-4 text-white" />
+                </div>
+              </Link>
             </div>
           </div>
         </header>
