@@ -1,43 +1,71 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Home, CreditCard, Gift, Award, User } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Home, CreditCard, Award, User, ScanLine } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import clubConfig from '@/config/club.config';
 
-const navItems = [
+const t = clubConfig.theme;
+
+const leftItems = [
   { icon: Home, label: 'Home', page: 'Home' },
   { icon: CreditCard, label: 'Membership', page: 'Membership' },
-  { icon: Gift, label: 'Benefits', page: 'Benefits' },
+];
+
+const rightItems = [
   { icon: Award, label: 'Sponsors', page: 'Sponsors' },
   { icon: User, label: 'Profile', page: 'Profile' },
 ];
 
 export default function BottomNav({ currentPage }) {
+  const renderNavItem = (item, idx) => {
+    const isActive = currentPage === item.page;
+    const Icon = item.icon;
+    return (
+      <Link key={idx} to={createPageUrl(item.page)} className="flex-1 flex justify-center">
+        <motion.div whileTap={{ scale: 0.9 }} className="flex flex-col items-center py-2 px-1">
+          <Icon className="w-5 h-5 mb-0.5" style={{ color: isActive ? t.goldHi : 'rgba(255,255,255,0.4)', strokeWidth: isActive ? 2.5 : 1.8 }} />
+          <span className="text-[9px] font-bold" style={{ color: isActive ? t.goldHi : 'rgba(255,255,255,0.4)' }}>{item.label}</span>
+        </motion.div>
+      </Link>
+    );
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 px-2 pb-safe z-50 shadow-lg">
-      <div className="flex items-center justify-around py-2">
-        {navItems.map((item, idx) => {
-          const isActive = currentPage === item.page;
-          return (
-            <Link key={idx} to={createPageUrl(item.page)} className="flex-1">
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                className={`flex flex-col items-center py-2 px-3 rounded-xl transition-colors ${
-                  isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
-                }`}
-              >
-                <item.icon className={`w-6 h-6 mb-1 ${isActive ? 'stroke-[2.5]' : ''}`} />
-                <span className={`text-xs ${isActive ? 'font-semibold' : ''}`}>{item.label}</span>
-                {isActive && (
-                  <motion.div
-                    layoutId="navIndicator"
-                    className="absolute bottom-1 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full"
-                  />
-                )}
-              </motion.div>
-            </Link>
-          );
-        })}
+    <div className="fixed left-3.5 right-3.5 z-50" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 14px)' }}>
+      <div className="relative flex items-center px-2 py-2" style={{
+        background: 'linear-gradient(160deg, rgba(255,255,255,0.075), rgba(255,255,255,0.02))',
+        border: '1px solid rgba(255,255,255,0.09)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderRadius: '22px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+      }}>
+        <div className="flex flex-1 items-center justify-around">
+          {leftItems.map(renderNavItem)}
+        </div>
+
+        <div className="flex-shrink-0" style={{ width: '60px' }} />
+
+        <div className="flex flex-1 items-center justify-around">
+          {rightItems.map(renderNavItem)}
+        </div>
+
+        <Link to={createPageUrl('ScanForPoints')} className="absolute left-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%)', top: '-22px' }}>
+          <motion.div whileTap={{ scale: 0.9 }} className="flex flex-col items-center">
+            <div className="flex items-center justify-center" style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, ${t.goldHi}, ${t.gold})`,
+              boxShadow: `0 4px 20px ${t.gold}55`,
+              border: `3px solid ${t.bg0}`
+            }}>
+              <ScanLine className="w-6 h-6" style={{ color: t.bg0 }} strokeWidth={2.5} />
+            </div>
+            <span className="text-[9px] font-bold mt-0.5" style={{ color: t.gold }}>SCAN</span>
+          </motion.div>
+        </Link>
       </div>
     </div>
   );

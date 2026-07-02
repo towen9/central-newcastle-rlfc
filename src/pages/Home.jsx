@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bell, Settings, ShieldCheck, Ticket } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Ticket } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
 
@@ -87,7 +86,7 @@ export default function Home() {
 
   if (!user) {
     return (
-      <div className="flex flex-col" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)`, height: '100dvh' }}>
+      <div className="flex flex-col" style={{ minHeight: '60dvh' }}>
         <div className="px-4 pt-6 space-y-3">
           <div className="h-44 rounded-[22px] animate-pulse" style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))' }} />
           <div className="h-28 rounded-[22px] animate-pulse" style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))' }} />
@@ -98,48 +97,11 @@ export default function Home() {
   }
 
   return (
-    <div className="relative flex flex-col" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)`, height: '100dvh', overflow: 'hidden' }}>
+    <div className="relative flex flex-col" style={{ minHeight: '100dvh' }}>
       {/* Ambient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute top-[-10%] left-[-5%] rounded-full" style={{ width: '60vw', height: '60vw', background: `radial-gradient(circle, ${t.royal}, transparent 70%)`, opacity: 0.12, filter: 'blur(80px)' }} />
         <div className="absolute top-[20%] right-[-10%] rounded-full" style={{ width: '50vw', height: '50vw', background: `radial-gradient(circle, ${t.gold}, transparent 70%)`, opacity: 0.08, filter: 'blur(90px)' }} />
-      </div>
-
-      {/* Header */}
-      <div className="relative z-30 pt-safe sticky top-0" style={{ background: 'rgba(6,13,31,0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        {/* Sponsor Strip */}
-        <div className="px-4 py-1.5 flex items-center justify-center gap-2" style={{ background: 'rgba(255,255,255,0.03)' }}>
-          <span className="text-[9px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>Principal Partner</span>
-          <div className="h-3 w-px" style={{ background: 'rgba(255,255,255,0.15)' }} />
-          <span className="text-[11px] font-bold tracking-wide" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: t.fontBody }}>Zoom Energy</span>
-        </div>
-        {/* User row */}
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <img src={clubConfig.identity.logo_url} alt={clubConfig.identity.club_name} className="w-10 h-10 object-contain bg-white rounded-full p-0.5" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.15em] font-semibold" style={{ color: t.gold }}>Welcome back</p>
-              <h1 className="text-white text-sm font-bold" style={{ fontFamily: t.fontBody }}>{user?.full_name || 'Member'}</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {user?.role === 'admin' &&
-              <Link to={createPageUrl('AdminDashboard')}>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: t.gold }}>
-                  <ShieldCheck className="w-4 h-4" style={{ color: t.bg0 }} />
-                </div>
-              </Link>
-            }
-            <button className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)' }}>
-              <Bell className="w-4 h-4 text-white" />
-            </button>
-            <Link to={createPageUrl('Profile')}>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.12)' }}>
-                <Settings className="w-4 h-4 text-white" />
-              </div>
-            </Link>
-          </div>
-        </div>
       </div>
 
       {/* Push banner */}
@@ -147,7 +109,7 @@ export default function Home() {
 
       {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="relative z-10 px-4 pt-4 pb-32 space-y-4">
+        <div className="relative z-10 px-4 pt-4 pb-4 space-y-4">
           {/* Ladies Long Lunch Banner */}
           {!dismissedLunch && new Date() < new Date('2026-08-01') && (
             <LadiesLunchBanner onDismiss={() => setDismissedLunch(true)} />
