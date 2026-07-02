@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import CheckInCelebration from '../components/CheckInCelebration';
 import jsQR from 'jsqr';
 
 export default function ScanForPoints() {
@@ -13,6 +14,7 @@ export default function ScanForPoints() {
   const [membership, setMembership] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
+  const [celebration, setCelebration] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -94,6 +96,7 @@ export default function ScanForPoints() {
         location,
         newBalance: (membership.points || 0) + pointsEarned
       });
+      setCelebration({ pointsEarned });
       queryClient.invalidateQueries(['membership']);
     },
     onError: (error) => {
@@ -357,6 +360,13 @@ export default function ScanForPoints() {
           </div>
         )}
       </div>
+      {celebration && (
+        <CheckInCelebration
+          pointsEarned={celebration.pointsEarned}
+          streak={0}
+          onDismiss={() => setCelebration(null)}
+        />
+      )}
     </div>
   );
 }

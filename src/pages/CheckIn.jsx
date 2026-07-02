@@ -6,12 +6,14 @@ import { Camera, CheckCircle, AlertCircle, ArrowLeft, Zap, QrCode } from 'lucide
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
+import CheckInCelebration from '../components/CheckInCelebration';
 
 export default function CheckIn() {
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null); // 'success' | 'error' | null
   const [errorMessage, setErrorMessage] = useState('');
   const [user, setUser] = useState(null);
+  const [celebration, setCelebration] = useState(null);
   const queryClient = useQueryClient();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -102,6 +104,7 @@ export default function CheckIn() {
     },
     onSuccess: (location) => {
       setResult('success');
+      setCelebration({ pointsEarned: 10, streak: (membership?.total_checkins || 0) + 1 });
       queryClient.invalidateQueries(['membership']);
       queryClient.invalidateQueries(['todayCheckins']);
     },
@@ -353,6 +356,13 @@ export default function CheckIn() {
           </div>
         )}
       </div>
+      {celebration && (
+        <CheckInCelebration
+          pointsEarned={celebration.pointsEarned}
+          streak={celebration.streak}
+          onDismiss={() => setCelebration(null)}
+        />
+      )}
     </div>
   );
 }
