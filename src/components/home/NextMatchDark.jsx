@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Calendar, MapPin } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, differenceInCalendarDays } from 'date-fns';
 import { motion } from 'framer-motion';
 import GlassCard from './GlassCard';
 import clubConfig from '@/config/club.config';
@@ -43,6 +43,7 @@ export default function NextMatchDark() {
   const nextMatch = fixtures[0];
   const matchDate = nextMatch ? new Date(nextMatch.date_time) : null;
   const countdown = useCountdown(matchDate);
+  const calDays = matchDate ? differenceInCalendarDays(matchDate, new Date()) : null;
 
   if (!nextMatch) {
     return (
@@ -59,9 +60,9 @@ export default function NextMatchDark() {
       <GlassCard className="p-5">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>Next Match</span>
-          {countdown && countdown.days <= 3 && (
+          {calDays !== null && calDays <= 3 && (
             <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: `${t.royal}33`, color: t.cyan }}>
-              {countdown.days === 0 ? 'Today!' : countdown.days === 1 ? 'Tomorrow' : `${countdown.days} days`}
+              {calDays === 0 ? 'Today!' : calDays === 1 ? 'Tomorrow' : `${calDays} days`}
             </span>
           )}
         </div>
