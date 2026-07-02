@@ -99,7 +99,7 @@ export default function Home() {
   return (
     <div className="relative flex flex-col" style={{ minHeight: '100dvh' }}>
       {/* Ambient blobs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
         <div className="absolute top-[-10%] left-[-5%] rounded-full" style={{ width: '60vw', height: '60vw', background: `radial-gradient(circle, ${t.royal}, transparent 70%)`, opacity: 0.12, filter: 'blur(80px)' }} />
         <div className="absolute top-[20%] right-[-10%] rounded-full" style={{ width: '50vw', height: '50vw', background: `radial-gradient(circle, ${t.gold}, transparent 70%)`, opacity: 0.08, filter: 'blur(90px)' }} />
       </div>
