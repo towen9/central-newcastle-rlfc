@@ -32,7 +32,7 @@ export default function BottomNav({ currentPage }) {
   };
 
   return (
-    <div className="fixed left-3.5 right-3.5 z-50" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 14px)' }}>
+    <div style={{ position: 'fixed', bottom: 'calc(14px + env(safe-area-inset-bottom))', left: '14px', right: '14px', zIndex: 50 }}>
       <div className="relative flex items-center px-2 py-2" style={{
         background: 'linear-gradient(160deg, rgba(255,255,255,0.075), rgba(255,255,255,0.02))',
         border: '1px solid rgba(255,255,255,0.09)',
