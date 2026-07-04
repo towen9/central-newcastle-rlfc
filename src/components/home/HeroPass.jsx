@@ -37,7 +37,7 @@ export default function HeroPass({ membership, user, onShowQR }) {
               <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
             </div>
             <div>
-              <Eyebrow color={t.gold}>2026 Season</Eyebrow>
+              <Eyebrow color={t.gold}>{clubConfig.season.label}</Eyebrow>
               <p className="text-white/60 text-xs" style={{ fontFamily: t.fontBody }}>{tierName || 'No Membership'}</p>
             </div>
           </div>

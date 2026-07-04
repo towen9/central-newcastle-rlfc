@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import clubConfig from '@/config/club.config';
 import { ShoppingBag, Tag, AlertTriangle, Star, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';
+const LOGO = clubConfig.identity.logo_url;
 
 export default function MemberMerchStatus() {
   const [state, setState] = useState('loading'); // loading | not_authenticated | no_membership | ready

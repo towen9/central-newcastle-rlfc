@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { QrCode, Star, Users, Shield } from 'lucide-react';
 import { format } from 'date-fns';
+import clubConfig from '@/config/club.config';
 
 function TierBadge({ tierName }) {
   if (tierName?.includes('Premium')) {
@@ -85,13 +86,13 @@ export default function MembershipPass({ membership, user, onShowQR }) {
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-0.5">
               <img
                 loading="lazy"
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-                alt="Central Newcastle RLFC"
+                src={clubConfig.identity.logo_url}
+                alt={clubConfig.identity.club_name}
                 className="w-full h-full object-contain"
               />
             </div>
             <div>
-              <h3 className="text-white font-bold text-sm tracking-wide">CENTRAL NEWCASTLE</h3>
+              <h3 className="text-white font-bold text-sm tracking-wide">{clubConfig.identity.club_short_name.toUpperCase()}</h3>
               <p className="text-white/70 text-xs">{tierName || 'No Membership'}</p>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import clubConfig from '@/config/club.config';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, CheckCircle, AlertCircle, ArrowLeft, Zap, QrCode } from 'lucide-react';
@@ -81,8 +82,8 @@ export default function CheckIn() {
         timestamp: new Date().toISOString()
       });
 
-      // Award points for check-in (10 points)
-      const pointsEarned = 10;
+      // Award points for check-in
+      const pointsEarned = clubConfig.celebration.points_per_checkin;
       await base44.entities.Membership.update(membership.id, {
         points: (membership.points || 0) + pointsEarned,
         total_checkins: (membership.total_checkins || 0) + 1
@@ -104,7 +105,7 @@ export default function CheckIn() {
     },
     onSuccess: (location) => {
       setResult('success');
-      setCelebration({ pointsEarned: 10, streak: (membership?.total_checkins || 0) + 1 });
+      setCelebration({ pointsEarned: clubConfig.celebration.points_per_checkin, streak: (membership?.total_checkins || 0) + 1 });
       queryClient.invalidateQueries(['membership']);
       queryClient.invalidateQueries(['todayCheckins']);
     },

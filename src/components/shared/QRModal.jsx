@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { OfflineCache } from '../offline/OfflineCache';
 import PhotoUpload from '../membership/PhotoUpload';
 import { base44 } from '@/api/base44Client';
+import clubConfig from '@/config/club.config';
 
 export default function QRModal({ isOpen, onClose, membership, user, onPhotoUploaded }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
@@ -127,13 +128,13 @@ export default function QRModal({ isOpen, onClose, membership, user, onPhotoUplo
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white rounded-xl border border-gray-200 flex items-center justify-center p-1">
                 <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-                  alt="Central Newcastle RLFC"
+                  src={clubConfig.identity.logo_url}
+                  alt={clubConfig.identity.club_name}
                   className="w-full h-full object-contain"
                 />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Central Newcastle RLFC</h3>
+                <h3 className="font-bold text-gray-900">{clubConfig.identity.club_name}</h3>
                 <p className="text-xs text-gray-500">Digital Membership Pass</p>
               </div>
             </div>

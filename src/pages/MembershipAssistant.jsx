@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Send, Bot, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import clubConfig from '@/config/club.config';
 import ReactMarkdown from 'react-markdown';
 
 export default function MembershipAssistant() {
@@ -84,7 +85,7 @@ export default function MembershipAssistant() {
         </div>
         <div>
           <p className="font-bold">Membership Assistant</p>
-          <p className="text-blue-200 text-xs">Central Newcastle RLFC</p>
+          <p className="text-blue-200 text-xs">{clubConfig.identity.club_name}</p>
         </div>
       </div>
 

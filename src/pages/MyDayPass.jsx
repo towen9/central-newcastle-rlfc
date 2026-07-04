@@ -6,6 +6,7 @@ import { Ticket, Calendar, MapPin, CheckCircle, User, Clock } from 'lucide-react
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
+import clubConfig from '@/config/club.config';
 
 export default function MyDayPass() {
   const [passId, setPassId] = useState(null);
@@ -73,12 +74,12 @@ export default function MyDayPass() {
         </div>
         <div className="px-6 py-6 text-center">
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-            alt="Central Newcastle RLFC"
+            src={clubConfig.identity.logo_url}
+            alt={clubConfig.identity.club_name}
             className="w-16 h-16 mx-auto mb-4 bg-white rounded-full p-2"
           />
           <h1 className="text-white text-2xl font-bold mb-1">Day Pass</h1>
-          <p className="text-blue-200 text-sm">Central Newcastle RLFC</p>
+          <p className="text-blue-200 text-sm">{clubConfig.identity.club_name}</p>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import clubConfig from '@/config/club.config';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Camera, CheckCircle, XCircle, Beer, ArrowLeft, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -68,7 +69,7 @@ export default function ScanForPoints() {
       }
 
       const location = qrCodes[0];
-      const pointsEarned = 5;
+      const pointsEarned = clubConfig.celebration.points_per_scan;
 
       // Update membership points
       await base44.entities.Membership.update(membership.id, {

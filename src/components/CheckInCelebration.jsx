@@ -5,7 +5,7 @@ import clubConfig from '@/config/club.config';
 
 const t = clubConfig.theme;
 
-const HYPE_LINES = ["LET'S GO BUTCHERS", "BLEED BLUE & WHITE", "THE PACK IS IN", "UP THE BUTCHER BOYS"];
+const HYPE_LINES = clubConfig.celebration.lines;
 
 export default function CheckInCelebration({ pointsEarned, streak, onDismiss }) {
   const [visible, setVisible] = useState(true);

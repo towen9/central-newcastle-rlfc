@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import clubConfig from '@/config/club.config';
 import { Button } from '@/components/ui/button';
 import { Loader2, Phone, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
@@ -133,7 +134,7 @@ export default function DayPassDetailsForm({ pass, user, onComplete }) {
               className="mt-1 w-5 h-5 rounded accent-[#1a365d] flex-shrink-0 cursor-pointer"
             />
             <label htmlFor="optInClub" className="text-sm text-gray-700 cursor-pointer leading-snug">
-              I'd like to hear about Central Newcastle RLFC news, fixtures, and offers.
+              I'd like to hear about {clubConfig.identity.club_name} news, fixtures, and offers.
             </label>
           </div>
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Share2, Copy, CheckCircle2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import clubConfig from '@/config/club.config';
 
 export default function ReferralShare({ membership, user }) {
   const [copied, setCopied] = useState(false);
@@ -24,8 +25,8 @@ export default function ReferralShare({ membership, user }) {
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({
-        title: 'Join Central Newcastle RLFC',
-        text: `🏉 Join me as a member at Central Newcastle RLFC! Use my link to sign up:`,
+        title: `Join ${clubConfig.identity.club_name}`,
+        text: `🏉 Join me as a member at ${clubConfig.identity.club_name}! Use my link to sign up:`,
         url: referralUrl,
       });
     } else {

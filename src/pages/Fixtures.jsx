@@ -126,7 +126,7 @@ export default function Fixtures() {
     <div className="min-h-full pb-24">
       {/* Header */}
       <div className="px-5 pt-6 pb-2">
-        <Eyebrow color={t.gold}>2026 Season</Eyebrow>
+        <Eyebrow color={t.gold}>{clubConfig.season.label}</Eyebrow>
         <h1 className="text-white text-2xl mt-1" style={{ fontFamily: t.fontDisplay }}>Fixtures</h1>
       </div>
 
@@ -196,7 +196,7 @@ export default function Fixtures() {
                           <div className="w-12 h-12 bg-white rounded-full p-1 flex items-center justify-center">
                             <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
                           </div>
-                          <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>Central</span>
+                          <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.team_short}</span>
                         </div>
                         <div className="flex flex-col items-center px-4">
                           <span className="text-[10px] uppercase tracking-wider text-white/30 mb-1">vs</span>
@@ -419,7 +419,7 @@ function FixtureRow({ fixture, hasMembership, index, isPast }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               {isHome && (
-                <Eyebrow color={t.gold}>St John Oval</Eyebrow>
+                <Eyebrow color={t.gold}>{clubConfig.identity.venue_name}</Eyebrow>
               )}
               {!isHome && fixture.venue && (
                 <span className="text-[9px] text-white/30 uppercase tracking-wider truncate" style={{ fontFamily: t.fontBody }}>
@@ -481,7 +481,7 @@ function EmptyState() {
     <GlassCard className="p-8 text-center">
       <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
       <p className="text-white/60 text-sm font-semibold" style={{ fontFamily: t.fontBody }}>Season draw coming soon.</p>
-      <p className="text-white/40 text-xs mt-1" style={{ fontFamily: t.fontBody }}>Check back for the full 2026 fixture list.</p>
+      <p className="text-white/40 text-xs mt-1" style={{ fontFamily: t.fontBody }}>Check back for the full {clubConfig.season.year} fixture list.</p>
     </GlassCard>
   );
 }

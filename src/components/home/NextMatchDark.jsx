@@ -69,7 +69,7 @@ export default function NextMatchDark() {
             <div className="w-12 h-12 bg-white rounded-full p-1 flex items-center justify-center">
               <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
             </div>
-            <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>Central</span>
+            <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.team_short}</span>
           </div>
           <div className="flex flex-col items-center px-4">
             <span className="text-[10px] uppercase tracking-wider text-white/30">vs</span>

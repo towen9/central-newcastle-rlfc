@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
 import { toast } from 'sonner';
+import clubConfig from '@/config/club.config';
 
 const tierConfig = {
   'Supporter Pack': {
@@ -159,8 +160,8 @@ export default function JoinMembership() {
               Back
             </button>
           </Link>
-          <h1 className="text-white text-2xl font-bold mb-1">2026 Memberships</h1>
-          <p className="text-blue-200 text-sm">Support Central Newcastle RLFC this season</p>
+          <h1 className="text-white text-2xl font-bold mb-1">{clubConfig.season.year} Memberships</h1>
+          <p className="text-blue-200 text-sm">Support {clubConfig.identity.club_name} this season</p>
         </div>
       </div>
 

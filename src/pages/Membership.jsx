@@ -330,9 +330,9 @@ export default function Membership() {
               <GlassCard className="p-6 text-center relative overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 30%, ${t.gold}15, transparent 60%)` }} />
                 <div className="relative z-10">
-                  <p className="text-[10px] uppercase tracking-[0.25em] font-semibold mb-2" style={{ color: t.gold, fontFamily: t.fontBody }}>2026 Season</p>
-                  <h1 className="text-white mb-2" style={{ fontFamily: t.fontDisplay, fontSize: '32px', lineHeight: 1.1 }}>Join the Central Family</h1>
-                  <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>Support Central Newcastle RLFC and unlock exclusive member benefits, digital passes, rewards and more.</p>
+                  <p className="text-[10px] uppercase tracking-[0.25em] font-semibold mb-2" style={{ color: t.gold, fontFamily: t.fontBody }}>{clubConfig.season.label}</p>
+                  <h1 className="text-white mb-2" style={{ fontFamily: t.fontDisplay, fontSize: '32px', lineHeight: 1.1 }}>{clubConfig.terminology.join_headline}</h1>
+                  <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>Support {clubConfig.identity.club_name} and unlock exclusive member benefits, digital passes, rewards and more.</p>
                 </div>
               </GlassCard>
 
@@ -340,10 +340,10 @@ export default function Membership() {
               <Link to={createPageUrl('PlayerPassRegistration')}>
                 <GlassCard className="p-5 cursor-pointer" style={{ borderColor: `${t.royal}44` }}>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>2026 Player Pass</h3>
+                    <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>{clubConfig.season.year} Player Pass</h3>
                     <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: `${t.royal}22`, color: t.cyan }}>FREE</span>
                   </div>
-                  <p className="text-sm text-white/50 mb-3" style={{ fontFamily: t.fontBody }}>For all registered Central Newcastle RLFC players</p>
+                  <p className="text-sm text-white/50 mb-3" style={{ fontFamily: t.fontBody }}>For all registered {clubConfig.identity.club_name} players</p>
                   <button className="w-full py-2.5 rounded-xl font-semibold text-sm transition-all" style={{ background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)' }}>
                     Apply Now
                   </button>

@@ -4,13 +4,14 @@ import { motion } from 'framer-motion';
 import { Ticket, Calendar, MapPin, Check, Loader2, ArrowLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import clubConfig from '@/config/club.config';
 const TICKET_PRICE_ID = 'price_1TjqdoLsW4v58VGVk0YiI9PK';
 const TICKET_PRICE_DISPLAY = 'A$90';
 const TICKET_PRICE_AMOUNT = 9000;
 const TICKET_PRICE = 90;
 const EVENT_NAME = 'Ladies Long Lunch — Old Butchers Day 2026';
 const EVENT_DATE = 'Saturday 1 August 2026';
-const LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';
+const LOGO = clubConfig.identity.logo_url;
 
 export default function EventTicket() {
   const [user, setUser] = useState(null);
@@ -171,7 +172,7 @@ export default function EventTicket() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-700">
                 <MapPin className="w-4 h-4 text-gray-400" />
-                <span>St John Oval, Newcastle</span>
+                <span>{clubConfig.identity.venue_name}, Newcastle</span>
               </div>
             </div>
           </motion.div>
@@ -247,7 +248,7 @@ export default function EventTicket() {
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <MapPin className="w-5 h-5 text-blue-500 shrink-0" />
-              <span>St John Oval, Newcastle</span>
+              <span>{clubConfig.identity.venue_name}, Newcastle</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <Users className="w-5 h-5 text-blue-500 shrink-0" />
@@ -255,7 +256,7 @@ export default function EventTicket() {
             </div>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Join us for a fully catered long lunch with free drinks, as part of Old Butchers Day at St John Oval. Ticket includes entry to the exclusive Ladies Long Lunch area.
+            Join us for a fully catered long lunch with free drinks, as part of Old Butchers Day at {clubConfig.identity.venue_name}. Ticket includes entry to the exclusive Ladies Long Lunch area.
           </p>
           <div className="mt-4 space-y-2">
             {['Fully catered lunch', 'Complimentary drinks on arrival', 'Exclusive Ladies Long Lunch area', 'Part of Old Butchers Day celebrations', 'Digital QR ticket — show at entry'].map((item, i) => (

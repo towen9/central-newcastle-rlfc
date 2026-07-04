@@ -29,9 +29,9 @@ export default function MembershipPromo() {
           <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${t.gold}22` }}>
             <ShieldCheck className="w-4 h-4" style={{ color: t.gold }} />
           </div>
-          <Eyebrow color={t.gold}>2026 Season</Eyebrow>
+          <Eyebrow color={t.gold}>{clubConfig.season.label}</Eyebrow>
         </div>
-        <h3 className="text-white text-2xl mb-1 leading-tight" style={{ fontFamily: t.fontDisplay }}>Join the Butcher Boys</h3>
+        <h3 className="text-white text-2xl mb-1 leading-tight" style={{ fontFamily: t.fontDisplay }}>Join the {clubConfig.identity.short_name}</h3>
         <p className="text-white/60 text-sm mb-4" style={{ fontFamily: t.fontBody }}>
           {lowestPrice !== null ? `From $${lowestPrice} — season entry, rewards & sponsor deals` : 'Season entry, rewards points & exclusive perks'}
         </p>

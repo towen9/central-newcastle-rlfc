@@ -4,6 +4,7 @@ import { Gift, Calendar, Zap, Share2, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+import clubConfig from '@/config/club.config';
 
 const actions = [
   { icon: Sparkles, label: 'Benefits', page: 'Benefits', color: 'bg-sky-500 dark:bg-sky-600' },
@@ -16,8 +17,8 @@ const actions = [
 export default function QuickActions() {
   const handleShare = async () => {
     const shareData = {
-      title: 'Central Newcastle RLFC',
-      text: 'Join Central Newcastle RLFC! Get your membership, earn rewards, and stay connected with the club.',
+      title: clubConfig.identity.club_name,
+      text: `Join ${clubConfig.identity.club_name}! Get your membership, earn rewards, and stay connected with the club.`,
       url: window.location.origin
     };
 

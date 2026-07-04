@@ -52,7 +52,7 @@ export default function Layout({ children, currentPageName }) {
             <div className="flex items-center gap-2.5">
               <img src={clubConfig.identity.logo_url} alt={clubConfig.identity.club_name} className="w-10 h-10 object-contain bg-white rounded-full p-0.5" />
               <div>
-                <p className="text-[9px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>Central Newcastle RLFC</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>{clubConfig.identity.club_name}</p>
                 <h1 className="text-white text-base leading-tight" style={{ fontFamily: t.fontDisplay }}>{clubConfig.identity.short_name}</h1>
               </div>
             </div>

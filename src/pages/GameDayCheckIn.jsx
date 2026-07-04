@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+import clubConfig from '@/config/club.config';
 
 export default function GameDayCheckIn() {
   const [step, setStep] = useState('loading'); // loading, register, payment, success
@@ -125,7 +126,7 @@ export default function GameDayCheckIn() {
           
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Entry Confirmed!</h2>
           <p className="text-gray-600 mb-6">
-            Welcome to {event.opponent} vs Central Newcastle RLFC
+            Welcome to {event.opponent} vs {clubConfig.identity.club_name}
           </p>
 
           <div className="bg-gray-50 rounded-2xl p-6 mb-6">
@@ -176,8 +177,8 @@ export default function GameDayCheckIn() {
       <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] pt-safe pb-24">
         <div className="px-6 py-6 text-center">
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-            alt="Central Newcastle RLFC"
+            src={clubConfig.identity.logo_url}
+            alt={clubConfig.identity.club_name}
             className="w-20 h-20 mx-auto mb-4 bg-white rounded-full p-2"
           />
           <h1 className="text-white text-2xl font-bold mb-2">Game Day Entry</h1>
