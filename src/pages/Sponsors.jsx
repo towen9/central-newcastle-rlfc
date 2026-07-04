@@ -1,17 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink, Mail, Phone, Globe, Percent } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { ExternalLink } from 'lucide-react';
+import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import { SkeletonCard } from '@/components/ui-kit/Skeleton';
+import GoldButton from '@/components/ui-kit/GoldButton';
+import SponsorRedemptionOverlay from '@/components/sponsors/SponsorRedemptionOverlay';
+
+const t = clubConfig.theme;
+
+function LogoChip({ sponsor, size = 56 }) {
+  if (sponsor.logo_url) {
+    return (
+      <div
+        className="flex-shrink-0 flex items-center justify-center"
+        style={{
+          width: size, height: size, borderRadius: 14,
+          background: '#fff', padding: size * 0.12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        }}
+      >
+        <img src={sponsor.logo_url} alt={sponsor.name} className="w-full h-full object-contain" loading="lazy" />
+      </div>
+    );
+  }
+  return (
+    <div
+      className="flex-shrink-0 flex items-center justify-center"
+      style={{
+        width: size, height: size, borderRadius: 14,
+        background: 'rgba(255,255,255,0.08)',
+        color: t.gold
+      }}
+    >
+      <span style={{ fontFamily: t.fontDisplay, fontSize: size * 0.4 }}>
+        {sponsor.name?.charAt(0) || '?'}
+      </span>
+    </div>
+  );
+}
 
 export default function Sponsors() {
-  const { data: sponsors = [] } = useQuery({
+  const [redeemSponsor, setRedeemSponsor] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+  }, []);
+
+  const { data: sponsors = [], isLoading } = useQuery({
     queryKey: ['sponsors'],
     queryFn: async () => {
       const allSponsors = await base44.entities.Sponsor.filter({ is_active: true });
-      // Sort by sort_order (lower first), then alphabetically
       return allSponsors.sort((a, b) => {
         const orderA = a.sort_order ?? 999;
         const orderB = b.sort_order ?? 999;
@@ -26,152 +69,203 @@ export default function Sponsors() {
     queryFn: () => base44.entities.Offer.filter({ is_active: true })
   });
 
-  const getOffersForSponsor = (sponsorId) => {
-    return offers.filter(o => o.sponsor_id === sponsorId);
+  const { data: membership } = useQuery({
+    queryKey: ['membership', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const m = await base44.entities.Membership.filter({ user_id: user.id, status: 'active' });
+      return m[0] || null;
+    },
+    enabled: !!user?.id
+  });
+
+  const getOfferForSponsor = (sponsorId) => {
+    return offers.find(o => o.sponsor_id === sponsorId && o.is_active !== false);
+  };
+
+  // No tier field on Sponsor entity — feature the first sponsor (lowest sort_order)
+  const featuredSponsor = sponsors[0];
+  const featuredOffer = featuredSponsor ? getOfferForSponsor(featuredSponsor.id) : null;
+  const remainingSponsors = sponsors.slice(1);
+
+  // Log redemption to OfferRedemption entity when overlay opens
+  const handleRedeem = (sponsor, offer) => {
+    setRedeemSponsor({ sponsor, offer });
+    // Fire redemption tracking if we have enough context
+    if (offer && user?.id) {
+      base44.entities.OfferRedemption.create({
+        offer_id: offer.id,
+        offer_title: offer.title,
+        sponsor_id: sponsor.id,
+        sponsor_name: sponsor.name,
+        user_id: user.id,
+        membership_id: membership?.id || null,
+        redemption_code: offer.offer_code || null,
+        timestamp: new Date().toISOString()
+      }).catch(() => {});
+    }
   };
 
   return (
-    <div className="bg-gray-50" style={{minHeight: '100dvh', paddingBottom: '6rem'}}>
+    <div className="min-h-full pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] pt-safe">
-        <div className="px-5 py-6 flex items-center gap-4">
-          <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </div>
-          </Link>
-          <div className="flex items-center gap-3">
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-              alt="Central Newcastle RLFC"
-              className="w-12 h-12 object-contain bg-white rounded-full p-1"
-            />
-            <div>
-              <h1 className="text-white text-xl font-bold">Our Sponsors</h1>
-              <p className="text-blue-200 text-sm">Supporting our club</p>
-            </div>
-          </div>
-        </div>
+      <div className="px-5 pt-6 pb-4">
+        <Eyebrow color={t.gold}>Our Partners</Eyebrow>
+        <h1 className="text-white text-2xl mt-1" style={{ fontFamily: t.fontDisplay }}>Sponsor Offers</h1>
+        <p className="text-white/50 text-sm mt-1" style={{ fontFamily: t.fontBody }}>Every redemption supports the club.</p>
       </div>
 
-      <div className="px-5 py-6">
-        {/* Sponsors List */}
-        <div className="space-y-4">
-          {sponsors.map((sponsor, idx) => {
-            const sponsorOffers = getOffersForSponsor(sponsor.id);
-            
-            return (
-              <motion.div
-                key={sponsor.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
-              >
-                <div className="p-5">
-                  {/* Logo & Name */}
-                  <div className="flex items-start gap-4 mb-4">
-                   {sponsor.logo_url ? (
-                     <img 
-                       src={sponsor.logo_url} 
-                       alt={sponsor.name}
-                       className="w-16 h-16 object-contain rounded-xl border-2 border-gray-200 p-2"
-                     />
-                   ) : (
-                     <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
-                       {sponsor.name.charAt(0)}
-                     </div>
-                   )}
-                   <div className="flex-1">
-                     <div className="flex items-center gap-2 mb-1">
-                       <h3 className="font-bold text-gray-900 text-lg">{sponsor.name}</h3>
-                       {sponsor.tier === 'naming_rights' && (
-                         <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-medium">
-                           Naming Rights Partner
-                         </span>
-                       )}
-                       {sponsorOffers.length > 0 && (
-                         <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
-                           <Percent className="w-3 h-3" />
-                           {sponsorOffers.length}
-                         </span>
-                       )}
-                     </div>
-                     {sponsor.description && (
-                       <p className="text-sm text-gray-500">{sponsor.description}</p>
-                     )}
-                   </div>
-                  </div>
-
-                  {/* Contact Info */}
-                  <div className="space-y-2 mb-4">
-                    {sponsor.website && (
-                      <a 
-                        href={sponsor.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
-                      >
-                        <Globe className="w-4 h-4" />
-                        <span className="truncate">{sponsor.website.replace(/^https?:\/\//, '')}</span>
-                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                      </a>
-                    )}
-                    {sponsor.contact_email && (
-                      <a 
-                        href={`mailto:${sponsor.contact_email}`}
-                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-700"
-                      >
-                        <Mail className="w-4 h-4" />
-                        <span className="truncate">{sponsor.contact_email}</span>
-                      </a>
-                    )}
-                    {sponsor.contact_phone && (
-                      <a 
-                        href={`tel:${sponsor.contact_phone}`}
-                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-700"
-                      >
-                        <Phone className="w-4 h-4" />
-                        {sponsor.contact_phone}
-                      </a>
-                    )}
-                  </div>
-
-                  {/* Offers */}
-                  {sponsorOffers.length > 0 && (
-                    <div className="border-t border-gray-100 pt-4">
-                      <p className="text-xs text-gray-500 font-medium mb-3">Member Offers:</p>
-                      <div className="space-y-2">
-                        {sponsorOffers.map((offer) => (
-                          <Link 
-                            key={offer.id} 
-                            to={createPageUrl('Benefits')}
-                            className="block bg-emerald-50 rounded-lg p-3 hover:bg-emerald-100 transition-colors"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <p className="font-medium text-gray-900 text-sm">{offer.title}</p>
-                                <p className="text-xs text-gray-500 line-clamp-1">{offer.description}</p>
-                              </div>
-                              <Percent className="w-5 h-5 text-emerald-600 flex-shrink-0 ml-3" />
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {sponsors.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No sponsors yet</p>
+      <div className="px-5">
+        {isLoading ? (
+          <div className="space-y-3">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
           </div>
+        ) : sponsors.length === 0 ? (
+          <GlassCard className="p-8 text-center">
+            <p className="text-white/60 text-sm font-semibold" style={{ fontFamily: t.fontBody }}>Partner offers coming soon.</p>
+            <p className="text-white/40 text-xs mt-1" style={{ fontFamily: t.fontBody }}>Check back for exclusive member deals.</p>
+          </GlassCard>
+        ) : (
+          <>
+            {/* Featured / Principal partner spotlight */}
+            {featuredSponsor && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-5"
+              >
+                <GlassCard
+                  className="p-6"
+                  style={{ borderColor: `${t.gold}55`, boxShadow: `0 0 24px ${t.gold}1a, 0 8px 32px rgba(0,0,0,0.3)` }}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Eyebrow color={t.gold}>Principal Partner</Eyebrow>
+                  </div>
+
+                  <div className="flex items-start gap-4 mb-4">
+                    <LogoChip sponsor={featuredSponsor} size={72} />
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-white text-xl leading-tight" style={{ fontFamily: t.fontDisplay }}>
+                        {featuredSponsor.name}
+                      </h2>
+                      {featuredSponsor.description && (
+                        <p className="text-white/50 text-sm mt-1" style={{ fontFamily: t.fontBody }}>
+                          {featuredSponsor.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {featuredOffer ? (
+                    <>
+                      <div className="rounded-xl p-3 mb-4" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                        <p className="text-white text-sm font-semibold" style={{ fontFamily: t.fontBody }}>
+                          {featuredOffer.title}
+                        </p>
+                        {featuredOffer.description && (
+                          <p className="text-white/50 text-xs mt-1" style={{ fontFamily: t.fontBody }}>
+                            {featuredOffer.description}
+                          </p>
+                        )}
+                      </div>
+                      <GoldButton fullWidth onClick={() => handleRedeem(featuredSponsor, featuredOffer)}>
+                        Redeem Offer
+                      </GoldButton>
+                    </>
+                  ) : (
+                    featuredSponsor.website && (
+                      <GoldButton
+                        variant="outline"
+                        fullWidth
+                        onClick={() => window.open(featuredSponsor.website, '_blank')}
+                      >
+                        Visit Website
+                        <ExternalLink className="w-4 h-4" />
+                      </GoldButton>
+                    )
+                  )}
+                </GlassCard>
+              </motion.div>
+            )}
+
+            {/* Offers wall */}
+            {remainingSponsors.length > 0 && (
+              <div className="space-y-3">
+                {remainingSponsors.map((sponsor, idx) => {
+                  const offer = getOfferForSponsor(sponsor.id);
+                  return (
+                    <motion.div
+                      key={sponsor.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.04 }}
+                    >
+                      <GlassCard className="p-4">
+                        <div className="flex items-start gap-3">
+                          <LogoChip sponsor={sponsor} size={48} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <h3 className="text-white text-sm font-semibold truncate" style={{ fontFamily: t.fontBody }}>
+                                {sponsor.name}
+                              </h3>
+                            </div>
+                            {sponsor.description && (
+                              <p className="text-white/40 text-xs line-clamp-1 mb-1" style={{ fontFamily: t.fontBody }}>
+                                {sponsor.description}
+                              </p>
+                            )}
+                            {offer ? (
+                              <p className="text-white/70 text-xs" style={{ fontFamily: t.fontBody }}>
+                                {offer.title}
+                              </p>
+                            ) : (
+                              sponsor.website && (
+                                <p className="text-white/30 text-xs truncate" style={{ fontFamily: t.fontBody }}>
+                                  {sponsor.website.replace(/^https?:\/\//, '')}
+                                </p>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mt-3">
+                          {offer ? (
+                            <GoldButton variant="outline" fullWidth onClick={() => handleRedeem(sponsor, offer)}>
+                              Redeem
+                            </GoldButton>
+                          ) : (
+                            sponsor.website && (
+                              <GoldButton
+                                variant="outline"
+                                fullWidth
+                                onClick={() => window.open(sponsor.website, '_blank')}
+                              >
+                                Visit Website
+                                <ExternalLink className="w-4 h-4" />
+                              </GoldButton>
+                            )
+                          )}
+                        </div>
+                      </GlassCard>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* Redemption overlay */}
+      {redeemSponsor && (
+        <SponsorRedemptionOverlay
+          sponsor={redeemSponsor.sponsor}
+          offer={redeemSponsor.offer}
+          onDismiss={() => setRedeemSponsor(null)}
+        />
+      )}
     </div>
   );
 }
