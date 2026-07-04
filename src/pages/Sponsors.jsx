@@ -88,12 +88,16 @@ export default function Sponsors() {
   const featuredOffer = featuredSponsor ? getOfferForSponsor(featuredSponsor.id) : null;
   const remainingSponsors = sponsors.slice(1);
 
-  // Log redemption to OfferRedemption entity when overlay opens
-  const handleRedeem = (sponsor, offer) => {
+  // Log redemption to OfferRedemption entity when overlay opens — dedup within 24h
+  const handleRedeem = async (sponsor, offer) => {
     setRedeemSponsor({ sponsor, offer });
-    // Fire redemption tracking if we have enough context
-    if (offer && user?.id) {
-      base44.entities.OfferRedemption.create({
+    if (!offer || !user?.id) return;
+    try {
+      const existing = await base44.entities.OfferRedemption.filter({ user_id: user.id, offer_id: offer.id });
+      const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+      const alreadyLogged = existing.some(r => new Date(r.timestamp).getTime() >= cutoff);
+      if (alreadyLogged) return;
+      await base44.entities.OfferRedemption.create({
         offer_id: offer.id,
         offer_title: offer.title,
         sponsor_id: sponsor.id,
@@ -102,8 +106,8 @@ export default function Sponsors() {
         membership_id: membership?.id || null,
         redemption_code: offer.offer_code || null,
         timestamp: new Date().toISOString()
-      }).catch(() => {});
-    }
+      });
+    } catch {}
   };
 
   return (
