@@ -2,7 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { QrCode } from 'lucide-react';
 import { format } from 'date-fns';
-import GlassCard from './GlassCard';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
 import clubConfig from '@/config/club.config';
 
 const t = clubConfig.theme;
@@ -35,7 +37,7 @@ export default function HeroPass({ membership, user, onShowQR }) {
               <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>2026 Season</p>
+              <Eyebrow color={t.gold}>2026 Season</Eyebrow>
               <p className="text-white/60 text-xs" style={{ fontFamily: t.fontBody }}>{tierName || 'No Membership'}</p>
             </div>
           </div>
@@ -77,24 +79,15 @@ export default function HeroPass({ membership, user, onShowQR }) {
           </div>
         )}
 
-        <motion.button
-          whileTap={{ scale: 0.98 }}
+        <GoldButton
           onClick={onShowQR}
           disabled={!isActive}
-          className="relative w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-bold transition-all"
-          style={isActive ? {
-            background: `linear-gradient(135deg, ${t.goldHi}, ${t.gold})`,
-            color: t.bg0,
-            boxShadow: `0 4px 20px ${t.gold}33`
-          } : {
-            background: 'rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.3)',
-            cursor: 'not-allowed'
-          }}
+          fullWidth
+          style={isActive ? {} : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.3)', boxShadow: 'none', cursor: 'not-allowed' }}
         >
           <QrCode className="w-4 h-4" />
           <span>Show Pass</span>
-        </motion.button>
+        </GoldButton>
       </GlassCard>
     </motion.div>
   );

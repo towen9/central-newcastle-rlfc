@@ -4,7 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { Calendar, MapPin } from 'lucide-react';
 import { format, differenceInCalendarDays } from 'date-fns';
 import { motion } from 'framer-motion';
-import GlassCard from './GlassCard';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
 import clubConfig from '@/config/club.config';
 
 const t = clubConfig.theme;
@@ -59,7 +60,7 @@ export default function NextMatchDark() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
       <GlassCard className="p-5">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>Next Match</span>
+          <Eyebrow color={t.gold}>Next Match</Eyebrow>
           {calDays !== null && calDays <= 3 && (
             <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: `${t.royal}33`, color: t.cyan }}>
               {calDays === 0 ? 'Today!' : calDays === 1 ? 'Tomorrow' : `${calDays} days`}

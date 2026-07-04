@@ -1,4 +1,7 @@
 import React from 'react';
+import clubConfig from '@/config/club.config';
+
+const t = clubConfig.theme;
 
 export default function GlassCard({ children, className = '', style = {}, ...props }) {
   return (

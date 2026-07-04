@@ -12,7 +12,9 @@ import QRModal from '../components/shared/QRModal';
 import PhotoUpload from '../components/membership/PhotoUpload';
 import { toast } from 'sonner';
 import clubConfig from '@/config/club.config';
-import GlassCard from '../components/home/GlassCard';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
 
 const t = clubConfig.theme;
 
@@ -244,14 +246,10 @@ export default function Membership() {
                     </div>
                   )}
 
-                  <button
-                    onClick={() => setShowQR(true)}
-                    className="w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
-                    style={{ background: `linear-gradient(135deg, ${t.gold}, ${t.goldHi})`, color: t.bg0, boxShadow: `0 0 16px ${t.gold}44` }}
-                  >
+                  <GoldButton onClick={() => setShowQR(true)} fullWidth>
                     <CreditCard className="w-5 h-5" />
                     View Digital Pass
-                  </button>
+                  </GoldButton>
                 </GlassCard>
               </motion.div>
 
@@ -385,9 +383,9 @@ export default function Membership() {
                           </div>
                         )}
                         <Link to={createPageUrl('JoinMembership')}>
-                          <button className="w-full py-3 rounded-xl font-bold text-sm transition-all" style={{ background: `linear-gradient(135deg, ${t.gold}, ${t.goldHi})`, color: t.bg0, boxShadow: `0 0 16px ${t.gold}33` }}>
+                          <GoldButton fullWidth>
                             Join as {tier.name}
-                          </button>
+                          </GoldButton>
                         </Link>
                       </GlassCard>
                     </motion.div>
@@ -397,7 +395,7 @@ export default function Membership() {
 
               {/* Day Pass */}
               <GlassCard className="p-5">
-                <p className="text-[10px] uppercase tracking-[0.2em] font-semibold mb-2" style={{ color: t.gold, fontFamily: t.fontBody }}>Just here for one game?</p>
+                <div className="mb-2"><Eyebrow color={t.gold}>Just here for one game?</Eyebrow></div>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-white" style={{ fontFamily: t.fontDisplay, fontSize: '20px' }}>Day Pass</h3>
                   {dayPassTier && (
@@ -406,9 +404,9 @@ export default function Membership() {
                 </div>
                 <p className="text-white/50 text-sm mb-4" style={{ fontFamily: t.fontBody }}>Single entry to any upcoming home game</p>
                 <Link to={createPageUrl('DayPass')}>
-                  <button className="w-full py-3 rounded-xl font-bold text-sm transition-all" style={{ background: 'transparent', color: t.gold, border: `1px solid ${t.gold}` }}>
+                  <GoldButton variant="outline" fullWidth>
                     Get Day Pass
-                  </button>
+                  </GoldButton>
                 </Link>
                 <p className="text-white/30 text-xs text-center mt-3" style={{ fontFamily: t.fontBody }}>Day Pass points count toward membership rewards.</p>
               </GlassCard>

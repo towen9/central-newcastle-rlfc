@@ -9,7 +9,7 @@ import HeroPass from '../components/home/HeroPass';
 import MembershipPromo from '../components/home/MembershipPromo';
 import NextMatchDark from '../components/home/NextMatchDark';
 import DayPassGlass from '../components/home/DayPassGlass';
-import GlassCard from '../components/home/GlassCard';
+import GlassCard from '@/components/ui-kit/GlassCard';
 
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';

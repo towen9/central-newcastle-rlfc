@@ -4,7 +4,9 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { ShieldCheck } from 'lucide-react';
 import { createPageUrl } from '@/utils';
-import GlassCard from './GlassCard';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
 import clubConfig from '@/config/club.config';
 
 const t = clubConfig.theme;
@@ -27,7 +29,7 @@ export default function MembershipPromo() {
           <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${t.gold}22` }}>
             <ShieldCheck className="w-4 h-4" style={{ color: t.gold }} />
           </div>
-          <span className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>2026 Season</span>
+          <Eyebrow color={t.gold}>2026 Season</Eyebrow>
         </div>
         <h3 className="text-white text-2xl mb-1 leading-tight" style={{ fontFamily: t.fontDisplay }}>Join the Butcher Boys</h3>
         <p className="text-white/60 text-sm mb-4" style={{ fontFamily: t.fontBody }}>
@@ -42,14 +44,12 @@ export default function MembershipPromo() {
             ))}
           </div>
         )}
-        <motion.button
-          whileTap={{ scale: 0.98 }}
+        <GoldButton
           onClick={() => window.location.href = createPageUrl('JoinMembership')}
-          className="w-full py-3.5 rounded-xl text-sm font-bold transition-all"
-          style={{ background: `linear-gradient(135deg, ${t.goldHi}, ${t.gold})`, color: t.bg0, boxShadow: `0 4px 20px ${t.gold}33` }}
+          fullWidth
         >
           View All Memberships →
-        </motion.button>
+        </GoldButton>
       </GlassCard>
     </motion.div>
   );

@@ -8,7 +8,9 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { format, addDays } from 'date-fns';
 import clubConfig from '@/config/club.config';
-import GlassCard from '../components/home/GlassCard';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
 
 const t = clubConfig.theme;
 
@@ -204,7 +206,7 @@ export default function Rewards() {
           <GlassCard className="p-5">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>Next Reward</p>
+                <Eyebrow color={t.gold}>Next Reward</Eyebrow>
                 <p className="text-white text-sm font-bold mt-0.5" style={{ fontFamily: t.fontBody }}>{nextReward.title}</p>
               </div>
               <p className="text-white/60 text-xs" style={{ fontFamily: t.fontBody }}>{points} / {nextReward.points_required}</p>
@@ -304,17 +306,12 @@ export default function Rewards() {
                               </p>
                             </div>
                             {affordable ? (
-                              <button
+                              <GoldButton
                                 onClick={() => setSelectedReward(reward)}
-                                className="rounded-xl px-4 py-2 text-sm font-bold flex-shrink-0 transition-all"
-                                style={{
-                                  background: `linear-gradient(135deg, ${t.gold}, ${t.goldHi})`,
-                                  color: t.bg0,
-                                  boxShadow: `0 0 16px ${t.gold}55`
-                                }}
+                                style={{ flexShrink: 0 }}
                               >
                                 Redeem
-                              </button>
+                              </GoldButton>
                             ) : (
                               <div className="flex items-center gap-1.5 flex-shrink-0">
                                 <Lock className="w-4 h-4 text-white/30" />
@@ -393,14 +390,13 @@ export default function Rewards() {
 
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => setSelectedReward(null)}>Cancel</Button>
-                <Button
-                  className="flex-1"
-                  style={{ background: `linear-gradient(135deg, ${t.gold}, ${t.goldHi})`, color: t.bg0 }}
+                <GoldButton
                   onClick={() => claimMutation.mutate(selectedReward)}
                   disabled={claimMutation.isPending}
+                  style={{ flex: 1 }}
                 >
                   {claimMutation.isPending ? 'Redeeming...' : 'Confirm'}
-                </Button>
+                </GoldButton>
               </div>
             </motion.div>
           </motion.div>

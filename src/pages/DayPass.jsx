@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import DayPassDetailsForm from '../components/daypass/DayPassDetailsForm';
 import clubConfig from '@/config/club.config';
-import GlassCard from '../components/home/GlassCard';
+import GlassCard from '@/components/ui-kit/GlassCard';
 
 const t = clubConfig.theme;
 
