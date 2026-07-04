@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, ShieldCheck, Settings } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -18,13 +18,20 @@ export default function Layout({ children, currentPageName }) {
   const isAdminPage = adminPages.includes(currentPageName);
   const showBottomNav = memberPages.includes(currentPageName) || memberPages2.includes(currentPageName);
   const [user, setUser] = useState(null);
+  const mainRef = useRef(null);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [currentPageName]);
+
   return (
-    <div className="relative flex flex-col" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)`, minHeight: '100dvh' }}>
+    <div className="relative flex flex-col" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)`, height: '100dvh', overflow: 'hidden' }}>
       <PushNotificationManager />
       <style>{`
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
@@ -32,7 +39,7 @@ export default function Layout({ children, currentPageName }) {
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         * { -webkit-tap-highlight-color: transparent; }
-        body { overscroll-behavior-x: none; overscroll-behavior-y: auto; -webkit-user-select: none; user-select: none; -webkit-overflow-scrolling: touch; -webkit-touch-callout: none; }
+        body { overscroll-behavior-x: none; overscroll-behavior-y: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; position: fixed; width: 100%; }
         html, body { height: 100%; overflow-x: hidden; }
         input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
         button, a, [role="button"], .clickable { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
@@ -40,7 +47,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {showBottomNav && (
-        <header className="relative z-30 pt-safe sticky top-0" style={{ background: `${t.bg0}cc`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <header className="relative z-30 pt-safe flex-shrink-0" style={{ background: `${t.bg0}cc`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <img src={clubConfig.identity.logo_url} alt={clubConfig.identity.club_name} className="w-10 h-10 object-contain bg-white rounded-full p-0.5" />
@@ -70,7 +77,7 @@ export default function Layout({ children, currentPageName }) {
         </header>
       )}
 
-      <main className="flex-1 relative z-10" style={{ paddingBottom: showBottomNav ? '110px' : '0' }}>
+      <main ref={mainRef} className="flex-1 relative z-10" style={{ paddingBottom: showBottomNav ? '110px' : '0', overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
         {children}
       </main>
 
