@@ -1,2 +1,2 @@
 // ACTIVE CLUB — swap this import to re-brand the entire app
-export { default } from './clubs/central-newcastle';
+export { default } from './clubs/kingsford-falcons-demo';
