@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Ticket, Beer, Building2, Trophy, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import clubConfig from '@/config/club.config';
 import { Button } from '@/components/ui/button';
 
 export default function HowPointsWork() {
@@ -138,7 +139,7 @@ export default function HowPointsWork() {
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
               <div>
                 <p className="font-bold text-gray-900">$20 Merchandise Voucher</p>
-                <p className="text-sm text-gray-500">Get some Central Newcastle RLFC gear</p>
+                <p className="text-sm text-gray-500">Get some {clubConfig.identity.club_short_name} gear</p>
               </div>
               <span className="text-xl font-bold text-amber-600">250 pts</span>
             </div>

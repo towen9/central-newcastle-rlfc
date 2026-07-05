@@ -13,7 +13,8 @@ const clubConfig = {
     logo_url: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg",
     app_url: "",
     team_short: "Kingsford",
-    club_short_name: "Kingsford Falcons"
+    club_short_name: "Kingsford Falcons",
+    sport_emoji: "🦅"
   },
 
   theme: {

@@ -4,13 +4,14 @@ import { CheckCircle2, Smartphone, Star, Gift, Building2, ShieldCheck, ArrowRigh
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import clubConfig from '@/config/club.config';
 import { base44 } from '@/api/base44Client';
 
 const steps = [
   {
     icon: Smartphone,
     title: 'Download & Sign Up',
-    description: 'Open the Central Newcastle RLFC app and create your free account using your email address.'
+    description: `Open the ${clubConfig.identity.club_name} app and create your free account using your email address.`
   },
   {
     icon: ShieldCheck,
@@ -58,8 +59,8 @@ export default function PlayerPassInvite() {
             animate={{ opacity: 1, y: 0 }}
           >
             <img
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-              alt="Central Newcastle RLFC"
+              src={clubConfig.identity.logo_url}
+              alt={clubConfig.identity.club_name}
               className="w-20 h-20 object-contain bg-white rounded-full p-1 mx-auto mb-4"
             />
             <div className="inline-flex items-center gap-2 bg-amber-400/20 border border-amber-400/40 rounded-full px-4 py-1.5 mb-4">
@@ -188,7 +189,7 @@ export default function PlayerPassInvite() {
                 </>
               )}
               <p className="text-center text-gray-400 text-xs mt-3">
-                Free for all registered Central Newcastle RLFC players • 2026 Season
+                Free for all registered {clubConfig.identity.club_name} players • {clubConfig.season.year} Season
               </p>
             </>
           )}

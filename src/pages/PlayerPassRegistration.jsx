@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+import clubConfig from '@/config/club.config';
 
 export default function PlayerPassRegistration() {
   const [user, setUser] = useState(null);
@@ -161,7 +162,7 @@ export default function PlayerPassRegistration() {
       try {
         await base44.integrations.Core.SendEmail({
           to: 'admin@centralrlfc.com',
-          subject: '🏉 New Player Pass Application',
+          subject: `${clubConfig.identity.sport_emoji} New Player Pass Application`,
           body: `
             A new player pass application has been submitted:
             
@@ -258,7 +259,7 @@ export default function PlayerPassRegistration() {
           <>
             <div className="bg-blue-50 rounded-xl p-4 mb-6">
               <p className="text-sm text-blue-800">
-                🏉 This pass is for Central Newcastle RLFC players (Men's & Women's). 
+                {clubConfig.identity.sport_emoji} This pass is for {clubConfig.identity.club_name} players (Men's & Women's). 
                 Your application will be reviewed by admin before activation.
               </p>
             </div>

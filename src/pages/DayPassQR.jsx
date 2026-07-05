@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Ticket, Download, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
+import clubConfig from '@/config/club.config';
 
 export default function DayPassQR() {
   const [user, setUser] = useState(null);
@@ -69,8 +70,8 @@ export default function DayPassQR() {
         {/* QR Code Display */}
         <div className="bg-white rounded-2xl p-8 shadow-xl text-center">
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-            alt="Central Newcastle RLFC"
+            src={clubConfig.identity.logo_url}
+            alt={clubConfig.identity.club_name}
             className="w-24 h-24 mx-auto mb-6 bg-white rounded-full p-2"
           />
           
@@ -116,8 +117,8 @@ export default function DayPassQR() {
         <div className="hidden print:block">
           <div className="text-center py-8">
             <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-              alt="Central Newcastle RLFC"
+              src={clubConfig.identity.logo_url}
+              alt={clubConfig.identity.club_name}
               className="w-32 h-32 mx-auto mb-8"
             />
             
