@@ -39,7 +39,9 @@ export default function OldButchersHonourRoll() {
     queryFn: async () => {
       const all = await base44.entities.Membership.filter({ tier_name: 'Old Butchers Membership', status: 'active' }, 'user_name');
       return all;
-    }
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000
   });
 
   const updateMutation = useMutation({
