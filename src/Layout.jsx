@@ -77,7 +77,7 @@ export default function Layout({ children, currentPageName }) {
         </header>
       )}
 
-      <main ref={mainRef} className="flex-1 relative z-10" style={{ paddingBottom: showBottomNav ? '110px' : '0', overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
+      <main ref={mainRef} className="flex-1 relative z-10" style={{ paddingBottom: showBottomNav ? '110px' : '0', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
         {children}
       </main>
 

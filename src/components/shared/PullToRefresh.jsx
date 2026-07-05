@@ -42,7 +42,7 @@ export default function PullToRefresh({ onRefresh, children }) {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto"
+      className="flex-1 overflow-y-auto overflow-x-hidden"
       style={{ WebkitOverflowScrolling: 'touch', overscrollBehaviorY: 'contain' }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
