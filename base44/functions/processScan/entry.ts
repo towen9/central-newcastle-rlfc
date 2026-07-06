@@ -57,7 +57,8 @@ Deno.serve(async (req) => {
     }).length;
 
     // Family memberships allow 2 entries per game day (2 adults), all others allow 1
-    const isFamily = membership.tier_name?.includes('Family');
+    // tier_type first, tier_name fallback for records created before the tier_type sweep
+    const isFamily = membership.tier_type ? membership.tier_type === 'family' : membership.tier_name?.includes('Family');
     const maxEntries = isFamily ? 2 : 1;
 
     if (todayCheckinsCount >= maxEntries) {
@@ -67,9 +68,11 @@ Deno.serve(async (req) => {
       return Response.json({ type: 'already_used', name: membership.user_name || 'Member', detail });
     }
 
-    const isSupporter = membership.tier_name?.includes('Supporter Pack');
-    // Award points to Family, Premium, and Old Butchers members
-    const isFamilyOrPremium = membership.tier_name?.includes('Family') || membership.tier_name?.includes('Premium') || membership.tier_name?.includes('Old Butchers');
+    const isSupporter = membership.tier_type ? membership.tier_type === 'supporter' : membership.tier_name?.includes('Supporter Pack');
+    // Award points to Family, Premium, and Old Butchers (legacy) members
+    const isFamilyOrPremium = membership.tier_type
+      ? ['family', 'premium', 'legacy'].includes(membership.tier_type)
+      : (membership.tier_name?.includes('Family') || membership.tier_name?.includes('Premium') || membership.tier_name?.includes('Old Butchers'));
 
     // Block Supporter Pack if no games remaining
     if (isSupporter) {
