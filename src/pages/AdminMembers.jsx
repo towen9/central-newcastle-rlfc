@@ -343,15 +343,15 @@ export default function AdminMembers() {
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Supporter</p>
-          <p className="text-2xl font-bold text-blue-600">{memberships.filter(m => m.tier_name === 'Supporter Pack').length}</p>
+          <p className="text-2xl font-bold text-blue-600">{memberships.filter(m => m.tier_type ? m.tier_type === 'supporter' : m.tier_name === 'Supporter Pack').length}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Family</p>
-          <p className="text-2xl font-bold text-purple-600">{memberships.filter(m => m.tier_name === 'Family Membership').length}</p>
+          <p className="text-2xl font-bold text-purple-600">{memberships.filter(m => m.tier_type ? m.tier_type === 'family' : m.tier_name === 'Family Membership').length}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Premium</p>
-          <p className="text-2xl font-bold text-amber-600">{memberships.filter(m => m.tier_name === 'Premium Membership').length}</p>
+          <p className="text-2xl font-bold text-amber-600">{memberships.filter(m => m.tier_type ? m.tier_type === 'premium' : m.tier_name === 'Premium Membership').length}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Pending</p>

@@ -13,8 +13,9 @@ export default function HeroPass({ membership, user, onShowQR }) {
   const isActive = membership?.status === 'active';
   const expiryDate = membership?.expiry_date ? new Date(membership.expiry_date) : null;
   const tierName = membership?.tier_name || '';
-  const isPremium = tierName.includes('Premium');
-  const isSupporter = tierName.includes('Supporter Pack');
+  const tierType = membership?.tier_type;
+  const isPremium = tierType ? tierType === 'premium' : tierName.includes('Premium');
+  const isSupporter = tierType ? tierType === 'supporter' : tierName.includes('Supporter Pack');
   const gamesRemaining = membership?.games_remaining ?? null;
   const points = membership?.points || 0;
   const gamesAttended = membership?.total_checkins || 0;

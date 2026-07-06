@@ -64,7 +64,7 @@ export default function OldButchersHonourRoll() {
     }
   });
 
-  const isOldButcher = membership?.tier_name === 'Old Butchers Membership';
+  const isOldButcher = membership?.tier_type ? membership.tier_type === 'legacy' : membership?.tier_name === 'Old Butchers Membership';
 
   if (!user) {
     return (
