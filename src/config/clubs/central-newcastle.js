@@ -4,6 +4,8 @@
  * fixture integration settings, and membership tier definitions.
  */
 
+import { resolveFeatures } from '../productTiers';
+
 const clubConfig = {
   identity: {
     club_name: "Central Newcastle RLFC",
@@ -31,22 +33,8 @@ const clubConfig = {
     fontBody: "'Archivo', sans-serif"
   },
 
-  features: {
-    membership: true,
-    day_pass: true,
-    gate_scanning: true,
-    fixtures: true,
-    push_notifications: true,
-    points_rewards: true,
-    gamification: true,
-    merch_shop: true,
-    sponsor_portal: true,
-    sponsor_dashboard: true,
-    juniors: true,
-    automations: true,
-    social_posting: true,
-    kpi_digest: true
-  },
+  product_tier: "elite",
+  features: resolveFeatures("elite"),
 
   fixtures: {
     source: "mysideline",

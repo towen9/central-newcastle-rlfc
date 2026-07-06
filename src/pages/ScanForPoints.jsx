@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import clubConfig from '@/config/club.config';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Camera, CheckCircle, XCircle, Beer, ArrowLeft, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -186,6 +186,10 @@ export default function ScanForPoints() {
       stopScanning();
     };
   }, []);
+
+  if (!clubConfig.features?.points_rewards) {
+    return <Navigate to={createPageUrl('Home')} replace />;
+  }
 
   // Block day pass holders from scanning for points
   if (user && !membership) {

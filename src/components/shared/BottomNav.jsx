@@ -10,11 +10,11 @@ const t = clubConfig.theme;
 
 const leftItems = [
   { icon: Home, label: 'Home', page: 'Home' },
-  { icon: CreditCard, label: 'Membership', page: 'Membership' },
+  { icon: CreditCard, label: 'Membership', page: 'Membership', feature: 'membership' },
 ];
 
 const rightItems = [
-  { icon: Award, label: 'Sponsors', page: 'Sponsors' },
+  { icon: Award, label: 'Sponsors', page: 'Sponsors', feature: 'sponsor_portal' },
   { icon: User, label: 'Profile', page: 'Profile' },
 ];
 
@@ -44,30 +44,32 @@ export default function BottomNav({ currentPage }) {
         boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
       }}>
         <div className="flex flex-1 items-center justify-around">
-          {leftItems.map(renderNavItem)}
+          {leftItems.filter(item => !item.feature || clubConfig.features?.[item.feature]).map(renderNavItem)}
         </div>
 
         <div className="flex-shrink-0" style={{ width: '60px' }} />
 
         <div className="flex flex-1 items-center justify-around">
-          {rightItems.map(renderNavItem)}
+          {rightItems.filter(item => !item.feature || clubConfig.features?.[item.feature]).map(renderNavItem)}
         </div>
 
-        <Link to={createPageUrl('ScanForPoints')} className="absolute left-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%)', top: '-22px', pointerEvents: 'auto' }}>
-          <motion.div whileTap={{ scale: 0.9 }} className="flex flex-col items-center">
-            <div className="flex items-center justify-center" style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${t.goldHi}, ${t.gold})`,
-              boxShadow: `0 4px 20px ${t.gold}55`,
-              border: `3px solid ${t.bg0}`
-            }}>
-              <ScanLine className="w-6 h-6" style={{ color: t.bg0 }} strokeWidth={2.5} />
-            </div>
-            <span className="text-[9px] font-bold mt-0.5" style={{ color: t.gold }}>SCAN</span>
-          </motion.div>
-        </Link>
+        {clubConfig.features?.gate_scanning && (
+          <Link to={createPageUrl('ScanForPoints')} className="absolute left-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%)', top: '-22px', pointerEvents: 'auto' }}>
+            <motion.div whileTap={{ scale: 0.9 }} className="flex flex-col items-center">
+              <div className="flex items-center justify-center" style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: `linear-gradient(135deg, ${t.goldHi}, ${t.gold})`,
+                boxShadow: `0 4px 20px ${t.gold}55`,
+                border: `3px solid ${t.bg0}`
+              }}>
+                <ScanLine className="w-6 h-6" style={{ color: t.bg0 }} strokeWidth={2.5} />
+              </div>
+              <span className="text-[9px] font-bold mt-0.5" style={{ color: t.gold }}>SCAN</span>
+            </motion.div>
+          </Link>
+        )}
       </div>
     </div>
   );

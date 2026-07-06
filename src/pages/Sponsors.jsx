@@ -3,6 +3,8 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
@@ -109,6 +111,10 @@ export default function Sponsors() {
       });
     } catch {}
   };
+
+  if (!clubConfig.features?.sponsor_portal) {
+    return <Navigate to={createPageUrl('Home')} replace />;
+  }
 
   return (
     <div className="min-h-full pb-24">

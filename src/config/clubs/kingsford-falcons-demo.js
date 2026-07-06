@@ -1,7 +1,9 @@
 /**
  * Kingsford Falcons AFC — Club Configuration (Demo)
- * White-label demo profile for a Starter-tier AFL club build.
+ * White-label demo profile for a Pro-tier AFL club build.
  */
+
+import { resolveFeatures } from '../productTiers';
 
 const clubConfig = {
   identity: {
@@ -30,22 +32,8 @@ const clubConfig = {
     fontBody: "'Archivo', sans-serif"
   },
 
-  features: {
-    membership: true,
-    day_pass: true,
-    gate_scanning: true,
-    fixtures: true,
-    push_notifications: true,
-    points_rewards: true,
-    gamification: true,
-    merch_shop: false,
-    sponsor_portal: true,
-    sponsor_dashboard: true,
-    juniors: false,
-    automations: true,
-    social_posting: true,
-    kpi_digest: true
-  },
+  product_tier: "pro",
+  features: resolveFeatures("pro"),
 
   fixtures: {
     source: "playhq",

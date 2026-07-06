@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trophy, Beer, Gift, Ticket, ArrowRight, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
 import GlassCard from '@/components/ui-kit/GlassCard';
@@ -116,6 +116,10 @@ export default function PointsRewards() {
       default: return 'rgba(255,255,255,0.6)';
     }
   };
+
+  if (!clubConfig.features?.points_rewards) {
+    return <Navigate to={createPageUrl('Home')} replace />;
+  }
 
   if (!user) {
     return (

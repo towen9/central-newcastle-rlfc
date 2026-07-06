@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Clock, Trophy, Users, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format, isAfter, isBefore } from 'date-fns';
@@ -121,6 +121,10 @@ export default function Fixtures() {
   const upcomingEvents = events.filter(e => isAfter(new Date(e.date_time), new Date()));
 
   const hasScore = (f) => typeof f.score_us === 'number' && typeof f.score_them === 'number';
+
+  if (!clubConfig.features?.fixtures) {
+    return <Navigate to={createPageUrl('Home')} replace />;
+  }
 
   return (
     <div className="min-h-full pb-24">

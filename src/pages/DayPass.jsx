@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Ticket, Calendar, MapPin, Check, ArrowLeft, Loader2, Camera, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -175,6 +175,10 @@ export default function DayPass() {
       setUploadingPhoto(false);
     }
   };
+
+  if (!clubConfig.features?.day_pass) {
+    return <Navigate to={createPageUrl('Home')} replace />;
+  }
 
   if (verifying || paymentSuccess) {
     if (paymentSuccess && !verifying && detailsStep && createdPass) {

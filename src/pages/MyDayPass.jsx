@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Ticket, Calendar, MapPin, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
@@ -41,6 +42,10 @@ export default function MyDayPass() {
     },
     enabled: !!pass?.event_id
   });
+
+  if (!clubConfig.features?.day_pass) {
+    return <Navigate to={createPageUrl('Home')} replace />;
+  }
 
   if (!pass || !fixture) {
     return (

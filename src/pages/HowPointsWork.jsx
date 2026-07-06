@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Ticket, Beer, Building2, Trophy, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
 import GlassCard from '@/components/ui-kit/GlassCard';
@@ -11,6 +11,9 @@ import GoldButton from '@/components/ui-kit/GoldButton';
 const t = clubConfig.theme;
 
 export default function HowPointsWork() {
+  if (!clubConfig.features?.points_rewards) {
+    return <Navigate to={createPageUrl('Home')} replace />;
+  }
   return (
     <div className="min-h-full pb-24">
       {/* Header */}
