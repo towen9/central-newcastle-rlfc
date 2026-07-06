@@ -8,48 +8,39 @@ import { Link } from 'react-router-dom';
 
 import { toast } from 'sonner';
 import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+import { SkeletonCard } from '@/components/ui-kit/Skeleton';
+
+const t = clubConfig.theme;
 
 const tierConfig = {
   'Supporter Pack': {
-    gradient: 'from-[#1a365d] to-[#2b6cb0]',
+    accent: t.royal,
     icon: Shield,
-    iconColor: 'text-blue-300',
-    badge: 'bg-blue-100 text-blue-800',
     badgeLabel: '5 GAME PACK',
-    buttonClass: 'bg-[#1a365d] hover:bg-[#2c5282]',
   },
   'Family Membership': {
-    gradient: 'from-[#4c1d95] to-[#7c3aed]',
+    accent: '#7c3aed',
     icon: Users,
-    iconColor: 'text-purple-300',
-    badge: 'bg-purple-100 text-purple-800',
     badgeLabel: 'FAMILY PASS',
-    buttonClass: 'bg-[#5b21b6] hover:bg-[#4c1d95]',
   },
   'Premium Membership': {
-    gradient: 'from-[#78350f] to-[#b45309]',
+    accent: t.gold,
     icon: Star,
-    iconColor: 'text-amber-300',
-    badge: 'bg-amber-100 text-amber-800',
     badgeLabel: 'PREMIUM',
-    buttonClass: 'bg-[#92400e] hover:bg-[#78350f]',
     featured: true,
   },
   'Old Butchers Membership': {
-    gradient: 'from-[#1a1a2e] to-[#16213e]',
+    accent: t.gold,
     icon: Trophy,
-    iconColor: 'text-yellow-400',
-    badge: 'bg-yellow-400/20 text-yellow-400',
     badgeLabel: 'LEGACY',
-    buttonClass: 'bg-yellow-500 hover:bg-yellow-400 text-gray-950',
   },
   'Sponsor Season Pass': {
-    gradient: 'from-[#065f46] to-[#059669]',
+    accent: t.green,
     icon: Star,
-    iconColor: 'text-emerald-300',
-    badge: 'bg-emerald-100 text-emerald-800',
     badgeLabel: 'SPONSOR',
-    buttonClass: 'bg-emerald-700 hover:bg-emerald-600',
   },
 };
 
@@ -149,30 +140,39 @@ export default function JoinMembership() {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="px-5 py-6 space-y-4" style={{ minHeight: '100dvh', paddingBottom: '6rem' }}>
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-full pb-24" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
       {/* Header */}
-      <div className="bg-[#1a365d] pt-safe">
-        <div className="px-5 py-6">
-          <Link to="/Membership">
-            <button className="flex items-center gap-2 text-blue-200 mb-4">
-              <ArrowLeft className="w-5 h-5" />
-              Back
-            </button>
-          </Link>
-          <h1 className="text-white text-2xl font-bold mb-1">{clubConfig.season.year} Memberships</h1>
-          <p className="text-blue-200 text-sm">Support {clubConfig.identity.club_name} this season</p>
-        </div>
+      <div className="pt-safe px-5 py-6">
+        <Link to="/Membership">
+          <button className="flex items-center gap-2 mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm" style={{ fontFamily: t.fontBody }}>Back</span>
+          </button>
+        </Link>
+        <Eyebrow color={t.gold}>{clubConfig.season.year} Season</Eyebrow>
+        <h1 className="text-white text-2xl mb-1" style={{ fontFamily: t.fontDisplay }}>{clubConfig.season.year} Memberships</h1>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Support {clubConfig.identity.club_name} this season</p>
       </div>
 
       <div className="px-5 py-6">
-        
-
         <div className="space-y-5">
           {tiers.map((tier, idx) => {
             const config = tierConfig[tier.name] || tierConfig['Supporter Pack'];
             const Icon = config.icon;
             const isFeatured = config.featured;
+            const accent = config.accent || t.gold;
+            const isHighlighted = highlightTier === tier.name;
 
             return (
               <motion.div
@@ -181,91 +181,92 @@ export default function JoinMembership() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
                 id={`tier-${tier.name.replace(/\s+/g, '-').toLowerCase()}`}
-                className={`relative rounded-2xl overflow-hidden shadow-lg ${
-                  highlightTier === tier.name
-                    ? 'ring-4 ring-amber-400 shadow-amber-200'
-                    : isFeatured
-                    ? 'ring-2 ring-amber-400'
-                    : 'border border-gray-100'
-                }`}
               >
-                {isFeatured && (
-                  <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-bl-xl z-10">
-                    ★ BEST VALUE
-                  </div>
-                )}
-
-                {/* Tier Header */}
-                <div className={`bg-gradient-to-r ${config.gradient} p-5`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                        <Icon className={`w-5 h-5 ${config.iconColor}`} />
-                      </div>
-                      <div>
-                        <h3 className="text-white text-lg font-bold">{tier.name}</h3>
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${config.badge}`}>
-                          {config.badgeLabel}
-                        </span>
-                      </div>
+                <GlassCard
+                  className="overflow-hidden"
+                  style={isFeatured || isHighlighted ? { borderColor: accent, boxShadow: `0 8px 32px ${accent}22` } : undefined}
+                >
+                  {isFeatured && (
+                    <div className="px-4 py-1.5 text-xs font-bold flex items-center gap-1" style={{ background: accent, color: t.bg0 }}>
+                      ★ BEST VALUE
                     </div>
-                    <div className="text-right">
-                      <p className="text-white text-3xl font-bold">${tier.price}</p>
-                      <p className="text-white/60 text-xs">per {tier.price_period}</p>
-                    </div>
-                  </div>
-                  <p className="text-white/80 text-sm mt-3">{tier.description}</p>
-                </div>
-
-                {/* Benefits */}
-                <div className="bg-white p-5">
-                  <div className="space-y-2 mb-5">
-                    {tier.benefits?.map((benefit, bidx) => (
-                      <div key={bidx} className="flex items-start gap-2 text-sm text-gray-700">
-                        <div className="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="w-3 h-3 text-emerald-600" />
-                        </div>
-                        <span>{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {tier.price === 0 && sponsorSubmitted ? (
-                    <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-4 text-center">
-                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Check className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      <p className="font-semibold text-emerald-800 text-sm mb-1">Application Received!</p>
-                      <p className="text-emerald-700 text-xs leading-relaxed">Your application has been received. A club administrator will review and approve your account shortly.</p>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={() => handlePurchase(tier)}
-                      disabled={processing && selectedTier?.id === tier.id}
-                      className={`w-full py-6 text-base font-semibold ${config.buttonClass} text-white`}
-                    >
-                      {processing && selectedTier?.id === tier.id ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : tier.price === 0 ? (
-                        'Apply for Sponsor Pass →'
-                      ) : (
-                        `Join for $${tier.price} →`
-                      )}
-                    </Button>
                   )}
-                </div>
+
+                  {/* Tier Header */}
+                  <div className="p-5" style={{ background: `linear-gradient(135deg, ${accent}22, rgba(255,255,255,0.02))` }}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${accent}22` }}>
+                          <Icon className="w-5 h-5" style={{ color: accent }} />
+                        </div>
+                        <div>
+                          <h3 className="text-white text-lg font-bold" style={{ fontFamily: t.fontBody }}>{tier.name}</h3>
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: `${accent}22`, color: accent }}>
+                            {config.badgeLabel}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white text-3xl font-bold" style={{ fontFamily: t.fontDisplay }}>${tier.price}</p>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>per {tier.price_period}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm mt-3" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>{tier.description}</p>
+                  </div>
+
+                  {/* Benefits */}
+                  <div className="p-5">
+                    <div className="space-y-2 mb-5">
+                      {tier.benefits?.map((benefit, bidx) => (
+                        <div key={bidx} className="flex items-start gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.7)', fontFamily: t.fontBody }}>
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${t.green}22` }}>
+                            <Check className="w-3 h-3" style={{ color: t.green }} />
+                          </div>
+                          <span>{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {tier.price === 0 && sponsorSubmitted ? (
+                      <div className="rounded-xl p-4 text-center" style={{ background: `${t.green}11`, border: `1px solid ${t.green}33` }}>
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: `${t.green}22` }}>
+                          <Check className="w-5 h-5" style={{ color: t.green }} />
+                        </div>
+                        <p className="font-semibold text-sm mb-1" style={{ color: t.green, fontFamily: t.fontBody }}>Application Received!</p>
+                        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Your application has been received. A club administrator will review and approve your account shortly.</p>
+                      </div>
+                    ) : (
+                      <GoldButton
+                        fullWidth
+                        onClick={() => handlePurchase(tier)}
+                        disabled={processing && selectedTier?.id === tier.id}
+                        style={{ padding: '14px 20px' }}
+                      >
+                        {processing && selectedTier?.id === tier.id ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Processing...
+                          </>
+                        ) : tier.price === 0 ? (
+                          'Apply for Sponsor Pass →'
+                        ) : (
+                          `Join for $${tier.price} →`
+                        )}
+                      </GoldButton>
+                    )}
+                  </div>
+                </GlassCard>
               </motion.div>
             );
           })}
         </div>
 
-        <div className="mt-8 bg-blue-50 rounded-xl p-4">
-          <p className="text-sm text-blue-800">
-            💳 Secure payment powered by Stripe. Paid memberships activate immediately. Sponsor passes require admin approval before activation.
-          </p>
+        <div className="mt-8">
+          <GlassCard className="p-4">
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
+              💳 Secure payment powered by Stripe. Paid memberships activate immediately. Sponsor passes require admin approval before activation.
+            </p>
+          </GlassCard>
         </div>
       </div>
     </div>

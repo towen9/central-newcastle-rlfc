@@ -6,6 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import clubConfig from '@/config/club.config';
 import ReactMarkdown from 'react-markdown';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+
+const t = clubConfig.theme;
 
 export default function MembershipAssistant() {
   const [conversation, setConversation] = useState(null);
@@ -72,20 +77,20 @@ export default function MembershipAssistant() {
   const visibleMessages = messages.filter(m => m.role === 'user' || m.role === 'assistant');
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
       {/* Header */}
-      <div className="bg-[#1a365d] text-white px-4 py-3 flex items-center gap-3" style={{ paddingTop: 'env(safe-area-inset-top, 12px)' }}>
+      <div className="px-4 py-3 flex items-center gap-3 pt-safe" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
         <Link to="/">
-          <button className="p-2 hover:bg-white/10 rounded-lg">
+          <button className="p-2 rounded-lg" style={{ color: 'rgba(255,255,255,0.6)' }}>
             <ArrowLeft className="w-5 h-5" />
           </button>
         </Link>
-        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-          <Bot className="w-6 h-6 text-white" />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `${t.gold}22`, border: `1px solid ${t.gold}33` }}>
+          <Bot className="w-6 h-6" style={{ color: t.gold }} />
         </div>
         <div>
-          <p className="font-bold">Membership Assistant</p>
-          <p className="text-blue-200 text-xs">{clubConfig.identity.club_name}</p>
+          <Eyebrow color={t.gold}>AI Assistant</Eyebrow>
+          <p className="text-white font-bold text-sm" style={{ fontFamily: t.fontBody }}>Membership Assistant</p>
         </div>
       </div>
 
@@ -93,35 +98,37 @@ export default function MembershipAssistant() {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {initializing && (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: t.gold }} />
           </div>
         )}
 
         {visibleMessages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} gap-2`}>
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 bg-[#1a365d] rounded-full flex items-center justify-center shrink-0 mt-1">
-                <Bot className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1" style={{ background: `${t.gold}1a`, border: `1px solid ${t.gold}33` }}>
+                <Bot className="w-4 h-4" style={{ color: t.gold }} />
               </div>
             )}
-            <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-              msg.role === 'user'
-                ? 'bg-[#1a365d] text-white'
-                : 'bg-white border border-gray-200 text-gray-800'
-            }`}>
+            <div
+              className="max-w-[80%] rounded-2xl px-4 py-3"
+              style={msg.role === 'user'
+                ? { background: t.gold, color: t.bg0 }
+                : { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)' }
+              }
+            >
               {msg.role === 'assistant' ? (
                 <ReactMarkdown
-                  className="text-sm prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+                  className="text-sm prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
                   components={{
                     a: ({ children, href }) => (
-                      <a href={href} className="text-blue-600 underline">{children}</a>
+                      <a href={href} className="underline" style={{ color: t.gold }}>{children}</a>
                     )
                   }}
                 >
                   {msg.content}
                 </ReactMarkdown>
               ) : (
-                <p className="text-sm">{msg.content}</p>
+                <p className="text-sm" style={{ fontFamily: t.fontBody }}>{msg.content}</p>
               )}
             </div>
           </div>
@@ -129,11 +136,11 @@ export default function MembershipAssistant() {
 
         {loading && (
           <div className="flex justify-start gap-2">
-            <div className="w-8 h-8 bg-[#1a365d] rounded-full flex items-center justify-center shrink-0">
-              <Bot className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: `${t.gold}1a`, border: `1px solid ${t.gold}33` }}>
+              <Bot className="w-4 h-4" style={{ color: t.gold }} />
             </div>
-            <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
-              <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+            <div className="rounded-2xl px-4 py-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <Loader2 className="w-4 h-4 animate-spin" style={{ color: t.gold }} />
             </div>
           </div>
         )}
@@ -142,7 +149,7 @@ export default function MembershipAssistant() {
       </div>
 
       {/* Input */}
-      <div className="bg-white border-t border-gray-200 px-4 py-3" style={{ paddingBottom: 'env(safe-area-inset-bottom, 12px)' }}>
+      <div className="px-4 py-3 pb-safe" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
         <div className="flex gap-2">
           <Input
             value={input}
@@ -151,14 +158,15 @@ export default function MembershipAssistant() {
             placeholder="Ask about your membership..."
             className="flex-1"
             disabled={loading || initializing}
+            style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
           />
-          <Button
+          <GoldButton
             onClick={sendMessage}
             disabled={loading || initializing || !input.trim()}
-            className="bg-[#1a365d] hover:bg-[#2c5282]"
+            style={{ padding: '8px 16px' }}
           >
             <Send className="w-4 h-4" />
-          </Button>
+          </GoldButton>
         </div>
       </div>
     </div>

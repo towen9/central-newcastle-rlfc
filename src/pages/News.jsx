@@ -8,14 +8,20 @@ import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import PullToRefresh from '../components/shared/PullToRefresh';
+import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import { SkeletonCard } from '@/components/ui-kit/Skeleton';
+
+const t = clubConfig.theme;
 
 const categoryColors = {
-  announcement: 'bg-blue-100 text-blue-700',
-  match_report: 'bg-emerald-100 text-emerald-700',
-  player_news: 'bg-purple-100 text-purple-700',
-  community: 'bg-amber-100 text-amber-700',
-  sponsor: 'bg-pink-100 text-pink-700',
-  general: 'bg-gray-100 text-gray-700'
+  announcement: t.royal,
+  match_report: t.green,
+  player_news: '#7c3aed',
+  community: t.gold,
+  sponsor: '#ec4899',
+  general: 'rgba(255,255,255,0.4)'
 };
 
 export default function News() {
@@ -42,29 +48,27 @@ export default function News() {
   }, [news]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
+    <div className="min-h-full pb-24" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
       {/* Header */}
-      <div className="bg-[#1a365d] dark:bg-gray-800 pt-safe">
-        <div className="px-5 py-4 flex items-center gap-4">
-          <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/10 dark:bg-white/5 rounded-full flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </div>
-          </Link>
-          <div>
-            <h1 className="text-white text-xl font-bold">Club News</h1>
-            <p className="text-blue-200 dark:text-gray-400 text-sm">Latest updates from Charlestown RLC</p>
+      <div className="pt-safe px-5 py-4 flex items-center gap-4">
+        <Link to={createPageUrl('Home')}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <ArrowLeft className="w-5 h-5 text-white" />
           </div>
+        </Link>
+        <div>
+          <Eyebrow color={t.gold}>Latest Updates</Eyebrow>
+          <h1 className="text-white text-xl font-bold" style={{ fontFamily: t.fontDisplay }}>Club News</h1>
         </div>
       </div>
 
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="px-5 py-6">
+        <div className="px-5 py-4">
         {news.length === 0 ? (
           <div className="text-center py-12">
-            <Newspaper className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">No news yet</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Check back soon for updates</p>
+            <Newspaper className="w-12 h-12 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
+            <h3 className="font-semibold text-white mb-1" style={{ fontFamily: t.fontBody }}>No news yet</h3>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Check back soon for updates</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -75,27 +79,28 @@ export default function News() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 onClick={() => setSelectedNews(item)}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-lg cursor-pointer"
               >
-                {item.image_url && (
-                  <img 
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-48 object-cover"
-                  />
-                )}
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${categoryColors[item.category] || categoryColors.general}`}>
-                      {item.category?.replace('_', ' ')}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {item.publish_date && format(new Date(item.publish_date), 'MMM d, yyyy')}
-                    </span>
+                <GlassCard className="overflow-hidden cursor-pointer">
+                  {item.image_url && (
+                    <img 
+                      src={item.image_url}
+                      alt={item.title}
+                      className="w-full h-48 object-cover"
+                    />
+                  )}
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-2 py-1 text-xs font-medium rounded-full" style={{ background: `${categoryColors[item.category] || categoryColors.general}22`, color: categoryColors[item.category] || categoryColors.general }}>
+                        {item.category?.replace('_', ' ')}
+                      </span>
+                      <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                        {item.publish_date && format(new Date(item.publish_date), 'MMM d, yyyy')}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-lg text-white mb-2" style={{ fontFamily: t.fontBody }}>{item.title}</h3>
+                    <p className="line-clamp-2" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.summary}</p>
                   </div>
-                  <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{item.summary}</p>
-                </div>
+                </GlassCard>
               </motion.div>
             ))}
 
@@ -107,30 +112,31 @@ export default function News() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 onClick={() => setSelectedNews(item)}
-                className="bg-white rounded-xl p-4 border border-gray-100 flex gap-4 cursor-pointer hover:shadow-md transition-shadow"
               >
-                {item.image_url ? (
-                  <img 
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <Newspaper className="w-8 h-8 text-gray-400" />
+                <GlassCard className="p-4 flex gap-4 cursor-pointer">
+                  {item.image_url ? (
+                    <img 
+                      src={item.image_url}
+                      alt={item.title}
+                      className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                      <Newspaper className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.3)' }} />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="px-2 py-0.5 text-xs font-medium rounded-full" style={{ background: `${categoryColors[item.category] || categoryColors.general}22`, color: categoryColors[item.category] || categoryColors.general }}>
+                        {item.category?.replace('_', ' ')}
+                      </span>
+                    </div>
+                    <h3 className="font-semibold text-white line-clamp-2 mb-1 text-sm" style={{ fontFamily: t.fontBody }}>{item.title}</h3>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      {item.publish_date && format(new Date(item.publish_date), 'MMM d, yyyy')}
+                    </p>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${categoryColors[item.category] || categoryColors.general}`}>
-                      {item.category?.replace('_', ' ')}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-1">{item.title}</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {item.publish_date && format(new Date(item.publish_date), 'MMM d, yyyy')}
-                  </p>
-                </div>
+                </GlassCard>
               </motion.div>
             ))}
           </div>
@@ -154,17 +160,19 @@ export default function News() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="min-h-screen bg-white sm:min-h-0 sm:max-w-2xl sm:mx-auto sm:my-8 sm:rounded-2xl overflow-hidden"
+              className="min-h-screen sm:min-h-0 sm:max-w-2xl sm:mx-auto sm:my-8 sm:rounded-2xl overflow-hidden"
+              style={{ background: `linear-gradient(180deg, ${t.bg1}, ${t.bg0})`, border: '1px solid rgba(255,255,255,0.08)' }}
             >
               {/* Header */}
-              <div className="sticky top-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center justify-between z-10">
+              <div className="sticky top-0 px-4 py-3 flex items-center justify-between z-10" style={{ background: `${t.bg0}cc`, backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <button 
                   onClick={() => setSelectedNews(null)}
-                  className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ background: 'rgba(255,255,255,0.05)' }}
                 >
-                  <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  <X className="w-5 h-5 text-white" />
                 </button>
-                <span className={`px-3 py-1 text-xs font-medium rounded-full ${categoryColors[selectedNews.category] || categoryColors.general}`}>
+                <span className="px-3 py-1 text-xs font-medium rounded-full" style={{ background: `${categoryColors[selectedNews.category] || categoryColors.general}22`, color: categoryColors[selectedNews.category] || categoryColors.general }}>
                   {selectedNews.category?.replace('_', ' ')}
                 </span>
               </div>
@@ -180,20 +188,20 @@ export default function News() {
 
               {/* Content */}
               <div className="p-6">
-                <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                <div className="flex items-center gap-2 text-sm mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
                   <Calendar className="w-4 h-4" />
                   {selectedNews.publish_date && format(new Date(selectedNews.publish_date), 'MMMM d, yyyy')}
                 </div>
 
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{selectedNews.title}</h1>
+                <h1 className="text-2xl font-bold text-white mb-4" style={{ fontFamily: t.fontDisplay }}>{selectedNews.title}</h1>
 
                 {selectedNews.summary && (
-                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 border-l-4 border-[#1a365d] dark:border-blue-500 pl-4">
+                  <p className="text-lg mb-6 pl-4" style={{ color: 'rgba(255,255,255,0.7)', borderLeft: `4px solid ${t.gold}` }}>
                     {selectedNews.summary}
                   </p>
                 )}
 
-                <div className="prose prose-gray dark:prose-invert max-w-none">
+                <div className="prose prose-invert max-w-none">
                   <ReactMarkdown>{selectedNews.content}</ReactMarkdown>
                 </div>
               </div>

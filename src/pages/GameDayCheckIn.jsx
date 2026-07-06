@@ -9,6 +9,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+
+const t = clubConfig.theme;
 
 export default function GameDayCheckIn() {
   const [step, setStep] = useState('loading'); // loading, register, payment, success
@@ -94,19 +99,19 @@ export default function GameDayCheckIn() {
 
   if (step === 'loading') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className="min-h-full flex items-center justify-center" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: t.gold }} />
       </div>
     );
   }
 
   if (step === 'error' || !event) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="min-h-full flex items-center justify-center p-6" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
         <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Invalid Entry Link</h2>
-          <p className="text-gray-500">Please scan the QR code at the gate</p>
+          <AlertCircle className="w-16 h-16 mx-auto mb-4" style={{ color: '#ef4444' }} />
+          <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Invalid Entry Link</h2>
+          <p style={{ color: 'rgba(255,255,255,0.5)' }}>Please scan the QR code at the gate</p>
         </div>
       </div>
     );
@@ -114,46 +119,45 @@ export default function GameDayCheckIn() {
 
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-500 to-teal-500 p-6 flex items-center justify-center">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl p-8 max-w-md w-full text-center"
-        >
-          <div className="w-20 h-20 bg-emerald-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-            <CheckCircle className="w-10 h-10 text-emerald-600" />
-          </div>
-          
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Entry Confirmed!</h2>
-          <p className="text-gray-600 mb-6">
-            Welcome to {event.opponent} vs {clubConfig.identity.club_name}
-          </p>
-
-          <div className="bg-gray-50 rounded-2xl p-6 mb-6">
-            <p className="text-sm text-gray-500 mb-2">Your Entry Pass</p>
-            <div className="w-48 h-48 mx-auto bg-white rounded-xl p-4 mb-3">
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${entryId}`}
-                alt="Entry Pass QR"
-                className="w-full h-full"
-              />
+      <div className="min-h-full p-6 flex items-center justify-center" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+          <GlassCard className="p-8 max-w-md w-full text-center" style={{ borderColor: `${t.green}55` }}>
+            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: `${t.green}22` }}>
+              <CheckCircle className="w-10 h-10" style={{ color: t.green }} />
             </div>
-            <p className="text-xs text-gray-500">Show this at the gate</p>
-          </div>
+            
+            <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Entry Confirmed!</h2>
+            <p className="mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              Welcome to {event.opponent} vs {clubConfig.identity.club_name}
+            </p>
 
-          <Button 
-            onClick={() => window.location.href = createPageUrl('GameDayPass') + '?entryId=' + entryId}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 mb-3"
-            size="lg"
-          >
-            View My Pass
-          </Button>
+            {/* QR code on solid white opaque background */}
+            <div className="rounded-2xl p-6 mb-6" style={{ background: `${t.green}11`, border: `1px solid ${t.green}33` }}>
+              <p className="text-sm mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>Your Entry Pass</p>
+              <div className="w-48 h-48 mx-auto bg-white rounded-xl p-4 mb-3">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${entryId}`}
+                  alt="Entry Pass QR"
+                  className="w-full h-full"
+                />
+              </div>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Show this at the gate</p>
+            </div>
 
-          <p className="text-xs text-gray-500 mb-4">Make a day of it!</p>
-          <div className="bg-blue-50 rounded-xl p-4 text-left">
-            <p className="font-semibold text-gray-900 text-sm mb-1">Central Leagues Club</p>
-            <p className="text-xs text-gray-600">Show your pass for dining specials today</p>
-          </div>
+            <GoldButton 
+              onClick={() => window.location.href = createPageUrl('GameDayPass') + '?entryId=' + entryId}
+              fullWidth
+              style={{ marginBottom: 12 }}
+            >
+              View My Pass
+            </GoldButton>
+
+            <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>Make a day of it!</p>
+            <div className="rounded-xl p-4 text-left" style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <p className="font-semibold text-white text-sm mb-1" style={{ fontFamily: t.fontBody }}>Central Leagues Club</p>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Show your pass for dining specials today</p>
+            </div>
+          </GlassCard>
         </motion.div>
       </div>
     );
@@ -161,29 +165,30 @@ export default function GameDayCheckIn() {
 
   if (step === 'payment') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="min-h-full flex items-center justify-center p-6" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Processing Payment...</h3>
-          <p className="text-sm text-gray-500">Please wait</p>
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: t.gold }} />
+          <h3 className="text-lg font-semibold text-white mb-2" style={{ fontFamily: t.fontBody }}>Processing Payment...</h3>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Please wait</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-full pb-8" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#1a365d] to-[#2c5282] pt-safe pb-24">
-        <div className="px-6 py-6 text-center">
+      <div className="pt-safe pb-24 text-center" style={{ background: `linear-gradient(160deg, ${t.bg1}, ${t.bg0})` }}>
+        <div className="px-6 py-6">
           <img 
             src={clubConfig.identity.logo_url}
             alt={clubConfig.identity.club_name}
             className="w-20 h-20 mx-auto mb-4 bg-white rounded-full p-2"
           />
-          <h1 className="text-white text-2xl font-bold mb-2">Game Day Entry</h1>
-          <p className="text-blue-200 text-sm">{event.opponent} - {event.team_grade}</p>
-          <p className="text-blue-200 text-xs mt-1">
+          <Eyebrow color={t.gold}>{event.team_grade}</Eyebrow>
+          <h1 className="text-white text-2xl font-bold mb-2" style={{ fontFamily: t.fontDisplay }}>Game Day Entry</h1>
+          <p className="text-sm" style={{ color: t.goldHi }}>{event.opponent} - {event.team_grade}</p>
+          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
             {new Date(event.date_time).toLocaleDateString('en-AU', { 
               weekday: 'long', 
               day: 'numeric', 
@@ -195,79 +200,84 @@ export default function GameDayCheckIn() {
 
       {/* Form Card */}
       <div className="px-6 -mt-16">
-        <div className="bg-white rounded-3xl shadow-xl p-6">
+        <GlassCard className="p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <Ticket className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `${t.gold}22` }}>
+              <Ticket className="w-5 h-5" style={{ color: t.gold }} />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900">Quick Registration</h2>
-              <p className="text-sm text-gray-500">Entry: ${event.entry_price?.toFixed(2) || '0.00'}</p>
+              <h2 className="font-bold text-white" style={{ fontFamily: t.fontBody }}>Quick Registration</h2>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Entry: ${event.entry_price?.toFixed(2) || '0.00'}</p>
             </div>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">First Name *</label>
+                <label className="text-sm font-medium mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>First Name *</label>
                 <Input 
                   required
                   value={formData.first_name}
                   onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                   placeholder="John"
+                  style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Last Name *</label>
+                <label className="text-sm font-medium mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Last Name *</label>
                 <Input 
                   required
                   value={formData.last_name}
                   onChange={(e) => setFormData({...formData, last_name: e.target.value})}
                   placeholder="Smith"
+                  style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Email *</label>
+              <label className="text-sm font-medium mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Email *</label>
               <Input 
                 type="email"
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 placeholder="john@example.com"
+                style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Mobile *</label>
+              <label className="text-sm font-medium mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Mobile *</label>
               <Input 
                 type="tel"
                 required
                 value={formData.mobile}
                 onChange={(e) => setFormData({...formData, mobile: e.target.value})}
                 placeholder="0400 000 000"
+                style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Postcode *</label>
+              <label className="text-sm font-medium mb-1 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Postcode *</label>
               <Input 
                 required
                 value={formData.postcode}
                 onChange={(e) => setFormData({...formData, postcode: e.target.value})}
                 placeholder="2290"
+                style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
               />
             </div>
 
-            <div className="border-t border-gray-100 pt-4 space-y-3">
+            <div className="space-y-3 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-start gap-3">
                 <Checkbox 
                   checked={formData.accept_terms}
                   onCheckedChange={(checked) => setFormData({...formData, accept_terms: checked})}
                   id="terms"
                 />
-                <label htmlFor="terms" className="text-xs text-gray-600 leading-relaxed">
+                <label htmlFor="terms" className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   I accept the terms and conditions and privacy policy *
                 </label>
               </div>
@@ -278,7 +288,7 @@ export default function GameDayCheckIn() {
                   onCheckedChange={(checked) => setFormData({...formData, opt_in_club: checked})}
                   id="club"
                 />
-                <label htmlFor="club" className="text-xs text-gray-600 leading-relaxed">
+                <label htmlFor="club" className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Keep me updated with club news and offers
                 </label>
               </div>
@@ -289,7 +299,7 @@ export default function GameDayCheckIn() {
                   onCheckedChange={(checked) => setFormData({...formData, opt_in_partners: checked})}
                   id="partners"
                 />
-                <label htmlFor="partners" className="text-xs text-gray-600 leading-relaxed">
+                <label htmlFor="partners" className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Send me partner and sponsor offers
                 </label>
               </div>
@@ -300,25 +310,25 @@ export default function GameDayCheckIn() {
                   onCheckedChange={(checked) => setFormData({...formData, opt_in_push: checked})}
                   id="push"
                 />
-                <label htmlFor="push" className="text-xs text-gray-600 leading-relaxed">
+                <label htmlFor="push" className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   Enable push notifications for game reminders and offers
                 </label>
               </div>
             </div>
 
-            <Button 
+            <GoldButton 
               type="submit" 
-              className="w-full bg-[#1a365d] hover:bg-[#2c5282]"
-              size="lg"
+              fullWidth
+              style={{ padding: '14px 20px' }}
             >
               Pay ${event.entry_price?.toFixed(2) || '0.00'} & Enter
-            </Button>
+            </GoldButton>
 
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
               Secure payment powered by Stripe
             </p>
           </form>
-        </div>
+        </GlassCard>
       </div>
     </div>
   );
