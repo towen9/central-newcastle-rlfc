@@ -10,14 +10,22 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
 import PullToRefresh from '../components/shared/PullToRefresh';
+import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import SectionHead from '@/components/ui-kit/SectionHead';
+import GoldButton from '@/components/ui-kit/GoldButton';
+import { SkeletonCard } from '@/components/ui-kit/Skeleton';
+
+const t = clubConfig.theme;
 
 const categoryConfig = {
-  food_drink: { icon: Utensils, label: 'Food & Drink', color: 'bg-orange-500' },
-  fitness_health: { icon: Dumbbell, label: 'Fitness & Health', color: 'bg-green-500' },
-  retail: { icon: ShoppingBag, label: 'Retail', color: 'bg-blue-500' },
-  trades_services: { icon: Wrench, label: 'Trades & Services', color: 'bg-purple-500' },
-  family_kids: { icon: Baby, label: 'Family & Kids', color: 'bg-pink-500' },
-  other: { icon: Tag, label: 'Other', color: 'bg-gray-500' }
+  food_drink: { icon: Utensils, label: 'Food & Drink' },
+  fitness_health: { icon: Dumbbell, label: 'Fitness & Health' },
+  retail: { icon: ShoppingBag, label: 'Retail' },
+  trades_services: { icon: Wrench, label: 'Trades & Services' },
+  family_kids: { icon: Baby, label: 'Family & Kids' },
+  other: { icon: Tag, label: 'Other' }
 };
 
 export default function Benefits() {
@@ -160,38 +168,36 @@ export default function Benefits() {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900" style={{height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
+    <div className="min-h-full pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-500 to-teal-500 dark:from-emerald-700 dark:to-teal-700 pt-safe sticky top-0 z-30">
-        <div className="px-5 py-4 flex items-center gap-4">
-          <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/20 dark:bg-white/10 rounded-full flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </div>
-          </Link>
-          <div className="flex-1">
-            <h1 className="text-white text-xl font-bold">Benefits</h1>
-            <p className="text-white/80 dark:text-white/70 text-sm">Offers & rewards for members</p>
+      <div className="pt-safe px-5 py-4 flex items-center gap-4">
+        <Link to={createPageUrl('Home')}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
+            <ArrowLeft className="w-5 h-5 text-white" />
           </div>
-          {activeTab === 'rewards' && (
-            <div className="text-right">
-              <p className="text-white/80 dark:text-white/70 text-xs">Stamps</p>
-              <p className="text-white text-2xl font-bold">{stamps}</p>
-            </div>
-          )}
+        </Link>
+        <div className="flex-1">
+          <Eyebrow color={t.gold}>Members</Eyebrow>
+          <h1 className="text-white text-xl" style={{ fontFamily: t.fontDisplay }}>Benefits</h1>
         </div>
+        {activeTab === 'rewards' && (
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>Stamps</p>
+            <p className="text-2xl" style={{ fontFamily: t.fontDisplay, color: t.gold }}>{stamps}</p>
+          </div>
+        )}
       </div>
 
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="px-5 pt-6 pb-32">
+        <div className="px-5 pt-2 pb-32">
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="w-full bg-white border border-gray-200">
-            <TabsTrigger value="offers" className="flex-1">
+          <TabsList className="w-full" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <TabsTrigger value="offers" className="flex-1 text-white data-[state=active]:text-white">
               <Percent className="w-4 h-4 mr-2" />
               Offers
             </TabsTrigger>
-            <TabsTrigger value="rewards" className="flex-1">
+            <TabsTrigger value="rewards" className="flex-1 text-white data-[state=active]:text-white">
               <Gift className="w-4 h-4 mr-2" />
               Rewards
             </TabsTrigger>
@@ -207,7 +213,7 @@ export default function Benefits() {
               exit={{ opacity: 0 }}
             >
               {/* Category Filter */}
-              <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide mb-4">
+              <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide mb-4">
                 {categories.map((cat) => {
                   const config = categoryConfig[cat];
                   const isActive = selectedCategory === cat;
@@ -216,19 +222,19 @@ export default function Benefits() {
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${
-                        isActive 
-                          ? 'bg-[#1a365d] text-white' 
-                          : 'bg-white text-gray-600 border border-gray-200'
-                      }`}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all flex-shrink-0 text-xs font-semibold"
+                      style={isActive
+                        ? { background: `${t.gold}22`, color: t.goldHi, border: `1px solid ${t.gold}66`, fontFamily: t.fontBody }
+                        : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)', fontFamily: t.fontBody }
+                      }
                     >
                       {config ? (
                         <>
                           <config.icon className="w-4 h-4" />
-                          <span className="text-sm font-medium">{config.label}</span>
+                          <span>{config.label}</span>
                         </>
                       ) : (
-                        <span className="text-sm font-medium">All</span>
+                        <span>All</span>
                       )}
                     </button>
                   );
@@ -247,43 +253,44 @@ export default function Benefits() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
                       onClick={() => setSelectedOffer(offer)}
-                      className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
                     >
-                      <div className="flex">
-                        {offer.image_url ? (
-                          <img 
-                            src={offer.image_url} 
-                            alt={offer.title}
-                            className="w-24 h-24 object-cover"
-                          />
-                        ) : (
-                          <div className={`w-24 h-24 ${config.color} flex items-center justify-center`}>
-                            <config.icon className="w-8 h-8 text-white" />
+                      <GlassCard className="overflow-hidden cursor-pointer">
+                        <div className="flex">
+                          {offer.image_url ? (
+                            <img 
+                              src={offer.image_url} 
+                              alt={offer.title}
+                              className="w-24 h-24 object-cover"
+                            />
+                          ) : (
+                            <div className="w-24 h-24 flex items-center justify-center" style={{ background: `${t.gold}1a` }}>
+                              <config.icon className="w-8 h-8" style={{ color: t.gold }} />
+                            </div>
+                          )}
+                          <div className="flex-1 p-4">
+                            <div className="flex items-start justify-between mb-1">
+                              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{offer.sponsor_name}</p>
+                              {offer.is_featured && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: `${t.gold}22`, color: t.gold }}>
+                                  Featured
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="font-semibold text-white text-sm" style={{ fontFamily: t.fontBody }}>{offer.title}</h3>
+                            <p className="text-xs line-clamp-1 mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{offer.description}</p>
                           </div>
-                        )}
-                        <div className="flex-1 p-4">
-                          <div className="flex items-start justify-between mb-1">
-                            <p className="text-xs text-gray-500">{offer.sponsor_name}</p>
-                            {offer.is_featured && (
-                              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
-                                Featured
-                              </span>
-                            )}
-                          </div>
-                          <h3 className="font-semibold text-gray-900 mb-1">{offer.title}</h3>
-                          <p className="text-sm text-gray-500 line-clamp-1">{offer.description}</p>
                         </div>
-                      </div>
+                      </GlassCard>
                     </motion.div>
                   );
                 })}
               </div>
 
               {filteredOffers.length === 0 && (
-                <div className="text-center py-12">
-                  <Percent className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                  <p className="text-gray-500">No offers in this category</p>
-                </div>
+                <GlassCard className="p-8 text-center">
+                  <Percent className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
+                  <p className="text-white/60 text-sm" style={{ fontFamily: t.fontBody }}>No offers in this category</p>
+                </GlassCard>
               )}
             </motion.div>
           )}
@@ -297,12 +304,12 @@ export default function Benefits() {
             >
               {/* Reward Sub-tabs */}
               <Tabs defaultValue="available" className="mb-6">
-                <TabsList className="w-full bg-white border border-gray-200">
-                  <TabsTrigger value="available" className="flex-1">Earn</TabsTrigger>
-                  <TabsTrigger value="unlocked" className="flex-1">
+                <TabsList className="w-full" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <TabsTrigger value="available" className="flex-1 text-white data-[state=active]:text-white">Earn</TabsTrigger>
+                  <TabsTrigger value="unlocked" className="flex-1 text-white data-[state=active]:text-white">
                     Unlocked {availableRedemptions.length > 0 && `(${availableRedemptions.length})`}
                   </TabsTrigger>
-                  <TabsTrigger value="history" className="flex-1">History</TabsTrigger>
+                  <TabsTrigger value="history" className="flex-1 text-white data-[state=active]:text-white">History</TabsTrigger>
                 </TabsList>
 
                 <div className="mt-6">
@@ -318,57 +325,46 @@ export default function Benefits() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.1 }}
-                            className={`bg-white rounded-2xl p-4 border ${
-                              canClaim ? 'border-amber-200 shadow-lg shadow-amber-100' : 'border-gray-100'
-                            }`}
                           >
-                            <div className="flex gap-4">
-                              <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                                canClaim ? 'bg-amber-100' : 'bg-gray-100'
-                              }`}>
-                                {canClaim ? (
-                                  <Gift className="w-7 h-7 text-amber-500" />
-                                ) : (
-                                  <Lock className="w-6 h-6 text-gray-400" />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between mb-2">
-                                  <div>
-                                    <h3 className="font-semibold text-gray-900">{reward.title}</h3>
-                                    <p className="text-sm text-gray-500">{reward.description}</p>
-                                  </div>
-                                  <div className={`px-2 py-1 rounded-lg text-xs font-bold ${
-                                    canClaim ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
-                                  }`}>
-                                    {reward.stamps_required}
-                                  </div>
+                            <GlassCard className="p-4" style={canClaim ? { borderColor: `${t.gold}55`, boxShadow: `0 0 24px ${t.gold}1a, 0 8px 32px rgba(0,0,0,0.3)` } : {}}>
+                              <div className="flex gap-4">
+                                <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: canClaim ? `${t.gold}22` : 'rgba(255,255,255,0.05)' }}>
+                                  {canClaim ? (
+                                    <Gift className="w-7 h-7" style={{ color: t.gold }} />
+                                  ) : (
+                                    <Lock className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.3)' }} />
+                                  )}
                                 </div>
-                                
-                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
-                                  <div 
-                                    className={`h-full rounded-full transition-all ${
-                                      canClaim ? 'bg-amber-500' : 'bg-gray-300'
-                                    }`}
-                                    style={{ width: `${progress}%` }}
-                                  />
-                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between mb-2">
+                                    <div>
+                                      <h3 className="font-semibold text-white text-sm" style={{ fontFamily: t.fontBody }}>{reward.title}</h3>
+                                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>{reward.description}</p>
+                                    </div>
+                                    <div className="px-2 py-1 rounded-lg text-xs font-bold" style={canClaim ? { background: `${t.gold}22`, color: t.gold } : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+                                      {reward.stamps_required}
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="h-2 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
+                                    <div 
+                                      className="h-full rounded-full transition-all"
+                                      style={{ width: `${progress}%`, background: canClaim ? `linear-gradient(90deg, ${t.gold}, ${t.goldHi})` : 'rgba(255,255,255,0.2)' }}
+                                    />
+                                  </div>
 
-                                {canClaim ? (
-                                  <Button 
-                                    size="sm"
-                                    className="bg-amber-500 hover:bg-amber-600"
-                                    onClick={() => setSelectedReward(reward)}
-                                  >
-                                    Claim Reward
-                                  </Button>
-                                ) : (
-                                  <p className="text-sm text-gray-500">
-                                    {reward.stamps_required - stamps} more stamps needed
-                                  </p>
-                                )}
+                                  {canClaim ? (
+                                    <GoldButton size="sm" onClick={() => setSelectedReward(reward)}>
+                                      Claim Reward
+                                    </GoldButton>
+                                  ) : (
+                                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
+                                      {reward.stamps_required - stamps} more stamps needed
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                            </div>
+                            </GlassCard>
                           </motion.div>
                         );
                       })}
@@ -377,29 +373,26 @@ export default function Benefits() {
 
                   <div data-state="unlocked" className="data-[state=active]:block hidden">
                     {availableRedemptions.length === 0 ? (
-                      <div className="text-center py-12">
-                        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                          <Ticket className="w-8 h-8 text-gray-400" />
+                      <GlassCard className="p-8 text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                          <Ticket className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.3)' }} />
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-1">No rewards yet</h3>
-                        <p className="text-sm text-gray-500">Earn stamps to unlock rewards</p>
-                      </div>
+                        <h3 className="font-semibold text-white mb-1" style={{ fontFamily: t.fontBody }}>No rewards yet</h3>
+                        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Earn stamps to unlock rewards</p>
+                      </GlassCard>
                     ) : (
                       <div className="space-y-4">
                         {availableRedemptions.map((redemption) => (
-                          <div 
-                            key={redemption.id}
-                            className="bg-white rounded-2xl p-4 border border-emerald-200 shadow-lg shadow-emerald-50"
-                          >
+                          <GlassCard key={redemption.id} className="p-4" style={{ borderColor: `${t.gold}44` }}>
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                                  <Gift className="w-6 h-6 text-emerald-500" />
+                                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${t.gold}22` }}>
+                                  <Gift className="w-6 h-6" style={{ color: t.gold }} />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-gray-900">{redemption.reward_title}</h3>
+                                  <h3 className="font-semibold text-white text-sm" style={{ fontFamily: t.fontBody }}>{redemption.reward_title}</h3>
                                   {redemption.expires_at && (
-                                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                                    <p className="text-xs flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
                                       <Clock className="w-3 h-3" />
                                       Expires {format(new Date(redemption.expires_at), 'MMM d, yyyy')}
                                     </p>
@@ -408,17 +401,17 @@ export default function Benefits() {
                               </div>
                             </div>
                             
-                            <div className="bg-gray-50 rounded-xl p-4 text-center mb-3">
-                              <p className="text-xs text-gray-500 mb-1">Redemption Code</p>
-                              <p className="font-mono text-2xl font-bold text-gray-900 tracking-wider">
+                            <div className="rounded-xl p-4 text-center mb-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
+                              <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: t.fontBody }}>Redemption Code</p>
+                              <p className="font-mono text-2xl font-bold tracking-wider" style={{ color: t.gold }}>
                                 {redemption.redemption_code}
                               </p>
                             </div>
                             
-                            <p className="text-xs text-gray-500 text-center">
+                            <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: t.fontBody }}>
                               Show this code to redeem at the club
                             </p>
-                          </div>
+                          </GlassCard>
                         ))}
                       </div>
                     )}
@@ -426,25 +419,25 @@ export default function Benefits() {
 
                   <div data-state="history" className="data-[state=active]:block hidden">
                     {redeemedRedemptions.length === 0 ? (
-                      <div className="text-center py-12">
-                        <p className="text-gray-500">No redeemed rewards yet</p>
-                      </div>
+                      <GlassCard className="p-8 text-center">
+                        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>No redeemed rewards yet</p>
+                      </GlassCard>
                     ) : (
                       <div className="space-y-3">
                         {redeemedRedemptions.map((redemption) => (
-                          <div key={redemption.id} className="bg-white rounded-xl p-4 border border-gray-100">
+                          <GlassCard key={redemption.id} className="p-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                                <CheckCircle className="w-5 h-5 text-gray-400" />
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                <CheckCircle className="w-5 h-5" style={{ color: t.gold }} />
                               </div>
                               <div className="flex-1">
-                                <p className="font-medium text-gray-900">{redemption.reward_title}</p>
-                                <p className="text-sm text-gray-500">
+                                <p className="font-medium text-white text-sm" style={{ fontFamily: t.fontBody }}>{redemption.reward_title}</p>
+                                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
                                   Redeemed {redemption.redeemed_at ? format(new Date(redemption.redeemed_at), 'MMM d, yyyy') : ''}
                                 </p>
                               </div>
                             </div>
-                          </div>
+                          </GlassCard>
                         ))}
                       </div>
                     )}
@@ -464,7 +457,8 @@ export default function Benefits() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+            style={{ background: 'rgba(6,13,31,0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
             onClick={() => {
               setSelectedOffer(null);
               setShowCode(false);
@@ -476,18 +470,23 @@ export default function Benefits() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+              className="max-w-lg w-full max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl"
+              style={{
+                background: `linear-gradient(160deg, ${t.bg1}, ${t.bg0})`,
+                border: '1px solid rgba(255,255,255,0.09)',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.5)'
+              }}
             >
               {selectedOffer.image_url ? (
                 <img 
                   src={selectedOffer.image_url}
                   alt={selectedOffer.title}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-48 object-cover rounded-t-3xl"
                 />
               ) : (
-                <div className={`w-full h-32 ${categoryConfig[selectedOffer.category]?.color || 'bg-gray-400'} flex items-center justify-center`}>
+                <div className="w-full h-32 flex items-center justify-center rounded-t-3xl" style={{ background: `${t.gold}1a` }}>
                   {categoryConfig[selectedOffer.category]?.icon && 
-                    React.createElement(categoryConfig[selectedOffer.category].icon, { className: 'w-12 h-12 text-white' })
+                    React.createElement(categoryConfig[selectedOffer.category].icon, { className: 'w-12 h-12', style: { color: t.gold } })
                   }
                 </div>
               )}
@@ -495,59 +494,61 @@ export default function Benefits() {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="text-sm text-emerald-600 font-medium mb-1">{selectedOffer.sponsor_name}</p>
-                    <h2 className="text-xl font-bold text-gray-900">{selectedOffer.title}</h2>
+                    <p className="text-sm font-medium mb-1" style={{ color: t.gold, fontFamily: t.fontBody }}>{selectedOffer.sponsor_name}</p>
+                    <h2 className="text-xl font-bold text-white" style={{ fontFamily: t.fontBody }}>{selectedOffer.title}</h2>
                   </div>
                   <button 
                     onClick={() => {
                       setSelectedOffer(null);
                       setShowCode(false);
                     }}
-                    className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: 'rgba(255,255,255,0.06)' }}
                   >
-                    <X className="w-4 h-4 text-gray-500" />
+                    <X className="w-4 h-4 text-white/60" />
                   </button>
                 </div>
 
-                <p className="text-gray-600 mb-6">{selectedOffer.description}</p>
+                <p className="mb-6" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>{selectedOffer.description}</p>
 
                 {showCode ? (
-                  <div className="bg-emerald-50 rounded-2xl p-6 text-center mb-6">
-                    <CheckCircle className="w-10 h-10 text-emerald-500 mx-auto mb-3" />
-                    <p className="text-sm text-emerald-600 mb-2">Your Offer Code</p>
+                  <div className="rounded-2xl p-6 text-center mb-6" style={{ background: `${t.gold}1a`, border: `1px solid ${t.gold}33` }}>
+                    <CheckCircle className="w-10 h-10 mx-auto mb-3" style={{ color: t.gold }} />
+                    <p className="text-sm mb-2" style={{ color: t.gold, fontFamily: t.fontBody }}>Your Offer Code</p>
                     <div className="flex items-center justify-center gap-3">
-                      <p className="font-mono text-2xl font-bold text-emerald-700">
+                      <p className="font-mono text-2xl font-bold" style={{ color: t.goldHi }}>
                         {selectedOffer.offer_code || 'MEMBER10'}
                       </p>
                       <button 
                         onClick={() => copyCode(selectedOffer.offer_code || 'MEMBER10')}
-                        className="p-2 hover:bg-emerald-100 rounded-lg transition-colors"
+                        className="p-2 rounded-lg transition-colors"
+                        style={{ background: 'rgba(255,255,255,0.06)' }}
                       >
-                        <Copy className="w-5 h-5 text-emerald-600" />
+                        <Copy className="w-5 h-5" style={{ color: t.gold }} />
                       </button>
                     </div>
-                    <p className="text-xs text-emerald-500 mt-3">Show this code to redeem</p>
+                    <p className="text-xs mt-3" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Show this code to redeem</p>
                   </div>
                 ) : (
-                  <Button
+                  <GoldButton
+                    fullWidth
                     onClick={() => redeemOfferMutation.mutate(selectedOffer)}
                     disabled={redeemOfferMutation.isPending}
-                    className="w-full bg-emerald-500 hover:bg-emerald-600 mb-6"
-                    size="lg"
+                    className="mb-6"
                   >
                     {redeemOfferMutation.isPending ? 'Loading...' : 'Get Offer Code'}
-                  </Button>
+                  </GoldButton>
                 )}
 
                 {selectedOffer.terms && (
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="text-xs text-gray-500 font-medium mb-2">Terms & Conditions</p>
-                    <p className="text-xs text-gray-400">{selectedOffer.terms}</p>
+                  <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                    <p className="text-xs font-medium mb-2" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Terms & Conditions</p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: t.fontBody }}>{selectedOffer.terms}</p>
                   </div>
                 )}
 
                 {selectedOffer.expiry_date && (
-                  <p className="text-xs text-gray-400 mt-4">
+                  <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: t.fontBody }}>
                     Valid until {format(new Date(selectedOffer.expiry_date), 'MMMM d, yyyy')}
                   </p>
                 )}
@@ -564,7 +565,8 @@ export default function Benefits() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+            style={{ background: 'rgba(6,13,31,0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
             onClick={() => setSelectedReward(null)}
           >
             <motion.div
@@ -572,31 +574,36 @@ export default function Benefits() {
               animate={{ y: 0 }}
               exit={{ y: 100 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl p-6 max-w-md w-full"
+              className="max-w-md w-full p-6 rounded-3xl"
+              style={{
+                background: `linear-gradient(160deg, ${t.bg1}, ${t.bg0})`,
+                border: '1px solid rgba(255,255,255,0.09)',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.5)'
+              }}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Claim Reward</h3>
+                <h3 className="text-xl font-bold text-white" style={{ fontFamily: t.fontBody }}>Claim Reward</h3>
                 <button onClick={() => setSelectedReward(null)}>
-                  <X className="w-6 h-6 text-gray-400" />
+                  <X className="w-6 h-6 text-white/40" />
                 </button>
               </div>
 
               <div className="text-center mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-2xl flex items-center justify-center">
-                  <Gift className="w-8 h-8 text-amber-500" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: `${t.gold}22` }}>
+                  <Gift className="w-8 h-8" style={{ color: t.gold }} />
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-1">{selectedReward.title}</h4>
-                <p className="text-gray-500">{selectedReward.description}</p>
+                <h4 className="text-lg font-semibold text-white mb-1" style={{ fontFamily: t.fontBody }}>{selectedReward.title}</h4>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>{selectedReward.description}</p>
               </div>
 
-              <div className="bg-amber-50 rounded-xl p-4 mb-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-amber-700">Cost</span>
-                  <span className="font-bold text-amber-700">{selectedReward.stamps_required} stamps</span>
+              <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <div className="flex items-center justify-between text-sm" style={{ fontFamily: t.fontBody }}>
+                  <span style={{ color: 'rgba(255,255,255,0.6)' }}>Cost</span>
+                  <span className="font-bold" style={{ color: t.gold }}>{selectedReward.stamps_required} stamps</span>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-amber-700">Your stamps after</span>
-                  <span className="font-bold text-amber-700">{stamps - selectedReward.stamps_required}</span>
+                <div className="flex items-center justify-between mt-2 text-sm" style={{ fontFamily: t.fontBody }}>
+                  <span style={{ color: 'rgba(255,255,255,0.6)' }}>Your stamps after</span>
+                  <span className="font-bold text-white">{stamps - selectedReward.stamps_required}</span>
                 </div>
               </div>
 
@@ -604,17 +611,18 @@ export default function Benefits() {
                 <Button 
                   variant="outline" 
                   className="flex-1"
+                  style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'white', background: 'transparent' }}
                   onClick={() => setSelectedReward(null)}
                 >
                   Cancel
                 </Button>
-                <Button 
-                  className="flex-1 bg-amber-500 hover:bg-amber-600"
+                <GoldButton 
+                  className="flex-1"
                   onClick={() => claimRewardMutation.mutate(selectedReward)}
                   disabled={claimRewardMutation.isPending}
                 >
                   {claimRewardMutation.isPending ? 'Claiming...' : 'Confirm'}
-                </Button>
+                </GoldButton>
               </div>
             </motion.div>
           </motion.div>
