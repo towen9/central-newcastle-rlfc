@@ -22,9 +22,18 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Fixture not found' }, { status: 404 });
     }
 
+    // Runtime price lookup — white-label safe, no hardcoded Stripe IDs
+    const dayPassTiers = await base44.entities.MembershipTier.filter({ tier_type: 'day_pass', is_active: true });
+    const dayPassTier = dayPassTiers[0];
+
+    if (!dayPassTier?.stripe_price_id) {
+      console.error('Day Pass tier missing or has no stripe_price_id');
+      return Response.json({ error: 'Day Pass is not configured. Please contact the club.' }, { status: 500 });
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: [{
-        price: 'price_1TJMnRLsW4v58VGVrPzGCXnB', // Day Pass $8 AUD (live)
+        price: dayPassTier.stripe_price_id,
         quantity: 1,
       }],
       mode: 'payment',
