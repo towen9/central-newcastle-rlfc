@@ -6,6 +6,13 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+import { SkeletonCard } from '@/components/ui-kit/Skeleton';
+
+const t = clubConfig.theme;
 
 export default function PointsRewards() {
   const [user, setUser] = useState(null);
@@ -90,171 +97,177 @@ export default function PointsRewards() {
     switch(type) {
       case 'beer_mid':
       case 'beer_full':
-        return <Beer className="w-8 h-8" />;
+        return <Beer className="w-5 h-5" />;
       case 'merchandise':
-        return <Gift className="w-8 h-8" />;
+        return <Gift className="w-5 h-5" />;
       case 'prize_draw':
-        return <Ticket className="w-8 h-8" />;
+        return <Ticket className="w-5 h-5" />;
       default:
-        return <Trophy className="w-8 h-8" />;
+        return <Trophy className="w-5 h-5" />;
     }
   };
 
   const getTransactionColor = (type) => {
     switch(type) {
-      case 'attendance': return 'text-blue-600';
-      case 'bar_purchase': return 'text-amber-600';
-      case 'leagues_club': return 'text-purple-600';
-      case 'redemption': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'attendance': return t.cyan;
+      case 'bar_purchase': return t.gold;
+      case 'leagues_club': return '#a78bfa';
+      case 'redemption': return '#ef4444';
+      default: return 'rgba(255,255,255,0.6)';
     }
   };
 
+  if (!user) {
+    return (
+      <div className="px-5 py-6 space-y-4" style={{ minHeight: '100dvh', paddingBottom: '6rem' }}>
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-full pb-24">
       {/* Header */}
-      <div className="bg-[#1a365d] pt-safe pb-8">
-        <div className="px-5 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-white">Points & Rewards</h1>
-              <Link to={createPageUrl('HowPointsWork')}>
-                <p className="text-blue-200 text-sm">How it works →</p>
-              </Link>
-            </div>
-            <Button
-              onClick={() => setShowHistory(!showHistory)}
-              variant="ghost"
-              className="text-white"
-            >
-              <History className="w-5 h-5" />
-            </Button>
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+        <Link to={createPageUrl('Home')}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
+            <ArrowRight className="w-5 h-5 text-white rotate-180" />
           </div>
-          
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
-            <p className="text-blue-200 text-sm mb-2">Your Balance</p>
-            <p className="text-5xl font-bold text-white">{pointsBalance}</p>
-            <p className="text-blue-200 text-lg mt-1">Points</p>
-          </div>
-        </div>
+        </Link>
+        <h1 className="text-white text-lg" style={{ fontFamily: t.fontDisplay }}>Points & Rewards</h1>
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ background: showHistory ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}
+        >
+          <History className="w-5 h-5 text-white" />
+        </button>
       </div>
 
-      {/* Content */}
-      <div className="px-5 -mt-4">
-        {!isRewardsEnabled ? (
-          <div className="pt-6">
-            <div className="bg-white rounded-2xl p-8 shadow-md text-center">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trophy className="w-8 h-8 text-amber-500" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Rewards Not Included</h2>
-              <p className="text-gray-500 text-sm mb-6">
-                The Supporter Pack doesn't include access to the rewards system. Upgrade to a Premium or Old Butchers membership to start earning and redeeming points.
-              </p>
-              <Link to="/JoinMembership">
-                <Button className="bg-[#1a365d] hover:bg-[#2c5282] w-full py-5 text-base">
-                  Upgrade Membership
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-            </div>
+      <div className="px-4 pb-4 space-y-4">
+        {/* Hero Balance Card */}
+        <GlassCard className="relative overflow-hidden p-6 text-center">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 40%, ${t.gold}22, transparent 60%)` }} />
+          <div className="relative z-10">
+            <Eyebrow color={t.gold}>Season Balance</Eyebrow>
+            <motion.p
+              key={pointsBalance}
+              initial={{ scale: 1.1, opacity: 0.6 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              style={{ fontFamily: t.fontDisplay, fontSize: '64px', color: t.gold, textShadow: `0 0 30px ${t.gold}66`, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}
+            >
+              {pointsBalance}
+            </motion.p>
+            <p className="text-white/50 text-xs mt-1" style={{ fontFamily: t.fontBody }}>points</p>
+            <Link to={createPageUrl('HowPointsWork')} className="inline-block mt-3">
+              <span className="text-xs font-semibold" style={{ color: t.cyan, fontFamily: t.fontBody }}>How it works →</span>
+            </Link>
           </div>
-        ) : showHistory ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl p-6 shadow-lg"
-          >
-            <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
-            <div className="space-y-3">
-              {transactions.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between py-3 border-b">
-                  <div>
-                    <p className="font-medium">{tx.description}</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(tx.timestamp).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <p className={`text-lg font-bold ${getTransactionColor(tx.transaction_type)}`}>
-                    {tx.points > 0 ? '+' : ''}{tx.points}
-                  </p>
-                </div>
-              ))}
-              {transactions.length === 0 && (
-                <p className="text-center text-gray-500 py-8">No activity yet</p>
-              )}
+        </GlassCard>
+
+        {/* Content */}
+        {!isRewardsEnabled ? (
+          <GlassCard className="p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: `${t.gold}22` }}>
+              <Trophy className="w-8 h-8" style={{ color: t.gold }} />
             </div>
-          </motion.div>
+            <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Rewards Not Included</h2>
+            <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
+              The Supporter Pack doesn't include access to the rewards system. Upgrade to a Premium or Old Butchers membership to start earning and redeeming points.
+            </p>
+            <Link to="/JoinMembership">
+              <GoldButton fullWidth>
+                Upgrade Membership
+                <ArrowRight className="w-4 h-4" />
+              </GoldButton>
+            </Link>
+          </GlassCard>
         ) : (
-          <div className="space-y-6 pt-4">
-            <h2 className="text-2xl font-bold text-black px-1">Available Rewards</h2>
-            
-            {rewards.map((reward) => {
-              const canAfford = pointsBalance >= reward.points_required;
-              
-              return (
-                <motion.div
-                  key={reward.id}
-                  whileHover={{ scale: canAfford ? 1.02 : 1 }}
-                  className={`bg-white rounded-2xl p-6 shadow-md ${
-                    !canAfford && 'opacity-60'
-                  }`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl ${
-                      canAfford ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'
-                    }`}>
-                      {getRewardIcon(reward.reward_type)}
+          <AnimatePresence mode="wait">
+            {showHistory ? (
+              <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <GlassCard className="divide-y divide-white/5 overflow-hidden">
+                  <div className="px-4 py-3">
+                    <Eyebrow color={t.gold}>Recent Activity</Eyebrow>
+                  </div>
+                  {transactions.length === 0 && (
+                    <p className="text-center text-white/40 py-10" style={{ fontFamily: t.fontBody }}>No activity yet</p>
+                  )}
+                  {transactions.map((tx) => (
+                    <div key={tx.id} className="flex items-center gap-3 px-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate" style={{ fontFamily: t.fontBody }}>{tx.description}</p>
+                        <p className="text-xs text-white/40" style={{ fontFamily: t.fontBody }}>
+                          {new Date(tx.timestamp).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <p className="text-base font-bold" style={{ color: getTransactionColor(tx.transaction_type), fontFamily: t.fontDisplay }}>
+                        {tx.points > 0 ? '+' : ''}{tx.points}
+                      </p>
                     </div>
-                    
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold">{reward.title}</h3>
-                      <p className="text-gray-600 text-sm mt-1">{reward.description}</p>
-                      
-                      <div className="flex items-center justify-between mt-4">
-                        <div>
-                          <p className="text-2xl font-bold text-amber-600">
-                            {reward.points_required}
-                          </p>
-                          <p className="text-xs text-gray-500">points required</p>
-                        </div>
-                        
-                        {canAfford && (
-                          <Button
-                            onClick={() => {
-                              if (confirm(`Redeem ${reward.title} for ${reward.points_required} points?`)) {
-                                redeemMutation.mutate(reward);
-                              }
-                            }}
-                            className="bg-amber-500 hover:bg-amber-600"
-                          >
-                            Redeem
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        )}
-                        
-                        {!canAfford && (
-                          <div className="text-right">
-                            <p className="text-sm text-gray-500">Need</p>
-                            <p className="font-bold text-gray-700">
-                              {reward.points_required - pointsBalance} more
+                  ))}
+                </GlassCard>
+              </motion.div>
+            ) : (
+              <motion.div key="rewards" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+                <div className="flex items-center justify-between px-1">
+                  <h2 className="text-white text-base font-bold" style={{ fontFamily: t.fontBody }}>Available Rewards</h2>
+                </div>
+
+                {rewards.map((reward) => {
+                  const canAfford = pointsBalance >= reward.points_required;
+
+                  return (
+                    <motion.div
+                      key={reward.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: canAfford ? 1 : 0.6, y: 0 }}
+                    >
+                      <GlassCard className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: canAfford ? `${t.gold}22` : 'rgba(255,255,255,0.05)' }}>
+                            <span style={{ color: canAfford ? t.gold : 'rgba(255,255,255,0.3)' }}>{getRewardIcon(reward.reward_type)}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-white text-sm" style={{ fontFamily: t.fontBody }}>{reward.title}</p>
+                            <p className="text-xs" style={{ color: canAfford ? t.gold : 'rgba(255,255,255,0.4)', fontFamily: t.fontDisplay }}>
+                              {reward.points_required} pts
                             </p>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-            
-            {rewards.length === 0 && (
-              <div className="bg-white rounded-2xl p-12 text-center">
-                <Trophy className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">No rewards available yet</p>
-              </div>
+                          {canAfford ? (
+                            <GoldButton
+                              onClick={() => {
+                                if (confirm(`Redeem ${reward.title} for ${reward.points_required} points?`)) {
+                                  redeemMutation.mutate(reward);
+                                }
+                              }}
+                              style={{ flexShrink: 0 }}
+                            >
+                              Redeem
+                            </GoldButton>
+                          ) : (
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                              <span className="text-xs text-white/40" style={{ fontFamily: t.fontBody }}>{reward.points_required - pointsBalance} more</span>
+                            </div>
+                          )}
+                        </div>
+                      </GlassCard>
+                    </motion.div>
+                  );
+                })}
+
+                {rewards.length === 0 && (
+                  <GlassCard className="p-8 text-center">
+                    <Trophy className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
+                    <p className="text-white/60 text-sm" style={{ fontFamily: t.fontBody }}>No rewards available yet</p>
+                  </GlassCard>
+                )}
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         )}
       </div>
     </div>

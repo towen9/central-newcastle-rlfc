@@ -9,6 +9,11 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import CheckInCelebration from '../components/CheckInCelebration';
 import jsQR from 'jsqr';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+
+const t = clubConfig.theme;
 
 export default function ScanForPoints() {
   const [user, setUser] = useState(null);
@@ -185,27 +190,25 @@ export default function ScanForPoints() {
   // Block day pass holders from scanning for points
   if (user && !membership) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-500 to-orange-600 pb-24">
-        <div className="bg-white/10 backdrop-blur-md pt-safe">
-          <div className="px-5 py-4">
-            <Link to={createPageUrl('Home')}>
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <ArrowLeft className="w-5 h-5 text-white" />
-              </div>
+      <div className="min-h-full pb-24">
+        <div className="pt-safe px-5 py-4 flex items-center gap-4">
+          <Link to={createPageUrl('Home')}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </div>
+          </Link>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-5 py-12">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: `${t.gold}22` }}>
+              <Beer className="w-8 h-8" style={{ color: t.gold }} />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Members Only</h2>
+            <p className="text-white/50 mb-6" style={{ fontFamily: t.fontBody }}>Bar scanning is exclusive to membership holders.</p>
+            <Link to={createPageUrl('Membership')}>
+              <GoldButton>View Memberships</GoldButton>
             </Link>
           </div>
-        </div>
-        <div className="px-5 py-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-white/90 rounded-full flex items-center justify-center">
-            <Beer className="w-8 h-8 text-amber-600" />
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">Members Only</h2>
-          <p className="text-white/90 mb-6">Bar scanning is exclusive to membership holders.</p>
-          <Link to={createPageUrl('Membership')}>
-            <Button className="bg-white text-amber-600 hover:bg-gray-100">
-              View Memberships
-            </Button>
-          </Link>
         </div>
       </div>
     );
@@ -213,31 +216,29 @@ export default function ScanForPoints() {
 
   if (!user || !membership) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+      <div className="min-h-full flex items-center justify-center">
+        <p className="text-white/50" style={{ fontFamily: t.fontBody }}>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-500 to-orange-600 dark:from-amber-600 dark:to-orange-700 pb-24">
+    <div className="min-h-full pb-24">
       {/* Header */}
-      <div className="bg-white/10 backdrop-blur-md pt-safe">
-        <div className="px-5 py-4 flex items-center justify-between">
-          <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </div>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Beer className="w-8 h-8 text-white" />
-            <div>
-              <h1 className="text-white text-xl font-bold">Scan for Points</h1>
-              <p className="text-amber-100 text-sm">+5 points per scan</p>
-            </div>
+      <div className="pt-safe px-5 py-4 flex items-center justify-between">
+        <Link to={createPageUrl('Home')}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
+            <ArrowLeft className="w-5 h-5 text-white" />
           </div>
-          <div className="w-10" />
+        </Link>
+        <div className="flex items-center gap-3">
+          <Beer className="w-6 h-6" style={{ color: t.gold }} />
+          <div>
+            <Eyebrow color={t.gold}>Bar & Canteen</Eyebrow>
+            <h1 className="text-white text-lg" style={{ fontFamily: t.fontDisplay }}>Scan for Points</h1>
+          </div>
         </div>
+        <div className="w-10" />
       </div>
 
       <div className="px-5 py-6">
@@ -245,13 +246,13 @@ export default function ScanForPoints() {
           /* Scanner View */
           <div className="space-y-4">
             {/* Current Points */}
-            <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl p-4 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Your Points</p>
-              <p className="text-4xl font-bold text-amber-600 dark:text-amber-500">{membership.points || 0}</p>
-            </div>
+            <GlassCard className="p-4 text-center" style={{ borderColor: `${t.gold}33` }}>
+              <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Your Points</p>
+              <p className="text-4xl font-bold" style={{ color: t.gold, fontFamily: t.fontDisplay }}>{membership.points || 0}</p>
+            </GlassCard>
 
-            {/* Scanner */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border-4 border-white/50 shadow-2xl">
+            {/* Scanner — camera feed is full-contrast, no glass overlay */}
+            <div className="rounded-2xl overflow-hidden" style={{ border: `3px solid ${t.gold}55`, boxShadow: `0 0 24px ${t.gold}1a, 0 8px 32px rgba(0,0,0,0.3)` }}>
               <div className="relative aspect-square bg-black">
                 <video
                   ref={videoRef}
@@ -262,25 +263,25 @@ export default function ScanForPoints() {
                 <canvas ref={canvasRef} className="hidden" />
                 
                 {!scanning && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-                    <Camera className="w-20 h-20 text-white/50" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+                    <Camera className="w-20 h-20 text-white/40" />
                   </div>
                 )}
 
                 {scanning && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-64 h-64 border-4 border-white rounded-3xl animate-pulse" />
+                    <div className="w-64 h-64 border-4 rounded-3xl animate-pulse" style={{ borderColor: t.gold }} />
                   </div>
                 )}
               </div>
             </div>
 
             {/* Instructions */}
-            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl p-4">
+            <GlassCard className="p-4">
               <div className="flex items-start gap-3">
-                <Zap className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-700 dark:text-gray-300">
-                  <p className="font-semibold mb-1">How it works:</p>
+                <Zap className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: t.gold }} />
+                <div className="text-sm" style={{ color: 'rgba(255,255,255,0.7)', fontFamily: t.fontBody }}>
+                  <p className="font-semibold mb-1 text-white">How it works:</p>
                   <ol className="list-decimal list-inside space-y-1">
                     <li>Scan the QR code at the bar or canteen</li>
                     <li>Earn 5 points instantly</li>
@@ -288,24 +289,22 @@ export default function ScanForPoints() {
                   </ol>
                 </div>
               </div>
-            </div>
+            </GlassCard>
 
             {/* Scan Button */}
             {!scanning ? (
-              <Button 
-                onClick={startScanning}
-                className="w-full bg-white hover:bg-gray-100 text-amber-600 py-6 text-lg font-semibold shadow-xl"
-              >
-                <Camera className="w-6 h-6 mr-3" />
+              <GoldButton fullWidth onClick={startScanning} style={{ padding: '16px 20px' }}>
+                <Camera className="w-6 h-6" />
                 Start Scanning
-              </Button>
+              </GoldButton>
             ) : (
               <div className="text-center">
-                <p className="text-white font-semibold animate-pulse">Point camera at QR code...</p>
+                <p className="text-white font-semibold animate-pulse" style={{ fontFamily: t.fontBody }}>Point camera at QR code...</p>
                 <Button 
                   onClick={stopScanning}
                   variant="outline"
-                  className="mt-3 bg-white/20 border-white/30 text-white hover:bg-white/30"
+                  className="mt-3"
+                  style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'white', background: 'transparent' }}
                 >
                   Cancel
                 </Button>
@@ -315,45 +314,40 @@ export default function ScanForPoints() {
         ) : (
           /* Result View */
           <div className="space-y-4">
-            <div className={`rounded-2xl p-8 text-center shadow-2xl ${
-              result.success 
-                ? 'bg-white dark:bg-gray-800' 
-                : 'bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800'
-            }`}>
+            <GlassCard className="p-8 text-center" style={result.success ? { borderColor: `${t.green}55` } : { borderColor: '#ef444455' }}>
               {result.success ? (
                 <>
-                  <CheckCircle className="w-20 h-20 text-emerald-500 mx-auto mb-4" />
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{result.message}</h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">{result.location}</p>
-                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
-                    <p className="text-sm text-amber-800 dark:text-amber-300 mb-1">New Balance</p>
-                    <p className="text-4xl font-bold text-amber-600 dark:text-amber-500">{result.newBalance}</p>
-                    <p className="text-sm text-amber-700 dark:text-amber-400">points</p>
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: `${t.green}22` }}>
+                    <CheckCircle className="w-10 h-10" style={{ color: t.green }} />
+                  </div>
+                  <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: t.fontDisplay }}>{result.message}</h2>
+                  <p className="mb-4" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>{result.location}</p>
+                  <div className="rounded-xl p-4" style={{ background: `${t.gold}1a`, border: `1px solid ${t.gold}33` }}>
+                    <p className="text-xs mb-1" style={{ color: t.gold, fontFamily: t.fontBody }}>New Balance</p>
+                    <p className="text-4xl font-bold" style={{ color: t.gold, fontFamily: t.fontDisplay }}>{result.newBalance}</p>
+                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>points</p>
                   </div>
                 </>
               ) : (
                 <>
-                  <XCircle className="w-20 h-20 text-red-500 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-red-900 dark:text-red-300 mb-2">Oops!</h2>
-                  <p className="text-red-700 dark:text-red-400">{result.message}</p>
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.15)' }}>
+                    <XCircle className="w-10 h-10" style={{ color: '#ef4444' }} />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2" style={{ color: '#ef4444', fontFamily: t.fontBody }}>Oops!</h2>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>{result.message}</p>
                 </>
               )}
-            </div>
+            </GlassCard>
 
-            <Button 
-              onClick={() => {
-                setResult(null);
-                startScanning();
-              }}
-              className="w-full bg-white hover:bg-gray-100 text-amber-600 py-6 text-lg font-semibold shadow-xl"
-            >
+            <GoldButton fullWidth onClick={() => { setResult(null); startScanning(); }} style={{ padding: '16px 20px' }}>
               Scan Again
-            </Button>
+            </GoldButton>
 
             <Link to={createPageUrl('Home')}>
-              <Button 
+              <Button
                 variant="outline"
-                className="w-full border-white/30 text-white hover:bg-white/20 py-6 text-lg"
+                className="w-full"
+                style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'white', background: 'transparent', padding: '16px 20px' }}
               >
                 Back to Home
               </Button>

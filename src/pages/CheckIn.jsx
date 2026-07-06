@@ -8,6 +8,11 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import CheckInCelebration from '../components/CheckInCelebration';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+
+const t = clubConfig.theme;
 
 export default function CheckIn() {
   const [scanning, setScanning] = useState(false);
@@ -157,69 +162,61 @@ export default function CheckIn() {
   // Block non-members after all hooks
   if (user && !membership) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-24">
-        <div className="bg-[#1a365d] pt-safe">
-          <div className="px-5 py-4 flex items-center gap-4">
-            <Link to={createPageUrl('Home')}>
-              <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                <ArrowLeft className="w-5 h-5 text-white" />
-              </div>
+      <div className="min-h-full pb-24">
+        <div className="pt-safe px-5 py-4 flex items-center gap-4">
+          <Link to={createPageUrl('Home')}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </div>
+          </Link>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-5 py-12">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}>
+              <QrCode className="w-8 h-8 text-white/40" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Members Only</h2>
+            <p className="text-white/50 mb-6" style={{ fontFamily: t.fontBody }}>Check-ins are exclusive to membership holders.</p>
+            <Link to={createPageUrl('Membership')}>
+              <GoldButton>View Memberships</GoldButton>
             </Link>
           </div>
-        </div>
-        <div className="px-5 py-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-            <QrCode className="w-8 h-8 text-blue-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Members Only</h2>
-          <p className="text-gray-600 mb-6">Check-ins are exclusive to membership holders.</p>
-          <Link to={createPageUrl('Membership')}>
-            <Button className="bg-[#1a365d] hover:bg-[#2c5282]">
-              View Memberships
-            </Button>
-          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-full pb-24">
       {/* Header */}
-      <div className="bg-[#1a365d] pt-safe">
-        <div className="px-5 py-4 flex items-center gap-4">
-          <Link to={createPageUrl('Home')}>
-            <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </div>
-          </Link>
-          <div>
-            <h1 className="text-white text-xl font-bold">Check In</h1>
-            <p className="text-blue-200 text-sm">Scan the club QR code</p>
+      <div className="pt-safe px-5 py-4 flex items-center gap-4">
+        <Link to={createPageUrl('Home')}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.09)' }}>
+            <ArrowLeft className="w-5 h-5 text-white" />
           </div>
+        </Link>
+        <div>
+          <Eyebrow color={t.gold}>Check-in</Eyebrow>
+          <h1 className="text-white text-xl" style={{ fontFamily: t.fontDisplay }}>Scan Club QR</h1>
         </div>
       </div>
 
       <div className="px-5 py-6">
         {/* Today's Status */}
-        <div className={`rounded-2xl p-4 mb-6 ${
-          hasCheckedInToday ? 'bg-emerald-50 border border-emerald-200' : 'bg-white border border-gray-200'
-        }`}>
+        <GlassCard className="p-4 mb-6" style={hasCheckedInToday ? { borderColor: `${t.green}55` } : {}}>
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              hasCheckedInToday ? 'bg-emerald-500' : 'bg-gray-200'
-            }`}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: hasCheckedInToday ? `${t.green}22` : 'rgba(255,255,255,0.06)' }}>
               {hasCheckedInToday ? (
-                <CheckCircle className="w-5 h-5 text-white" />
+                <CheckCircle className="w-5 h-5" style={{ color: t.green }} />
               ) : (
-                <Zap className="w-5 h-5 text-gray-500" />
+                <Zap className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.4)' }} />
               )}
             </div>
             <div>
-              <p className={`font-semibold ${hasCheckedInToday ? 'text-emerald-800' : 'text-gray-700'}`}>
+              <p className="font-semibold text-white text-sm" style={{ fontFamily: t.fontBody }}>
                 {hasCheckedInToday ? 'Checked in today!' : 'No check-in yet today'}
               </p>
-              <p className={`text-sm ${hasCheckedInToday ? 'text-emerald-600' : 'text-gray-500'}`}>
+              <p className="text-xs" style={{ color: hasCheckedInToday ? t.green : 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
                 {hasCheckedInToday 
                   ? `${todayCheckins.length} check-in${todayCheckins.length > 1 ? 's' : ''} recorded`
                   : 'Scan a club QR code to earn points'
@@ -227,7 +224,7 @@ export default function CheckIn() {
               </p>
             </div>
           </div>
-        </div>
+        </GlassCard>
 
         {/* Camera View or Result */}
         <AnimatePresence mode="wait">
@@ -237,35 +234,33 @@ export default function CheckIn() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className={`rounded-3xl p-8 text-center ${
-                result === 'success' ? 'bg-emerald-500' : 'bg-red-500'
-              }`}
             >
-              <div className="w-20 h-20 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
-                {result === 'success' ? (
-                  <CheckCircle className="w-10 h-10 text-white" />
-                ) : (
-                  <AlertCircle className="w-10 h-10 text-white" />
-                )}
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                {result === 'success' ? 'Check-in Successful!' : 'Check-in Failed'}
-              </h2>
-              <p className="text-white/80 mb-6">
-                {result === 'success' 
-                  ? 'You earned 10 points. Keep collecting for rewards!'
-                  : errorMessage
-                }
-              </p>
-              <Button
-                onClick={() => {
-                  setResult(null);
-                  setErrorMessage('');
-                }}
-                className="bg-white text-gray-900 hover:bg-white/90"
-              >
-                {result === 'success' ? 'Done' : 'Try Again'}
-              </Button>
+              <GlassCard className="p-8 text-center" style={result === 'success' ? { borderColor: `${t.green}55` } : { borderColor: '#ef444455' }}>
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: result === 'success' ? `${t.green}22` : 'rgba(239,68,68,0.15)' }}>
+                  {result === 'success' ? (
+                    <CheckCircle className="w-10 h-10" style={{ color: t.green }} />
+                  ) : (
+                    <AlertCircle className="w-10 h-10" style={{ color: '#ef4444' }} />
+                  )}
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>
+                  {result === 'success' ? 'Check-in Successful!' : 'Check-in Failed'}
+                </h2>
+                <p className="mb-6" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
+                  {result === 'success' 
+                    ? 'You earned 10 points. Keep collecting for rewards!'
+                    : errorMessage
+                  }
+                </p>
+                <GoldButton
+                  onClick={() => {
+                    setResult(null);
+                    setErrorMessage('');
+                  }}
+                >
+                  {result === 'success' ? 'Done' : 'Try Again'}
+                </GoldButton>
+              </GlassCard>
             </motion.div>
           ) : scanning ? (
             <motion.div
@@ -275,6 +270,7 @@ export default function CheckIn() {
               exit={{ opacity: 0 }}
               className="relative rounded-3xl overflow-hidden bg-black aspect-square"
             >
+              {/* Camera feed — full contrast, no glass overlay */}
               <video
                 ref={videoRef}
                 className="w-full h-full object-cover"
@@ -282,7 +278,7 @@ export default function CheckIn() {
               />
               <canvas ref={canvasRef} className="hidden" />
               
-              {/* Scanner overlay */}
+              {/* Scanner overlay frame — on the video, no glass */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-64 h-64 border-2 border-white/50 rounded-2xl">
                   <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl" />
@@ -292,11 +288,13 @@ export default function CheckIn() {
                 </div>
               </div>
 
+              {/* Cancel button — Broadcast styled chrome, below the video */}
               <div className="absolute bottom-4 left-4 right-4">
                 <Button
                   onClick={stopScanning}
                   variant="secondary"
                   className="w-full"
+                  style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}
                 >
                   Cancel
                 </Button>
@@ -308,53 +306,51 @@ export default function CheckIn() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="bg-white rounded-3xl p-8 text-center border border-gray-200"
             >
-              <div className="w-20 h-20 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center">
-                <Camera className="w-10 h-10 text-blue-500" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Ready to Check In?</h2>
-              <p className="text-gray-500 mb-6">
-                Point your camera at the club's QR code to check in and earn 10 points
-              </p>
-              <div className="space-y-3">
-                <Button
-                  onClick={startScanning}
-                  className="w-full bg-[#1a365d] hover:bg-[#2c5282]"
-                  size="lg"
-                >
-                  <Camera className="w-5 h-5 mr-2" />
-                  Start Scanning
-                </Button>
-                
-                {/* Demo button for testing */}
-                <Button
-                  onClick={handleDemoCheckIn}
-                  variant="outline"
-                  className="w-full"
-                  disabled={checkInMutation.isPending}
-                >
-                  Demo Check-in (Testing)
-                </Button>
-              </div>
+              <GlassCard className="p-8 text-center">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: `${t.gold}22` }}>
+                  <Camera className="w-10 h-10" style={{ color: t.gold }} />
+                </div>
+                <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Ready to Check In?</h2>
+                <p className="mb-6" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
+                  Point your camera at the club's QR code to check in and earn 10 points
+                </p>
+                <div className="space-y-3">
+                  <GoldButton fullWidth onClick={startScanning}>
+                    <Camera className="w-5 h-5" />
+                    Start Scanning
+                  </GoldButton>
+                  
+                  {/* Demo button for testing */}
+                  <Button
+                    onClick={handleDemoCheckIn}
+                    variant="outline"
+                    className="w-full"
+                    disabled={checkInMutation.isPending}
+                    style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'white', background: 'transparent' }}
+                  >
+                    Demo Check-in (Testing)
+                  </Button>
+                </div>
+              </GlassCard>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Current Points */}
         {membership && (
-          <div className="mt-6 bg-amber-50 rounded-2xl p-4 border border-amber-200">
+          <GlassCard className="mt-6 p-4" style={{ borderColor: `${t.gold}33` }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-amber-800 font-semibold">Your Points</p>
-                <p className="text-amber-600 text-sm">Keep checking in for rewards</p>
+                <p className="font-semibold text-white text-sm" style={{ fontFamily: t.fontBody }}>Your Points</p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Keep checking in for rewards</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-amber-600">{membership.points || 0}</p>
-                <p className="text-xs text-amber-500">points</p>
+                <p className="text-3xl font-bold" style={{ color: t.gold, fontFamily: t.fontDisplay }}>{membership.points || 0}</p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: t.fontBody }}>points</p>
               </div>
             </div>
-          </div>
+          </GlassCard>
         )}
       </div>
       {celebration && (
