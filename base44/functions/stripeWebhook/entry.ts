@@ -80,6 +80,7 @@ Deno.serve(async (req) => {
         user_name: user_name,
         tier_id: tier_id,
         tier_name: tierData.name,
+        tier_type: tierData.tier_type || null,
         start_date: startDate.toISOString().split('T')[0],
         expiry_date: expiryDate.toISOString().split('T')[0],
         status: 'active',
@@ -97,7 +98,7 @@ Deno.serve(async (req) => {
       // Mark any existing Day Pass membership as converted so the cadence stops
       try {
         const existingMemberships = await base44.asServiceRole.entities.Membership.filter({ user_id: user_id });
-        const dayPassMembership = existingMemberships.find(m => m.tier_name === 'Day Pass' && m.id !== membership.id);
+        const dayPassMembership = existingMemberships.find(m => (m.tier_type === 'day_pass' || m.tier_name === 'Day Pass') && m.id !== membership.id);
         if (dayPassMembership) {
           await base44.asServiceRole.entities.Membership.update(dayPassMembership.id, {
             conversion_sequence_stage: 'converted'
