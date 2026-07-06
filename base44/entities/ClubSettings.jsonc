@@ -1,0 +1,68 @@
+{
+  "name": "ClubSettings",
+  "properties": {
+    "app_url": {
+      "description": "Public app URL used in email/SMS links",
+      "type": "string"
+    },
+    "club_name": {
+      "description": "Full club name used in emails, SMS, and push copy e.g. Central Newcastle RLFC",
+      "type": "string"
+    },
+    "club_short_name": {
+      "description": "Short form e.g. Central Newcastle",
+      "type": "string"
+    },
+    "contact_email": {
+      "description": "Club contact/reply-to email for outbound comms",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "description": "Singleton guard \u2014 only one active record",
+      "type": "boolean"
+    },
+    "short_name": {
+      "description": "Nickname e.g. Butcher Boys",
+      "type": "string"
+    },
+    "sport": {
+      "description": "Sport code e.g. rugby_league",
+      "type": "string"
+    },
+    "sport_emoji": {
+      "description": "Emoji used in comms e.g. \ud83c\udfc9",
+      "type": "string"
+    },
+    "team_short": {
+      "description": "Shortest form e.g. Central",
+      "type": "string"
+    },
+    "venue_name": {
+      "description": "Home ground name e.g. St John Oval",
+      "type": "string"
+    }
+  },
+  "required": [
+    "club_name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}
