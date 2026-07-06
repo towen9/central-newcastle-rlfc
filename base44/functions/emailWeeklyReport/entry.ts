@@ -99,6 +99,12 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '' };
+    try {
+      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     const now = new Date();
 
     // Sydney-aware week boundaries
@@ -201,7 +207,7 @@ Deno.serve(async (req) => {
 </head>
 <body>
   <div class="header">
-    <h1>📊 Central Newcastle RLFC</h1>
+    <h1>📊 ${club.club_name}</h1>
     <p>Weekly Performance Report — Week ${getISOWeek(now)}, ${now.getUTCFullYear()}</p>
     <p>${periodLabel}</p>
   </div>
@@ -244,7 +250,7 @@ Deno.serve(async (req) => {
     </div>` : ''}
 
   </div>
-  <div class="footer">Central Newcastle RLFC Membership App • Auto-generated report</div>
+  <div class="footer">${club.club_name} Membership App • Auto-generated report</div>
 </body>
 </html>`;
 

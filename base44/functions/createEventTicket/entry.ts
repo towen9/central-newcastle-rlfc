@@ -12,6 +12,12 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, error: 'Unauthorised' }, { status: 401 });
     }
 
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '' };
+    try {
+      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     let body;
     try {
       body = await req.json();
@@ -87,13 +93,13 @@ Deno.serve(async (req) => {
         body: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
-    <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="Central Newcastle RLFC" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
     <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">You're in! 🎉</h1>
     <p style="color: #93c5fd; margin: 0; font-size: 14px;">Ladies Long Lunch — Old Butchers Day 2026</p>
   </div>
   <div style="padding: 32px 24px; background: white;">
     <p style="color: #1e293b; font-size: 16px;">Hi ${purchaser_name.split(' ')[0]},</p>
-    <p style="color: #475569; font-size: 15px; line-height: 1.6;">Your ticket for the <strong>Ladies Long Lunch</strong> on <strong>Saturday 1 August 2026</strong> at St John Oval is confirmed!</p>
+    <p style="color: #475569; font-size: 15px; line-height: 1.6;">Your ticket for the <strong>Ladies Long Lunch</strong> on <strong>Saturday 1 August 2026</strong> at ${club.venue_name} is confirmed!</p>
     <div style="background: #eff6ff; border-left: 4px solid #1a365d; border-radius: 8px; padding: 16px 20px; margin: 24px 0;">
       <p style="color: #1e3a5f; font-weight: bold; font-size: 15px; margin: 0 0 8px;">📱 Your QR ticket</p>
       <p style="color: #475569; font-size: 14px; margin: 0;">Open the app on the day and navigate to <strong>Ladies Long Lunch</strong> to display your QR code at the entry.</p>
@@ -102,7 +108,7 @@ Deno.serve(async (req) => {
     <p style="color: #94a3b8; font-size: 13px;">Questions? Contact the club directly.</p>
   </div>
   <div style="background: #1a365d; padding: 16px 24px; text-align: center;">
-    <p style="color: #93c5fd; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Old Butchers Day 2026</p>
+    <p style="color: #93c5fd; font-size: 12px; margin: 0;">${club.club_name} · ${club.short_name} · Old Butchers Day 2026</p>
   </div>
 </div>`
       });

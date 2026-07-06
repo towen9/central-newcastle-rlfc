@@ -156,7 +156,7 @@ function decidePush(event, fixture) {
   return { shouldPush: false, audience: null, message: '', reason: 'unknown event type' };
 }
 
-async function sendPushToAudience(sb, audience, message, fixtureId, eventId) {
+async function sendPushToAudience(sb, audience, message, fixtureId, eventId, club) {
   let targets;
 
   if (audience === 'all_members') {
@@ -193,7 +193,7 @@ async function sendPushToAudience(sb, audience, message, fixtureId, eventId) {
   const valid = targets.filter(m => m.push_subscription);
 
   const payload = JSON.stringify({
-    title: 'Central Newcastle RLFC',
+    title: club.club_name,
     body: message,
     icon: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg',
     badge: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg',
@@ -260,6 +260,12 @@ Deno.serve(async (req) => {
     // 3. Load event and fixture using service role
     const sb = userClient.asServiceRole;
 
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '' };
+    try {
+      const settings = await sb.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     let event, fixture;
     try {
       event = await sb.entities.MatchEvent.get(eventId);
@@ -291,7 +297,7 @@ Deno.serve(async (req) => {
     let pushResult = { sent: 0, failed: 0, skipped_reason: null };
 
     if (pushDecision.shouldPush && pushDecision.message) {
-      pushResult = await sendPushToAudience(sb, pushDecision.audience, pushDecision.message, fixture.id, event.id);
+      pushResult = await sendPushToAudience(sb, pushDecision.audience, pushDecision.message, fixture.id, event.id, club);
     } else {
       pushResult.skipped_reason = pushDecision.reason || 'no push needed';
     }

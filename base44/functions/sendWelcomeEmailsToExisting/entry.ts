@@ -9,6 +9,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Admin only' }, { status: 403 });
     }
 
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: 'https://charlestown-rl-community-app-1e1650bd.base44.app' };
+    try {
+      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     const memberships = await base44.asServiceRole.entities.Membership.filter({ status: 'active' });
 
     let sent = 0;
@@ -24,14 +30,14 @@ Deno.serve(async (req) => {
 
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: membership.user_email,
-          subject: `Welcome to Central Newcastle RLFC, ${firstName}! 🏉 Action Required`,
+          subject: `Welcome to ${club.club_name}, ${firstName}! ${club.sport_emoji} Action Required`,
           body: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
 
   <!-- Header -->
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
-    <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="Central Newcastle RLFC" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
-    <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">Welcome to Central Newcastle RLFC!</h1>
+    <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">Welcome to ${club.club_name}!</h1>
     <p style="color: #93c5fd; margin: 0; font-size: 14px;">${tierName} · Season 2026</p>
   </div>
 
@@ -39,7 +45,7 @@ Deno.serve(async (req) => {
   <div style="padding: 32px 24px; background: white;">
     <p style="color: #1e293b; font-size: 16px; margin: 0 0 12px;">Hi ${firstName},</p>
     <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
-      Your <strong>${tierName}</strong> is confirmed — welcome to the Butcher Boys family! 🎉<br/>
+      Your <strong>${tierName}</strong> is confirmed — welcome to the ${club.short_name} family! 🎉<br/>
       To use your digital pass at the gate on game day, you'll need to complete your setup in the app on your phone.
     </p>
 
@@ -50,7 +56,7 @@ Deno.serve(async (req) => {
         Open this link on your phone using <strong>Safari (iPhone)</strong> or <strong>Chrome (Android)</strong>:
       </p>
       <div style="text-align: center; margin-top: 12px;">
-        <a href="https://charlestown-rl-community-app-1e1650bd.base44.app" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: bold;">
+        <a href="${club.app_url}" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: bold;">
           Open the App →
         </a>
       </div>
@@ -101,7 +107,7 @@ Deno.serve(async (req) => {
 
   <!-- Footer -->
   <div style="background: #1a365d; padding: 16px 24px; text-align: center;">
-    <p style="color: #93c5fd; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Season 2026</p>
+    <p style="color: #93c5fd; font-size: 12px; margin: 0;">${club.club_name} · ${club.short_name} · Season 2026</p>
   </div>
 
 </div>

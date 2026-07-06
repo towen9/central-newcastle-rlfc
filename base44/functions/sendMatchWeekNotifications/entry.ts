@@ -98,6 +98,12 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const sb = base44.asServiceRole;
 
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '' };
+    try {
+      const settings = await sb.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     const now = new Date();
     const sydNow = getSydneyTime(now);
 
@@ -124,7 +130,7 @@ Deno.serve(async (req) => {
       if (hoursUntilKickoff < -1) continue;
 
       const opponent = (fixture.opponent_name || fixture.opponent || 'the opposition').replace(/\s*DEC\s*$/i, '').trim();
-      const venue = fixture.venue || 'St John Oval';
+      const venue = fixture.venue || club.venue_name;
       const kickoffTimeStr = formatSydneyTime(kickoff);
       const kickoffDay = getSydneyWeekday(kickoff);
       const isHome = fixture.fixture_type === 'home';
@@ -138,7 +144,7 @@ Deno.serve(async (req) => {
       ) {
         const title = `Game day this ${kickoffDay}`;
         const body = isHome
-          ? `Central v ${opponent} at ${venue}, ${kickoffTimeStr}. Members get in free with their digital pass. Loaded into your app. 🐂`
+          ? `${club.team_short} v ${opponent} at ${venue}, ${kickoffTimeStr}. Members get in free with their digital pass. Loaded into your app. 🐂`
           : `Boys travel to ${venue} this ${kickoffDay}, ${kickoffTimeStr} to take on ${opponent}. Cheer the team on — follow live updates in the app. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { wednesday_preview_sent_at: now.toISOString() });
@@ -170,7 +176,7 @@ Deno.serve(async (req) => {
       ) {
         const title = isHome ? `Game day at ${venue}` : `Game day in 2 hours`;
         const body = isHome
-          ? `Kick-off in 2 hours. Central v ${opponent} at ${venue}. Digital pass ready in your app. Get loud. 🐂`
+          ? `Kick-off in 2 hours. ${club.team_short} v ${opponent} at ${venue}. Digital pass ready in your app. Get loud. 🐂`
           : `Boys kick off in 2 hours away at ${venue} vs ${opponent}. Follow the score live in the app. 🐂`;
         const result = await sendPushToAll(sb, title, body);
         await sb.entities.Fixture.update(fixture.id, { matchday_alert_sent_at: now.toISOString() });

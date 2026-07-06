@@ -7,19 +7,21 @@ webpush.setVapidDetails(
   Deno.env.get('VAPID_PRIVATE_KEY')
 );
 
-const APP_URL = 'https://charlestown-rl-community-app-1e1650bd.base44.app';
+const DEFAULT_APP_URL = 'https://charlestown-rl-community-app-1e1650bd.base44.app';
 const CLUB_LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';
 
-const MESSAGES = {
-  t24: {
-    pushTitle: 'Yesterday at St John',
-    pushBody: 'Yesterday at St John → all season at St John. Code DAYPASS24 at checkout for $8 credit on a full membership. Tap to upgrade.',
-    emailSubject: (firstName) => `${firstName}, see you back at St John?`,
-    emailBody: (firstName) => `
+function buildMessages(club) {
+  const APP_URL = club.app_url || DEFAULT_APP_URL;
+  return {
+    t24: {
+      pushTitle: 'Yesterday at St John',
+      pushBody: 'Yesterday at St John → all season at St John. Code DAYPASS24 at checkout for $8 credit on a full membership. Tap to upgrade.',
+      emailSubject: (firstName) => `${firstName}, see you back at St John?`,
+      emailBody: (firstName) => `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
-    <img src="${CLUB_LOGO}" alt="Central Newcastle RLFC" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
-    <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">Central Newcastle RLFC</h1>
+    <img src="${CLUB_LOGO}" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">${club.club_name}</h1>
   </div>
   <div style="padding: 32px 24px; background: white;">
     <p style="color: #1e293b; font-size: 16px; margin: 0 0 16px;">Hey ${firstName}, thanks for coming to St John yesterday — hope you enjoyed the game.</p>
@@ -28,22 +30,22 @@ const MESSAGES = {
       <a href="${APP_URL}/Membership" style="display: inline-block; background: #1a365d; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: bold;">Become a Butcher Boy →</a>
     </div>
     <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 8px;">See you at St John,</p>
-    <p style="color: #1e293b; font-size: 15px; font-weight: bold; margin: 0;">The Butcher Boys</p>
+    <p style="color: #1e293b; font-size: 15px; font-weight: bold; margin: 0;">The ${club.short_name}</p>
   </div>
   <div style="background: #1a365d; padding: 16px 24px; text-align: center;">
-    <p style="color: #93c5fd; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Season 2026</p>
+    <p style="color: #93c5fd; font-size: 12px; margin: 0;">${club.club_name} · ${club.short_name} · Season 2026</p>
   </div>
 </div>`.trim()
-  },
-  t72: {
-    pushTitle: "The pack's growing",
-    pushBody: "Members who upgraded after their first Day Pass average 8 home games a season. The pack's growing — come with us. 🐂",
-    emailSubject: () => 'What our members have to say',
-    emailBody: (firstName) => `
+    },
+    t72: {
+      pushTitle: "The pack's growing",
+      pushBody: "Members who upgraded after their first Day Pass average 8 home games a season. The pack's growing — come with us. 🐂",
+      emailSubject: () => 'What our members have to say',
+      emailBody: (firstName) => `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
-    <img src="${CLUB_LOGO}" alt="Central Newcastle RLFC" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
-    <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">Central Newcastle RLFC</h1>
+    <img src="${CLUB_LOGO}" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">${club.club_name}</h1>
   </div>
   <div style="padding: 32px 24px; background: white;">
     <p style="color: #1e293b; font-size: 16px; margin: 0 0 16px;">Hey ${firstName}, three members joined this week — all bought a Day Pass first. Here's why they upgraded...</p>
@@ -61,18 +63,18 @@ const MESSAGES = {
     </div>
   </div>
   <div style="background: #1a365d; padding: 16px 24px; text-align: center;">
-    <p style="color: #93c5fd; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Season 2026</p>
+    <p style="color: #93c5fd; font-size: 12px; margin: 0;">${club.club_name} · ${club.short_name} · Season 2026</p>
   </div>
 </div>`.trim()
-  },
-  t7d: {
-    pushTitle: 'Code DAYPASS24 expires soon',
-    pushBody: 'Last chance — your $8 credit expires Sunday. Lock in your season at St John. Tap to upgrade.',
-    emailSubject: () => 'Last call: your $8 credit expires Sunday',
-    emailBody: (firstName) => `
+    },
+    t7d: {
+      pushTitle: 'Code DAYPASS24 expires soon',
+      pushBody: 'Last chance — your $8 credit expires Sunday. Lock in your season at St John. Tap to upgrade.',
+      emailSubject: () => 'Last call: your $8 credit expires Sunday',
+      emailBody: (firstName) => `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
-    <img src="${CLUB_LOGO}" alt="Central Newcastle RLFC" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <img src="${CLUB_LOGO}" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
     <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">Last Call, ${firstName}</h1>
   </div>
   <div style="padding: 32px 24px; background: white;">
@@ -84,14 +86,15 @@ const MESSAGES = {
     <div style="text-align: center; margin: 0 0 24px;">
       <a href="${APP_URL}/Membership" style="display: inline-block; background: #dc2626; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: bold;">Lock In My Membership →</a>
     </div>
-    <p style="color: #94a3b8; font-size: 13px; text-align: center; margin: 0;">The Butcher Boys</p>
+    <p style="color: #94a3b8; font-size: 13px; text-align: center; margin: 0;">The ${club.short_name}</p>
   </div>
   <div style="background: #1a365d; padding: 16px 24px; text-align: center;">
-    <p style="color: #93c5fd; font-size: 12px; margin: 0;">Central Newcastle RLFC · Butcher Boys · Season 2026</p>
+    <p style="color: #93c5fd; font-size: 12px; margin: 0;">${club.club_name} · ${club.short_name} · Season 2026</p>
   </div>
 </div>`.trim()
-  }
-};
+    }
+  };
+}
 
 async function sendSinglePush(sb, membership, title, body, stage) {
   if (!membership.push_subscription) return { ok: false, reason: 'no_subscription' };
@@ -129,13 +132,13 @@ async function sendSinglePush(sb, membership, title, body, stage) {
   }
 }
 
-async function sendSingleEmail(sb, membership, subject, body) {
+async function sendSingleEmail(sb, membership, subject, body, club) {
   if (!membership.user_email) return { ok: false, reason: 'no_email' };
 
   try {
     await sb.integrations.Core.SendEmail({
       to: membership.user_email,
-      from_name: 'Central Newcastle RLFC',
+      from_name: club.club_name,
       subject,
       body
     });
@@ -150,6 +153,14 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const sb = base44.asServiceRole;
+
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: 'https://charlestown-rl-community-app-1e1650bd.base44.app' };
+    try {
+      const settings = await sb.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
+    const MESSAGES = buildMessages(club);
 
     const now = new Date();
     const H24 = 24 * 60 * 60 * 1000;
@@ -202,7 +213,7 @@ Deno.serve(async (req) => {
 
       const [pushResult, emailResult] = await Promise.allSettled([
         sendSinglePush(sb, membership, msgs.pushTitle, msgs.pushBody, targetStage),
-        sendSingleEmail(sb, membership, msgs.emailSubject(firstName), msgs.emailBody(firstName))
+        sendSingleEmail(sb, membership, msgs.emailSubject(firstName), msgs.emailBody(firstName), club)
       ]);
 
       const pushOk = pushResult.status === 'fulfilled' && pushResult.value?.ok;

@@ -3,6 +3,12 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '' };
+    try {
+      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     const { alerts } = await req.json();
 
     if (!alerts || alerts.length === 0) {
@@ -54,7 +60,7 @@ Deno.serve(async (req) => {
       <body>
         <div class="header">
           <h1>⚠️ Operations Alert</h1>
-          <p>Central Newcastle RLFC Digital Platform</p>
+          <p>${club.club_name} Digital Platform</p>
         </div>
         <div style="padding: 20px;">
           <p><strong>${alerts.length} alert(s) detected</strong> that require your attention:</p>

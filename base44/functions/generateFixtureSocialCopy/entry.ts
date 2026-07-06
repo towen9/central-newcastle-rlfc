@@ -10,6 +10,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized: Admin access required' }, { status: 403 });
     }
 
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '' };
+    try {
+      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     const { fixtureId, type } = await req.json();
 
     if (!fixtureId) {
@@ -34,7 +40,7 @@ Deno.serve(async (req) => {
       const sponsorText = fixture.sponsor_of_round ? `\n\nProudly supported by ${fixture.sponsor_of_round}` : '';
       const gradeText = fixture.team_grade ? `\n${fixture.team_grade}` : '\nAll grades in action';
       
-      socialCopy = `🏉 ${roundText} – Central v ${fixture.opponent}
+      socialCopy = `${club.sport_emoji} ${roundText} – ${club.team_short} v ${fixture.opponent}
 ${matchDay} ${matchTime} | ${fixture.venue || 'TBA'}${gradeText}
 
 See you there!${sponsorText}`;
@@ -60,11 +66,11 @@ See you there!${sponsorText}`;
       const theirScore = fixture.fixture_type === 'home' ? fixture.result_away : fixture.result_home;
 
       const resultText = isWin 
-        ? `⚡ Full Time: Central ${ourScore} def ${fixture.opponent} ${theirScore}`
-        : `Full Time: ${fixture.opponent} ${theirScore} def Central ${ourScore}`;
+        ? `⚡ Full Time: ${club.team_short} ${ourScore} def ${fixture.opponent} ${theirScore}`
+        : `Full Time: ${fixture.opponent} ${theirScore} def ${club.team_short} ${ourScore}`;
 
       const performanceText = isWin 
-        ? 'Strong performance from the Butcher Boys.'
+        ? `Strong performance from the ${club.short_name}.`
         : 'Tough contest today.';
 
       const sponsorText = fixture.sponsor_of_round 
@@ -75,7 +81,7 @@ See you there!${sponsorText}`;
 
 ${performanceText}${sponsorText}
 
-#CentralNewcastle #ButcherBoys`;
+#${club.club_short_name.replace(/\s/g, '')} #${club.short_name.replace(/\s/g, '')}`;
 
       // Save to fixture
       await base44.asServiceRole.entities.Fixture.update(fixtureId, {

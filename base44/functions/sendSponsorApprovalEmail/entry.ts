@@ -3,6 +3,12 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: 'https://butcher-boy-c0b7e412.base44.app' };
+    try {
+      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]) club = { ...club, ...settings[0] };
+    } catch (_) { /* fall back to defaults */ }
+
     const { membership_id } = await req.json();
 
     if (!membership_id) {
@@ -31,12 +37,12 @@ Deno.serve(async (req) => {
 
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: toEmail,
-      from_name: 'Central Newcastle RLFC',
+      from_name: club.club_name,
       subject: '🎉 Your Sponsor Season Pass Has Been Approved!',
       body: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
   <div style="background: linear-gradient(135deg, #065f46, #059669); border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 24px;">
-    <h1 style="color: white; margin: 0; font-size: 24px;">Central Newcastle RLFC</h1>
+    <h1 style="color: white; margin: 0; font-size: 24px;">${club.club_name}</h1>
     <p style="color: #a7f3d0; margin: 8px 0 0; font-size: 14px;">Sponsor Season Pass</p>
   </div>
 
@@ -47,12 +53,12 @@ Deno.serve(async (req) => {
   </p>
 
   <p style="font-size: 16px; line-height: 1.6;">
-    We're absolutely stoked to have you on board as a sponsor of Central Newcastle RLFC. Your support means the world to the players, coaches, and everyone in our club community.
+    We're absolutely stoked to have you on board as a sponsor of ${club.club_name}. Your support means the world to the players, coaches, and everyone in our club community.
   </p>
 
   <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 24px 0; text-align: center;">
     <p style="margin: 0 0 12px; font-size: 15px; color: #065f46; font-weight: bold;">Access your membership pass here:</p>
-    <a href="https://butcher-boy-c0b7e412.base44.app" style="display: inline-block; background: #059669; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; font-size: 15px;">Open My Membership →</a>
+    <a href="${club.app_url}" style="display: inline-block; background: #059669; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; font-size: 15px;">Open My Membership →</a>
   </div>
 
   <p style="font-size: 15px; line-height: 1.6; color: #374151;">
@@ -65,11 +71,11 @@ Deno.serve(async (req) => {
 
   <p style="font-size: 15px; color: #374151;">
     Cheers,<br/>
-    <strong>Central Newcastle RLFC</strong>
+    <strong>${club.club_name}</strong>
   </p>
 
   <div style="border-top: 1px solid #e5e7eb; margin-top: 32px; padding-top: 16px; text-align: center;">
-    <p style="font-size: 12px; color: #9ca3af;">Central Newcastle RLFC — Butcher Boys</p>
+    <p style="font-size: 12px; color: #9ca3af;">${club.club_name} — ${club.short_name}</p>
   </div>
 </div>
       `.trim()
