@@ -83,15 +83,16 @@ Deno.serve(async (req) => {
       const existingMemberships = await base44.asServiceRole.entities.Membership.filter({ user_id: user.id });
 
       const PAID_TIERS = ['Premium Membership', 'Family Membership', 'Supporter Pack', 'Old Butchers Membership', 'Sponsor Season Pass'];
+      const PAID_TIER_TYPES = ['premium', 'family', 'supporter', 'legacy', 'sponsor'];
       const hasPaidMembership = existingMemberships.some(m =>
-        PAID_TIERS.some(tier => m.tier_name?.includes(tier))
+        m.tier_type ? PAID_TIER_TYPES.includes(m.tier_type) : PAID_TIERS.some(tier => m.tier_name?.includes(tier))
       );
 
       if (hasPaidMembership) {
         // Paid tier already exists — don't touch it
         console.log('Day Pass comms: user has paid membership, skipping Day Pass tier creation');
       } else {
-        const existingDayPass = existingMemberships.find(m => m.tier_name === 'Day Pass');
+        const existingDayPass = existingMemberships.find(m => m.tier_type === 'day_pass' || m.tier_name === 'Day Pass');
         if (existingDayPass) {
           // Already has a Day Pass membership — just bump updated_date, preserve push fields
           await base44.asServiceRole.entities.Membership.update(existingDayPass.id, {
@@ -100,13 +101,20 @@ Deno.serve(async (req) => {
           console.log('Day Pass comms: updated existing Day Pass membership', existingDayPass.id);
         } else {
           // No membership at all — create a new Day Pass one
+          // Resolve the real Day Pass tier record; fall back to legacy string if lookup fails (non-fatal path)
+          let dayPassTierId = 'day_pass';
+          try {
+            const dpTiers = await base44.asServiceRole.entities.MembershipTier.filter({ tier_type: 'day_pass' });
+            if (dpTiers && dpTiers[0]) dayPassTierId = dpTiers[0].id;
+          } catch (_) { /* keep string fallback */ }
           const nameParts2 = (user.full_name || '').split(' ');
           await base44.asServiceRole.entities.Membership.create({
             user_id: user.id,
             user_email: user.email,
             user_name: user.full_name || user.email,
-            tier_id: 'day_pass',
+            tier_id: dayPassTierId,
             tier_name: 'Day Pass',
+            tier_type: 'day_pass',
             status: 'active',
             push_enabled: false,
             push_subscription: null,
