@@ -5,6 +5,13 @@ import { Camera, CheckCircle, Loader2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+import { SkeletonCard } from '@/components/ui-kit/Skeleton';
+
+const t = clubConfig.theme;
 
 export default function PhotoCapture() {
   const [user, setUser] = useState(null);
@@ -131,25 +138,23 @@ export default function PhotoCapture() {
 
   if (!user || !fixtureId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className="px-5 py-6 space-y-4 flex items-center justify-center" style={{ minHeight: '100dvh' }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: t.gold }} />
       </div>
     );
   }
 
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center p-6">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl p-8 max-w-md w-full text-center"
-        >
-          <div className="w-20 h-20 bg-emerald-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-            <CheckCircle className="w-10 h-10 text-emerald-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Pass Created!</h2>
-          <p className="text-gray-600">Redirecting to your Day Pass...</p>
+      <div className="min-h-full flex items-center justify-center p-6" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+          <GlassCard className="p-8 max-w-md w-full text-center" style={{ borderColor: `${t.green}55` }}>
+            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: `${t.green}22` }}>
+              <CheckCircle className="w-10 h-10" style={{ color: t.green }} />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Pass Created!</h2>
+            <p className="text-white/60" style={{ fontFamily: t.fontBody }}>Redirecting to your Day Pass...</p>
+          </GlassCard>
         </motion.div>
       </div>
     );
@@ -157,29 +162,30 @@ export default function PhotoCapture() {
 
   if (step === 'uploading') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-full flex items-center justify-center" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Creating Your Pass...</h3>
-          <p className="text-sm text-gray-500">Please wait</p>
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: t.gold }} />
+          <h3 className="text-lg font-semibold text-white mb-2" style={{ fontFamily: t.fontBody }}>Creating Your Pass...</h3>
+          <p className="text-sm text-white/50" style={{ fontFamily: t.fontBody }}>Please wait</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-[#1a365d] pt-safe">
-        <div className="px-5 py-6 text-center">
-          <h1 className="text-white text-2xl font-bold mb-2">Take Your Photo</h1>
-          <p className="text-blue-200 text-sm">
-            {step === 'camera' ? 'Position your face in the frame' : 'Review your photo'}
-          </p>
-        </div>
+    <div className="min-h-full pb-24">
+      {/* Header */}
+      <div className="pt-safe px-5 py-6 text-center">
+        <Eyebrow color={t.gold}>Day Pass</Eyebrow>
+        <h1 className="text-white text-2xl font-bold mb-2" style={{ fontFamily: t.fontDisplay }}>Take Your Photo</h1>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
+          {step === 'camera' ? 'Position your face in the frame' : 'Review your photo'}
+        </p>
       </div>
 
       <div className="px-5 py-6">
-        <div className="bg-white rounded-3xl overflow-hidden shadow-xl mb-6">
+        {/* Camera / Preview — solid black background, full contrast, no glass overlay on the feed */}
+        <div className="rounded-3xl overflow-hidden mb-6" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
           <div className="relative aspect-square bg-black">
             {step === 'camera' ? (
               <>
@@ -206,26 +212,21 @@ export default function PhotoCapture() {
         </div>
 
         {step === 'camera' ? (
-          <Button
-            onClick={capturePhoto}
-            className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-lg"
-          >
-            <Camera className="w-6 h-6 mr-3" />
+          <GoldButton fullWidth onClick={capturePhoto} style={{ padding: '16px 20px' }}>
+            <Camera className="w-6 h-6" />
             Capture Photo
-          </Button>
+          </GoldButton>
         ) : (
           <div className="space-y-3">
-            <Button
-              onClick={confirmPhoto}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 py-6 text-lg"
-            >
-              <CheckCircle className="w-6 h-6 mr-3" />
+            <GoldButton fullWidth onClick={confirmPhoto} style={{ padding: '16px 20px' }}>
+              <CheckCircle className="w-6 h-6" />
               Looks Good - Continue
-            </Button>
+            </GoldButton>
             <Button
               onClick={retakePhoto}
               variant="outline"
-              className="w-full py-6 text-lg"
+              className="w-full"
+              style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'white', background: 'transparent', padding: '16px 20px' }}
             >
               <RotateCcw className="w-6 h-6 mr-3" />
               Retake Photo
@@ -233,10 +234,12 @@ export default function PhotoCapture() {
           </div>
         )}
 
-        <div className="mt-6 bg-blue-50 rounded-xl p-4">
-          <p className="text-sm text-blue-800 text-center">
-            Your photo will be shown on your digital pass for verification at the gate
-          </p>
+        <div className="mt-6">
+          <GlassCard className="p-4">
+            <p className="text-sm text-center" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
+              Your photo will be shown on your digital pass for verification at the gate
+            </p>
+          </GlassCard>
         </div>
       </div>
     </div>

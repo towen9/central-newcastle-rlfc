@@ -6,6 +6,11 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
 import { base44 } from '@/api/base44Client';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+
+const t = clubConfig.theme;
 
 const steps = [
   {
@@ -50,145 +55,119 @@ export default function PlayerPassInvite() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-full" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#1a365d] via-[#1e4a8a] to-[#2b6cb0] pt-safe">
-        <div className="px-5 py-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <img
-              src={clubConfig.identity.logo_url}
-              alt={clubConfig.identity.club_name}
-              className="w-20 h-20 object-contain bg-white rounded-full p-1 mx-auto mb-4"
-            />
-            <div className="inline-flex items-center gap-2 bg-amber-400/20 border border-amber-400/40 rounded-full px-4 py-1.5 mb-4">
-              <Star className="w-4 h-4 text-amber-400" />
-              <span className="text-amber-300 text-sm font-semibold">2026 Player Pass</span>
-            </div>
-            <h1 className="text-white text-3xl font-extrabold mb-3 leading-tight">
-              You're Invited,<br />Central Player! 🏉
-            </h1>
-            <p className="text-blue-200 text-base max-w-xs mx-auto">
-              As a registered player, you get a <strong className="text-white">FREE digital pass</strong> — your ticket into every home game, plus rewards, discounts & exclusive perks.
-            </p>
-          </motion.div>
-        </div>
-        {/* Wave */}
-        <svg viewBox="0 0 1440 40" className="w-full" preserveAspectRatio="none">
-          <path fill="#f9fafb" d="M0,40 C360,0 1080,0 1440,40 L1440,40 L0,40 Z" />
-        </svg>
+      <div className="pt-safe px-5 py-10 text-center">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <img
+            src={clubConfig.identity.logo_url}
+            alt={clubConfig.identity.club_name}
+            className="w-20 h-20 object-contain bg-white rounded-full p-1 mx-auto mb-4"
+          />
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4" style={{ background: `${t.gold}22`, border: `1px solid ${t.gold}44` }}>
+            <Star className="w-4 h-4" style={{ color: t.gold }} />
+            <span className="text-sm font-semibold" style={{ color: t.goldHi }}>2026 Player Pass</span>
+          </div>
+          <h1 className="text-white text-3xl font-extrabold mb-3 leading-tight" style={{ fontFamily: t.fontDisplay }}>
+            You're Invited,<br />Central Player! 🏉
+          </h1>
+          <p className="text-base max-w-xs mx-auto" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
+            As a registered player, you get a <strong className="text-white">FREE digital pass</strong> — your ticket into every home game, plus rewards, discounts & exclusive perks.
+          </p>
+        </motion.div>
       </div>
 
-      <div className="px-5 pb-16 max-w-md mx-auto">
-
+      <div className="px-5 pb-16 max-w-md mx-auto space-y-5">
         {/* Gate Entry Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-amber-400 rounded-2xl p-4 mb-4 -mt-2 flex items-center gap-3"
-        >
-          <span className="text-3xl">🎟️</span>
-          <div>
-            <p className="font-extrabold text-amber-900 text-base">Your pass = your gate ticket</p>
-            <p className="text-amber-800 text-sm">Show your QR code at the gate every home game. No phone = no entry. Keep it charged!</p>
-          </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <GlassCard className="p-4 flex items-center gap-3" style={{ borderColor: `${t.gold}55`, background: `linear-gradient(135deg, ${t.gold}22, rgba(255,255,255,0.03))` }}>
+            <span className="text-3xl">🎟️</span>
+            <div>
+              <p className="font-extrabold text-base" style={{ color: t.goldHi, fontFamily: t.fontBody }}>Your pass = your gate ticket</p>
+              <p className="text-sm" style={{ color: t.gold, fontFamily: t.fontBody }}>Show your QR code at the gate every home game. No phone = no entry. Keep it charged!</p>
+            </div>
+          </GlassCard>
         </motion.div>
 
         {/* Perks */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-5"
-        >
-          <h2 className="font-bold text-gray-900 mb-3 text-lg">What's included</h2>
-          <div className="space-y-2">
-            {perks.map((perk, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700 text-sm">{perk}</span>
-              </div>
-            ))}
-          </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <GlassCard className="p-5">
+            <h2 className="font-bold text-white mb-3 text-lg" style={{ fontFamily: t.fontBody }}>What's included</h2>
+            <div className="space-y-2">
+              {perks.map((perk, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: t.green }} />
+                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)', fontFamily: t.fontBody }}>{perk}</span>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
         </motion.div>
 
         {/* Leagues Club highlight */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-5 mb-5 text-white"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <Building2 className="w-7 h-7 text-blue-200" />
-            <h3 className="font-bold text-lg">Leagues Club Points</h3>
-          </div>
-          <p className="text-blue-100 text-sm">
-            After every home game, scan your QR at the <strong className="text-white">Central Leagues Club</strong> to earn <strong className="text-white">+20 bonus points</strong>. Stack them up for free rewards!
-          </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+          <GlassCard className="p-5" style={{ borderColor: `${t.cyan}44` }}>
+            <div className="flex items-center gap-3 mb-2">
+              <Building2 className="w-7 h-7" style={{ color: t.cyan }} />
+              <h3 className="font-bold text-lg text-white" style={{ fontFamily: t.fontBody }}>Leagues Club Points</h3>
+            </div>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
+              After every home game, scan your QR at the <strong className="text-white">Central Leagues Club</strong> to earn <strong className="text-white">+20 bonus points</strong>. Stack them up for free rewards!
+            </p>
+          </GlassCard>
         </motion.div>
 
         {/* Steps */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-6"
-        >
-          <h2 className="font-bold text-gray-900 mb-4 text-lg">How to get started</h2>
-          <div className="space-y-5">
-            {steps.map((step, i) => (
-              <div key={i} className="flex gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-[#1a365d] rounded-xl flex items-center justify-center">
-                    <step.icon className="w-5 h-5 text-white" />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <GlassCard className="p-5">
+            <h2 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: t.fontBody }}>How to get started</h2>
+            <div className="space-y-5">
+              {steps.map((step, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${t.gold}22` }}>
+                      <step.icon className="w-5 h-5" style={{ color: t.gold }} />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white text-sm" style={{ fontFamily: t.fontBody }}>{i + 1}. {step.title}</p>
+                    <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>{step.description}</p>
                   </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-900 text-sm">{i + 1}. {step.title}</p>
-                  <p className="text-gray-500 text-sm mt-0.5">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </GlassCard>
         </motion.div>
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
           {!loading && (
             <>
               {user ? (
-                // Already logged in — go straight to registration
                 <Link to={createPageUrl('PlayerPassRegistration')}>
-                  <Button className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-base font-bold">
+                  <GoldButton fullWidth style={{ padding: '16px 20px' }}>
                     Register My Player Pass
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
+                    <ArrowRight className="w-5 h-5" />
+                  </GoldButton>
                 </Link>
               ) : (
-                // Not logged in — create account first, return here after
                 <>
-                  <Button
-                    className="w-full bg-amber-400 hover:bg-amber-300 text-amber-900 py-6 text-base font-bold shadow-lg mb-3"
+                  <GoldButton
+                    fullWidth
                     onClick={() => base44.auth.redirectToLogin(createPageUrl('PlayerPassRegistration'))}
+                    style={{ padding: '16px 20px' }}
                   >
-                    <UserPlus className="w-5 h-5 mr-2" />
+                    <UserPlus className="w-5 h-5" />
                     Create Account & Get My Pass
-                  </Button>
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
-                    <p className="text-blue-800 text-sm">
+                  </GoldButton>
+                  <GlassCard className="p-3 mt-3 text-center">
+                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
                       👆 This will create your free club account, then take you straight to registration.
                     </p>
-                  </div>
+                  </GlassCard>
                 </>
               )}
-              <p className="text-center text-gray-400 text-xs mt-3">
+              <p className="text-center text-xs mt-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
                 Free for all registered {clubConfig.identity.club_name} players • {clubConfig.season.year} Season
               </p>
             </>

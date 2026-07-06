@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Loader2, CheckCircle2, Camera, RefreshCw, User } from 'lucide-react';
+import { ArrowLeft, Loader2, CheckCircle2, Camera, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,12 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import clubConfig from '@/config/club.config';
+import GlassCard from '@/components/ui-kit/GlassCard';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+import { SkeletonCard } from '@/components/ui-kit/Skeleton';
+
+const t = clubConfig.theme;
 
 export default function PlayerPassRegistration() {
   const [user, setUser] = useState(null);
@@ -204,120 +210,129 @@ export default function PlayerPassRegistration() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-2xl p-8 max-w-md w-full text-center"
-        >
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-10 h-10 text-emerald-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h2>
-          <p className="text-gray-600 mb-6">
-            Your 2026 Player Pass application has been submitted for admin approval. 
-            You'll receive an email once it's been reviewed.
-          </p>
-          <Link to={createPageUrl('Home')}>
-            <Button className="w-full bg-[#1a365d] hover:bg-[#2c5282]">
-              Back to Home
-            </Button>
-          </Link>
+      <div className="min-h-full flex items-center justify-center p-6" style={{ background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)` }}>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+          <GlassCard className="p-8 max-w-md w-full text-center">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: `${t.green}22` }}>
+              <CheckCircle2 className="w-10 h-10" style={{ color: t.green }} />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Application Submitted!</h2>
+            <p className="mb-6" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
+              Your 2026 Player Pass application has been submitted for admin approval. 
+              You'll receive an email once it's been reviewed.
+            </p>
+            <Link to={createPageUrl('Home')}>
+              <GoldButton fullWidth>Back to Home</GoldButton>
+            </Link>
+          </GlassCard>
         </motion.div>
       </div>
     );
   }
 
+  if (!user) {
+    return (
+      <div className="px-5 py-6 space-y-4" style={{ minHeight: '100dvh', paddingBottom: '6rem' }}>
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-full pb-24">
       {/* Header */}
-      <div className="bg-[#1a365d] pt-safe">
-        <div className="px-5 py-6">
-          {step === 'photo' ? (
-            <button onClick={() => { stopCamera(); setStep('form'); }} className="flex items-center gap-2 text-blue-200 mb-4">
+      <div className="pt-safe px-5 py-6">
+        {step === 'photo' ? (
+          <button onClick={() => { stopCamera(); setStep('form'); }} className="flex items-center gap-2 mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm" style={{ fontFamily: t.fontBody }}>Back</span>
+          </button>
+        ) : (
+          <Link to={createPageUrl('Home')}>
+            <button className="flex items-center gap-2 mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
               <ArrowLeft className="w-5 h-5" />
-              Back
+              <span className="text-sm" style={{ fontFamily: t.fontBody }}>Back</span>
             </button>
-          ) : (
-            <Link to={createPageUrl('Home')}>
-              <button className="flex items-center gap-2 text-blue-200 mb-4">
-                <ArrowLeft className="w-5 h-5" />
-                Back
-              </button>
-            </Link>
-          )}
-          <h1 className="text-white text-2xl font-bold mb-2">2026 Player Pass</h1>
-          <p className="text-blue-200">
-            {step === 'form' ? 'Step 1 of 2 — Your details' : 'Step 2 of 2 — Player photo'}
-          </p>
-        </div>
+          </Link>
+        )}
+        <Eyebrow color={t.gold}>2026 Season</Eyebrow>
+        <h1 className="text-white text-2xl mb-2" style={{ fontFamily: t.fontDisplay }}>Player Pass</h1>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
+          {step === 'form' ? 'Step 1 of 2 — Your details' : 'Step 2 of 2 — Player photo'}
+        </p>
       </div>
 
       <div className="px-5 py-6 max-w-2xl mx-auto">
         {/* Step 1: Form */}
         {step === 'form' && (
           <>
-            <div className="bg-blue-50 rounded-xl p-4 mb-6">
-              <p className="text-sm text-blue-800">
+            <GlassCard className="p-4 mb-6">
+              <p className="text-sm" style={{ color: t.goldHi, fontFamily: t.fontBody }}>
                 {clubConfig.identity.sport_emoji} This pass is for {clubConfig.identity.club_name} players (Men's & Women's). 
                 Your application will be reviewed by admin before activation.
               </p>
-            </div>
+            </GlassCard>
 
-            <form onSubmit={handleFormNext} className="bg-white rounded-2xl p-6 space-y-5">
-              <div>
-                <Label htmlFor="full_name">Full Name *</Label>
-                <Input
-                  id="full_name"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  placeholder="Your full name"
-                  required
-                />
-              </div>
+            <form onSubmit={handleFormNext}>
+              <GlassCard className="p-6 space-y-5">
+                <div>
+                  <Label htmlFor="full_name" className="mb-1 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Full Name *</Label>
+                  <Input
+                    id="full_name"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    placeholder="Your full name"
+                    required
+                    style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="your.email@example.com"
-                  required
-                />
-              </div>
+                <div>
+                  <Label htmlFor="email" className="mb-1 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="your.email@example.com"
+                    required
+                    style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="phone">Mobile Number *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="04XX XXX XXX"
-                  required
-                />
-              </div>
+                <div>
+                  <Label htmlFor="phone" className="mb-1 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Mobile Number *</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="04XX XXX XXX"
+                    required
+                    style={{ background: 'rgba(255,255,255,0.05)', color: 'white', borderColor: 'rgba(255,255,255,0.1)' }}
+                  />
+                </div>
 
-              <Button type="submit" className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6">
-                Next — Take Your Photo →
-              </Button>
+                <GoldButton type="submit" fullWidth style={{ padding: '16px 20px' }}>
+                  Next — Take Your Photo →
+                </GoldButton>
+              </GlassCard>
             </form>
           </>
         )}
 
         {/* Step 2: Photo */}
         {step === 'photo' && (
-          <div className="bg-white rounded-2xl p-6 space-y-5">
+          <GlassCard className="p-6 space-y-5">
             <div className="text-center mb-2">
-              <h2 className="text-lg font-bold text-gray-900">Player Photo</h2>
-              <p className="text-sm text-gray-500">This photo will appear on your digital pass for identity verification at the gate.</p>
+              <h2 className="text-lg font-bold text-white" style={{ fontFamily: t.fontBody }}>Player Photo</h2>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>This photo will appear on your digital pass for identity verification at the gate.</p>
             </div>
 
             {!photoDataUrl ? (
               <div className="space-y-4">
-                {/* Camera viewfinder */}
+                {/* Camera viewfinder — full contrast, no glass overlay on the feed */}
                 <div className="relative rounded-2xl overflow-hidden bg-black aspect-square w-full max-w-xs mx-auto">
                   <video
                     ref={videoRef}
@@ -332,13 +347,13 @@ export default function PlayerPassRegistration() {
                     <div className="w-40 h-48 border-4 border-white/60 rounded-full" />
                   </div>
                   {!cameraActive && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black">
                       <Loader2 className="w-8 h-8 text-white animate-spin" />
                     </div>
                   )}
                 </div>
 
-                <p className="text-xs text-center text-gray-400">Position your face in the circle • Good lighting • Look at the camera</p>
+                <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>Position your face in the circle • Good lighting • Look at the camera</p>
 
                 <div className="flex gap-3">
                   <Button
@@ -346,27 +361,28 @@ export default function PlayerPassRegistration() {
                     variant="outline"
                     onClick={flipCamera}
                     className="flex-1"
+                    style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'white', background: 'transparent' }}
                   >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Flip
                   </Button>
-                  <Button
+                  <GoldButton
                     type="button"
                     onClick={capturePhoto}
                     disabled={!cameraActive}
-                    className="flex-2 bg-[#1a365d] hover:bg-[#2c5282] flex-1"
+                    className="flex-1"
                   >
-                    <Camera className="w-4 h-4 mr-2" />
+                    <Camera className="w-4 h-4" />
                     Take Photo
-                  </Button>
+                  </GoldButton>
                 </div>
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Preview */}
+                {/* Preview — full contrast, no glass */}
                 <div className="relative rounded-2xl overflow-hidden aspect-square w-full max-w-xs mx-auto">
                   <img src={photoDataUrl} alt="Your photo" className="w-full h-full object-cover" />
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: t.green }}>
                     ✓ Photo taken
                   </div>
                 </div>
@@ -376,36 +392,40 @@ export default function PlayerPassRegistration() {
                   variant="outline"
                   onClick={retakePhoto}
                   className="w-full"
+                  style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'white', background: 'transparent' }}
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Retake Photo
                 </Button>
 
-                <Button
+                <GoldButton
                   type="button"
                   onClick={handleSubmit}
                   disabled={registrationMutation.isPending}
-                  className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6"
+                  fullWidth
+                  style={{ padding: '16px 20px' }}
                 >
                   {registrationMutation.isPending ? (
                     <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       Submitting...
                     </>
                   ) : (
                     'Submit Application'
                   )}
-                </Button>
+                </GoldButton>
               </div>
             )}
-          </div>
+          </GlassCard>
         )}
 
-        <div className="mt-6 bg-gray-100 rounded-xl p-4">
-          <p className="text-sm text-gray-700">
-            <strong>Note:</strong> This is a free pass for registered players. 
-            Admin approval is required before your pass becomes active.
-          </p>
+        <div className="mt-6">
+          <GlassCard className="p-4">
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: t.fontBody }}>
+              <strong>Note:</strong> This is a free pass for registered players. 
+              Admin approval is required before your pass becomes active.
+            </p>
+          </GlassCard>
         </div>
       </div>
     </div>
