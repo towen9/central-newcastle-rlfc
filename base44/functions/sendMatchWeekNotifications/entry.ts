@@ -110,7 +110,14 @@ Deno.serve(async (req) => {
     console.log(`sendMatchWeekNotifications: now=${now.toISOString()} Sydney=${sydNow.weekday} ${sydNow.hour}:${String(sydNow.minute).padStart(2,'0')}`);
 
     // Load scheduled DEC (first grade) men's fixtures only — women's and other grades do not trigger the push cadence
-    const upcomingFixtures = await sb.entities.Fixture.filter({ match_status: 'scheduled', division: 'mens', team_grade: 'DEC' });
+    // Date-driven upcoming selection — the calendar is the truth, status fields are decoration.
+    // (match_status proved unreliable: stale values silently blinded the push scheduler.)
+    const allFixtures = await sb.entities.Fixture.filter({ team_grade: 'DEC' });
+    const now = new Date();
+    const upcomingFixtures = allFixtures.filter(f =>
+      f.date_time && new Date(f.date_time) > now &&
+      f.status !== 'cancelled' && f.status !== 'postponed'
+    );
 
     if (upcomingFixtures.length === 0) {
       return Response.json({ success: true, message: 'No scheduled fixtures' });
