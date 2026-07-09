@@ -34,6 +34,7 @@ function gradeChipLabel(fixture) {
   const division = fixture.division;
   if (division === 'womens') return grade || "Women's";
   if (grade === 'DEC') return 'First Grade';
+  if (grade === 'WT') return "Women's Tackle";
   if (grade === 'RES') return 'Reserves';
   return grade || 'First Grade';
 }
@@ -97,11 +98,11 @@ export default function Fixtures() {
     : dedupedFixtures.filter(f => gradeChipLabel(f) === selectedGrade);
 
   const upcomingFixtures = filteredFixtures
-    .filter(f => f.status === 'upcoming' || f.status === 'live' || isAfter(new Date(f.date_time), new Date()))
+    .filter(f => f.status === 'live' || isAfter(new Date(f.date_time), new Date()))
     .sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
 
   const pastFixtures = filteredFixtures
-    .filter(f => f.status === 'completed' && isBefore(new Date(f.date_time), new Date()))
+    .filter(f => f.status !== 'live' && isBefore(new Date(f.date_time), new Date()))
     .sort((a, b) => new Date(b.date_time) - new Date(a.date_time));
 
   const nextMatch = upcomingFixtures[0];
@@ -437,6 +438,17 @@ function FixtureRow({ fixture, hasMembership, index, isPast }) {
             <p className="text-[10px] text-white/40" style={{ fontFamily: t.fontBody }}>
               {gradeChipLabel(fixture)} • {isHome ? 'Home' : 'Away'}
             </p>
+            {(fixture.status === 'cancelled' || fixture.status === 'postponed') && (
+              <span
+                className="inline-block mt-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
+                style={{
+                  background: fixture.status === 'cancelled' ? 'rgba(220,38,38,0.15)' : 'rgba(245,158,11,0.15)',
+                  color: fixture.status === 'cancelled' ? '#f87171' : '#fbbf24',
+                }}
+              >
+                {fixture.status === 'cancelled' ? 'Cancelled' : 'Postponed'}
+              </span>
+            )}
           </div>
 
           {/* Right: time, score, or day pass */}

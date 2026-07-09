@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Calendar, MapPin } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isAfter } from 'date-fns';
 import { motion } from 'framer-motion';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
@@ -35,8 +35,11 @@ export default function NextMatchDark() {
   const { data: fixtures = [] } = useQuery({
     queryKey: ['upcomingFixtures'],
     queryFn: async () => {
-      const all = await base44.entities.Fixture.filter({ match_status: 'scheduled', division: 'mens', team_grade: 'DEC' });
-      return all.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
+      const all = await base44.entities.Fixture.filter({ team_grade: clubConfig.fixtures?.primary_grade || 'DEC' });
+      const now = new Date();
+      return all
+        .filter(f => isAfter(new Date(f.date_time), now) && f.status !== 'cancelled' && f.status !== 'postponed')
+        .sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
     },
     staleTime: 0,
     gcTime: 0
