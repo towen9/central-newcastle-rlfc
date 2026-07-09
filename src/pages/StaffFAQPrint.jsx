@@ -1,4 +1,9 @@
 import React, { useEffect } from 'react';
+import { Printer } from 'lucide-react';
+import clubConfig from '@/config/club.config';
+import { UtilityButton } from '@/components/ui-kit';
+
+const t = clubConfig.theme;
 
 export default function StaffFAQPrint() {
   useEffect(() => {
@@ -81,22 +86,26 @@ export default function StaffFAQPrint() {
         .step-num { background: #1a365d; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; }
 
         .footer { border-top: 2px solid #e5e7eb; padding-top: 8px; text-align: center; color: #9ca3af; font-size: 9px; margin-top: 16px; }
-        .print-btn { position: fixed; bottom: 20px; right: 20px; background: #1a365d; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; }
       `}</style>
 
-      <button className="print-btn no-print" onClick={() => window.print()}>🖨️ Print / Save PDF</button>
+      {/* Screen-only print button — Utility variant */}
+      <div className="no-print" style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 100 }}>
+        <UtilityButton variant="secondary" onClick={() => window.print()} style={{ width: 'auto', minHeight: 48, fontSize: 14, padding: '12px 20px', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+          <Printer className="w-4 h-4" /> Print / Save PDF
+        </UtilityButton>
+      </div>
 
       <div className="page">
 
         {/* Header */}
         <div className="header">
           <img
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-            alt="Central Newcastle RLFC"
+            src={clubConfig.identity.logo_url}
+            alt={clubConfig.identity.club_name}
           />
           <div className="header-text">
-            <h1>Central Newcastle RLFC</h1>
-            <p>2026 Staff Reference Guide — Membership, Benefits & Troubleshooting</p>
+            <h1>{clubConfig.identity.club_name}</h1>
+            <p>{clubConfig.season.label} Staff Reference Guide — Membership, Benefits & Troubleshooting</p>
             <p style={{color:'#666', fontSize:'9px', marginTop:'2px'}}>Keep this handy on game day · For staff use only</p>
           </div>
         </div>
@@ -284,7 +293,7 @@ export default function StaffFAQPrint() {
 
         {/* Footer */}
         <div className="footer">
-          <p>Central Newcastle RLFC · Butcher Boys · 2026 Season · Staff Reference Guide</p>
+          <p>{clubConfig.identity.club_name} · {clubConfig.identity.short_name} · {clubConfig.season.label} · Staff Reference Guide</p>
           <p>For system access issues, contact your club administrator · charlestown-rl-community-app-1e1650bd.base44.app</p>
         </div>
 

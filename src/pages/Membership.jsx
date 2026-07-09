@@ -198,7 +198,7 @@ export default function Membership() {
                         <img src={clubConfig.identity.logo_url} alt={clubConfig.identity.club_name} className="w-full h-full object-contain" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>CENTRAL NEWCASTLE RLFC</h3>
+                        <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.club_name.toUpperCase()}</h3>
                         <p className="text-white/60 text-sm" style={{ fontFamily: t.fontBody }}>{currentTier?.name || membership.tier_name}</p>
                       </div>
                     </div>
