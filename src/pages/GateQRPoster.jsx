@@ -2,7 +2,10 @@ import React, { useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Printer } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import clubConfig from '@/config/club.config';
+import GoldButton from '@/components/ui-kit/GoldButton';
+
+const t = clubConfig.theme;
 
 export default function GateQRPoster() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -22,47 +25,47 @@ export default function GateQRPoster() {
 
   if (!qr) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">No QR code found. Create one in Admin → QR Codes first.</p>
+      <div className="flex items-center justify-center" style={{ minHeight: '100dvh', background: t.bg0 }}>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16 }}>No QR code found. Create one in Admin → QR Codes first.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8">
-      {/* Print button - hidden when printing */}
+    <div className="flex flex-col items-center justify-center p-8" style={{ minHeight: '100dvh', background: t.bg0 }}>
+      {/* Print button — hidden when printing */}
       <div className="mb-6 print:hidden">
-        <Button onClick={() => window.print()} className="bg-[#1a365d] hover:bg-[#2c5282]">
-          <Printer className="w-4 h-4 mr-2" />
+        <GoldButton onClick={() => window.print()} style={{ fontSize: 16, padding: '12px 24px', minHeight: 48 }}>
+          <Printer className="w-4 h-4" />
           Print Poster
-        </Button>
+        </GoldButton>
       </div>
 
-      {/* Poster */}
+      {/* Poster — print-friendly light surface */}
       <div
         id="gate-poster"
         className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl print:shadow-none print:rounded-none print:max-w-none"
         style={{ aspectRatio: '210/297' }}
       >
         {/* Header */}
-        <div className="bg-[#1a365d] px-8 py-8 text-center">
+        <div className="px-8 py-8 text-center" style={{ background: t.navy }}>
           <img
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg"
-            alt="Central Newcastle RLFC"
+            src={clubConfig.identity.logo_url}
+            alt={clubConfig.identity.club_name}
             className="w-24 h-24 object-contain bg-white rounded-full p-1.5 mx-auto mb-4"
           />
           <h1 className="text-white text-3xl font-extrabold tracking-tight">GATE ENTRY</h1>
-          <p className="text-blue-200 text-base mt-1">Central Newcastle RLFC</p>
+          <p className="text-base mt-1" style={{ color: '#93c5fd' }}>{clubConfig.identity.club_name}</p>
         </div>
 
         {/* Instruction */}
-        <div className="bg-amber-400 px-6 py-3 text-center">
-          <p className="text-amber-900 font-bold text-lg">📱 Scan your member QR code here</p>
+        <div className="px-6 py-3 text-center" style={{ background: '#f59e0b' }}>
+          <p className="font-bold text-lg" style={{ color: '#1a1303' }}>📱 Scan your member QR code here</p>
         </div>
 
-        {/* QR Code */}
+        {/* QR Code — solid white opaque background with quiet-zone padding */}
         <div className="flex flex-col items-center justify-center px-8 py-8 bg-white">
-          <div className="border-4 border-[#1a365d] rounded-2xl p-3">
+          <div className="rounded-2xl p-6" style={{ background: 'white', border: `4px solid ${t.navy}` }}>
             <img
               src={getQRImageUrl(qr)}
               alt="Gate Entry QR"
@@ -74,23 +77,23 @@ export default function GateQRPoster() {
 
         {/* Instructions */}
         <div className="px-8 pb-6 space-y-3">
-          <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
+          <div className="flex items-start gap-3 rounded-xl p-3" style={{ background: '#f9fafb' }}>
             <span className="text-2xl">1️⃣</span>
-            <p className="text-gray-700 text-sm font-medium">Open the Central Newcastle RLFC app on your phone</p>
+            <p className="text-gray-700 text-sm font-medium">Open the {clubConfig.identity.club_name} app on your phone</p>
           </div>
-          <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
+          <div className="flex items-start gap-3 rounded-xl p-3" style={{ background: '#f9fafb' }}>
             <span className="text-2xl">2️⃣</span>
             <p className="text-gray-700 text-sm font-medium">Tap your membership pass to show your QR code</p>
           </div>
-          <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
+          <div className="flex items-start gap-3 rounded-xl p-3" style={{ background: '#f9fafb' }}>
             <span className="text-2xl">3️⃣</span>
             <p className="text-gray-700 text-sm font-medium">Hold your screen up to the scanner at the gate</p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="bg-[#1a365d] px-6 py-3 text-center">
-          <p className="text-blue-200 text-xs">No app? No entry. Download at centralfootball.com.au</p>
+        <div className="px-6 py-3 text-center" style={{ background: t.navy }}>
+          <p className="text-xs" style={{ color: '#93c5fd' }}>No app? No entry. Download at centralfootball.com.au</p>
         </div>
       </div>
 

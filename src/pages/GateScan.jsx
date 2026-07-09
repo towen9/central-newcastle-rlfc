@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Camera, CheckCircle, XCircle, Shield, LogOut, LayoutDashboard } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import jsQR from 'jsqr';
+import clubConfig from '@/config/club.config';
+import Eyebrow from '@/components/ui-kit/Eyebrow';
+import GoldButton from '@/components/ui-kit/GoldButton';
+
+const t = clubConfig.theme;
 
 export default function GateScan() {
   const [user, setUser] = useState(null);
@@ -182,123 +186,140 @@ export default function GateScan() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-          <p className="text-gray-500">Loading...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center" style={{ minHeight: '100dvh', background: t.bg0 }}>
+        <Shield className="w-12 h-12 mb-3" style={{ color: t.gold }} />
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16, fontFamily: t.fontBody }}>Loading...</p>
       </div>
     );
   }
 
   if (checkInSuccess && scanResult) {
     return (
-      <div className="fixed inset-0 bg-emerald-500 flex flex-col items-center justify-center z-50 px-6">
+      <div className="fixed inset-0 flex flex-col items-center justify-center z-50 px-6" style={{ background: '#16a34a' }}>
         <CheckCircle className="w-32 h-32 text-white mb-6" />
-        <p className="text-white text-4xl font-extrabold mb-2">✅ LET 'EM IN!</p>
+        <p className="text-white text-4xl font-extrabold mb-2" style={{ fontFamily: t.fontDisplay }}>✅ LET 'EM IN!</p>
         {scanResult.photo && <img src={scanResult.photo} alt="" className="w-24 h-24 rounded-full object-cover border-4 border-white mb-3 mt-2" />}
-        <p className="text-emerald-100 text-2xl font-semibold">{scanResult.name}</p>
-        <p className="text-emerald-200 text-base mt-1">{scanResult.passType}</p>
-        <p className="text-emerald-200 text-sm mt-1">{scanResult.detail}</p>
-        <p className="text-emerald-300 text-xs mt-4">✅ {scanCount} scanned today</p>
+        <p className="text-white text-2xl font-semibold">{scanResult.name}</p>
+        <p className="text-white text-base mt-1" style={{ opacity: 0.85 }}>{scanResult.passType}</p>
+        <p className="text-white text-base mt-1" style={{ opacity: 0.75 }}>{scanResult.detail}</p>
+        <p className="text-white text-sm mt-4" style={{ opacity: 0.7 }}>✅ {scanCount} scanned today</p>
       </div>
     );
   }
 
   if (checkInLastEntry && scanResult) {
     return (
-      <div className="fixed inset-0 bg-amber-500 flex flex-col items-center justify-center z-50 px-6 text-center">
-        <p className="text-white text-6xl mb-4">⚠️</p>
-        <p className="text-white text-3xl font-extrabold mb-3">LAST ENTRY</p>
-        {scanResult.photo && <img src={scanResult.photo} alt="" className="w-24 h-24 rounded-full object-cover border-4 border-white mb-3" />}
-        <p className="text-amber-100 text-2xl font-semibold">{scanResult.name}</p>
-        <p className="text-amber-100 text-base mt-3 max-w-xs">{scanResult.detail}</p>
-        <p className="text-amber-200 text-sm mt-4">✅ Entry granted — auto-continue in 4s</p>
+      <div className="fixed inset-0 flex flex-col items-center justify-center z-50 px-6 text-center" style={{ background: '#f59e0b' }}>
+        <p className="text-6xl mb-4" style={{ color: '#1a1303' }}>⚠️</p>
+        <p className="text-3xl font-extrabold mb-3" style={{ color: '#1a1303', fontFamily: t.fontDisplay }}>LAST ENTRY</p>
+        {scanResult.photo && <img src={scanResult.photo} alt="" className="w-24 h-24 rounded-full object-cover border-4 mb-3" style={{ borderColor: '#1a1303' }} />}
+        <p className="text-2xl font-semibold" style={{ color: '#1a1303' }}>{scanResult.name}</p>
+        <p className="text-base mt-3 max-w-xs" style={{ color: '#1a1303', opacity: 0.85 }}>{scanResult.detail}</p>
+        <p className="text-sm mt-4" style={{ color: '#1a1303', opacity: 0.7 }}>✅ Entry granted — auto-continue in 4s</p>
       </div>
     );
   }
 
   if (checkInExhausted && scanResult) {
     return (
-      <div className="fixed inset-0 bg-red-700 flex flex-col items-center justify-center z-50 px-6 text-center">
+      <div className="fixed inset-0 flex flex-col items-center justify-center z-50 px-6 text-center" style={{ background: '#dc2626' }}>
         <p className="text-white text-6xl mb-4">❌</p>
-        <p className="text-white text-3xl font-extrabold mb-3">NO ENTRIES REMAINING</p>
-        <p className="text-red-100 text-2xl font-semibold">{scanResult.name}</p>
-        <p className="text-red-100 text-base mt-3 max-w-sm">{scanResult.detail}</p>
-        <Button
+        <p className="text-white text-3xl font-extrabold mb-3" style={{ fontFamily: t.fontDisplay }}>NO ENTRIES REMAINING</p>
+        <p className="text-white text-2xl font-semibold">{scanResult.name}</p>
+        <p className="text-white text-base mt-3 max-w-sm" style={{ opacity: 0.85 }}>{scanResult.detail}</p>
+        <button
           onClick={() => {
             setCheckInExhausted(false);
             setScanResult(null);
             isProcessingRef.current = false;
             startScanningRef.current?.();
           }}
-          className="mt-8 bg-white text-red-700 font-bold px-8 py-4 text-lg hover:bg-red-50"
+          className="mt-8 bg-white text-red-700 font-bold px-8 py-4 text-lg rounded-xl"
+          style={{ minHeight: 56 }}
         >
           Acknowledge &amp; Continue
-        </Button>
+        </button>
       </div>
     );
   }
 
   if (checkInDenied && scanResult) {
     return (
-      <div className="fixed inset-0 bg-red-600 flex flex-col items-center justify-center z-50 px-6">
+      <div className="fixed inset-0 flex flex-col items-center justify-center z-50 px-6" style={{ background: '#dc2626' }}>
         <XCircle className="w-32 h-32 text-white mb-6" />
-        <p className="text-white text-4xl font-extrabold mb-2">🚫 DENY ENTRY</p>
-        <p className="text-red-100 text-xl font-semibold">{scanResult.name}</p>
-        <p className="text-red-200 text-sm mt-2">{scanResult.detail}</p>
+        <p className="text-white text-4xl font-extrabold mb-2" style={{ fontFamily: t.fontDisplay }}>🚫 DENY ENTRY</p>
+        <p className="text-white text-xl font-semibold">{scanResult.name}</p>
+        <p className="text-white text-base mt-2" style={{ opacity: 0.85 }}>{scanResult.detail}</p>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: '#f9fafb' }}>
-      <div className="bg-[#1a365d] text-white" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+    <div style={{ minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: t.bg0, fontFamily: t.fontBody }}>
+      {/* Header */}
+      <div style={{ paddingTop: 'env(safe-area-inset-top, 0px)', background: t.bg1, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="px-5 py-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <Shield className="w-10 h-10" />
+              <Shield className="w-10 h-10" style={{ color: t.gold }} />
               <div>
-                <h1 className="text-xl font-bold">Gate Scanner</h1>
-                <p className="text-blue-200 text-sm">{user.full_name}</p>
+                <Eyebrow color={t.gold}>Gate Entry</Eyebrow>
+                <h1 className="text-white text-xl font-bold mt-0.5" style={{ fontFamily: t.fontDisplay }}>Gate Scanner</h1>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{user.full_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/AdminDashboard'} className="text-white hover:bg-white/20">
-                <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => base44.auth.logout()} className="text-white hover:bg-white/20">
-                <LogOut className="w-4 h-4 mr-2" />Logout
-              </Button>
+              <button onClick={() => window.location.href = '/AdminDashboard'} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-white" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)', minHeight: 40 }}>
+                <LayoutDashboard className="w-4 h-4" />Dashboard
+              </button>
+              <button onClick={() => base44.auth.logout()} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-white" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)', minHeight: 40 }}>
+                <LogOut className="w-4 h-4" />Logout
+              </button>
             </div>
           </div>
-          {scanCount > 0 && <div className="mt-2 bg-white/15 rounded-full px-4 py-1 inline-block text-sm font-semibold">✅ {scanCount} scanned today</div>}
+          {scanCount > 0 && (
+            <div className="mt-2 rounded-full px-4 py-1 inline-block text-sm font-semibold" style={{ background: t.navy, color: t.green }}>
+              ✅ {scanCount} scanned today
+            </div>
+          )}
         </div>
       </div>
+
       <div className="px-5 py-6 space-y-4">
-        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200">
+        {/* Camera viewport — solid card, feed stays full-contrast and unobstructed */}
+        <div className="overflow-hidden" style={{ borderRadius: 16, background: t.bg1, border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="relative aspect-square bg-black">
             <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
             <canvas ref={canvasRef} className="hidden" />
-            {!scanning && <div className="absolute inset-0 flex items-center justify-center bg-black/50"><Camera className="w-16 h-16 text-white/50" /></div>}
-            {scanning && <div className="absolute inset-0 border-4 border-blue-500/50"><div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-4 border-white rounded-2xl" /></div>}
+            {!scanning && (
+              <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'black' }}>
+                <Camera className="w-16 h-16" style={{ color: 'rgba(255,255,255,0.3)' }} />
+              </div>
+            )}
           </div>
         </div>
+
         {!scanning ? (
-          <Button onClick={startScanning} className="w-full bg-[#1a365d] hover:bg-[#2c5282] py-6 text-lg">
-            <Camera className="w-6 h-6 mr-3" />Start Scanning
-          </Button>
+          <GoldButton onClick={startScanning} fullWidth style={{ fontSize: 18, padding: '16px 24px', minHeight: 56 }}>
+            <Camera className="w-6 h-6" />Start Scanning
+          </GoldButton>
         ) : (
           <div className="text-center py-4">
-            <p className="text-gray-600 animate-pulse text-base">Scanning for QR code...</p>
-            <Button onClick={stopScanning} variant="outline" className="mt-4">Cancel</Button>
+            <p className="animate-pulse text-base" style={{ color: 'rgba(255,255,255,0.6)' }}>Scanning for QR code...</p>
+            <button onClick={stopScanning} className="mt-4 rounded-xl px-6 py-3 text-sm font-semibold text-white" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.20)', minHeight: 48 }}>
+              Cancel
+            </button>
           </div>
         )}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
-          <p className="font-semibold mb-1">✅ Accepts:</p>
-          <p>• Supporter Pack (5 game entries)</p>
-          <p>• Day Passes</p>
-          <p>• Family & Premium memberships</p>
+
+        {/* Accepts info — solid opaque card */}
+        <div className="p-4" style={{ borderRadius: 16, background: t.bg1, border: '1px solid rgba(255,255,255,0.08)' }}>
+          <Eyebrow color={t.gold}>Accepts</Eyebrow>
+          <div className="mt-2 space-y-1" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16 }}>
+            <p>• Supporter Pack (5 game entries)</p>
+            <p>• Day Passes</p>
+            <p>• Family & Premium memberships</p>
+          </div>
         </div>
       </div>
     </div>
