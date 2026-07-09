@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ticket } from 'lucide-react';
 import { createPageUrl } from '@/utils';
@@ -23,18 +24,10 @@ import SupporterPackAlert from '../components/home/SupporterPackAlert';
 const t = clubConfig.theme;
 
 export default function Home() {
+  const { user, checkAppState } = useAuth();
   const [showQR, setShowQR] = useState(false);
   const [dismissedLunch, setDismissedLunch] = useState(false);
-  const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const userData = await base44.auth.me();
-      setUser(userData);
-    };
-    loadUser();
-  }, []);
 
   const { data: membership } = useQuery({
     queryKey: ['membership', user?.id],
@@ -183,10 +176,7 @@ export default function Home() {
         onClose={() => setShowQR(false)}
         membership={membership}
         user={user}
-        onPhotoUploaded={async () => {
-          const userData = await base44.auth.me();
-          setUser(userData);
-        }} />
+        onPhotoUploaded={() => checkAppState()} />
     </div>
   );
 }
