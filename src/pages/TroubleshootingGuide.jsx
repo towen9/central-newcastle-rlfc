@@ -1,30 +1,74 @@
 import React, { useState } from 'react';
-import { ArrowLeft, AlertTriangle, Smartphone, Wifi, Battery, Camera, QrCode, CreditCard, Users } from 'lucide-react';
+import { AlertTriangle, Smartphone, Wifi, Battery, Camera, QrCode, CreditCard, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import clubConfig from '@/config/club.config';
+import { UtilityCard, UtilityHeader } from '@/components/ui-kit';
+
+const t = clubConfig.theme;
+
+const bodyText = {
+  color: 'rgba(255,255,255,0.75)',
+  fontFamily: t.fontBody,
+  fontSize: 17,
+  lineHeight: 1.6,
+};
+
+const solutionBox = {
+  borderRadius: 8,
+  padding: 12,
+  marginTop: 8,
+};
+
+const solutionText = {
+  color: 'rgba(255,255,255,0.6)',
+  fontFamily: t.fontBody,
+  fontSize: 15,
+  lineHeight: 1.6,
+};
+
+const issueTitle = {
+  fontFamily: t.fontBody,
+  fontSize: 18,
+  fontWeight: 700,
+};
+
+function IssueCard({ icon, iconColor, titleColor, title, cause, solutions, boxBg }) {
+  return (
+    <UtilityCard>
+      <div className="flex items-start gap-3 mb-3">
+        <div className="flex-shrink-0" style={{ color: iconColor }}>{icon}</div>
+        <div className="flex-1">
+          <h3 className="font-bold" style={{ ...issueTitle, color: titleColor }}>{title}</h3>
+          <div className="mt-2 space-y-2">
+            <p style={bodyText}><strong>Cause:</strong> {cause}</p>
+            <div style={{ ...solutionBox, background: boxBg || t.navy }}>
+              <p style={{ ...solutionText, fontWeight: 700, color: t.gold }}>Solutions:</p>
+              <ul className="list-disc ml-4 space-y-1 mt-1" style={solutionText}>
+                {solutions.map((s, i) => <li key={i}>{s}</li>)}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </UtilityCard>
+  );
+}
 
 export default function TroubleshootingGuide() {
   const [activeTab, setActiveTab] = useState('gate');
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
-      {/* Header */}
-      <div className="bg-[#1a365d] pt-safe pb-6">
-        <div className="px-5 py-4">
-          <Link to={createPageUrl('AdminDashboard')}>
-            <button className="text-white mb-4 flex items-center gap-2">
-              <ArrowLeft className="w-5 h-5" />
-              Back to Admin
-            </button>
-          </Link>
-          <h1 className="text-2xl font-bold text-white">Troubleshooting Guide</h1>
-          <p className="text-blue-200 text-sm mt-1">Quick fixes for common issues</p>
-        </div>
-      </div>
+    <div className="pb-8" style={{ minHeight: '100dvh', background: t.bg0, fontFamily: t.fontBody }}>
+      <UtilityHeader
+        title="Troubleshooting Guide"
+        onBack={() => window.location.href = createPageUrl('AdminDashboard')}
+      />
 
-      <div className="px-5 -mt-4">
+      <div className="px-5 py-6 space-y-6">
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Quick fixes for common issues</p>
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-3 mb-6">
             <TabsTrigger value="gate">Gate</TabsTrigger>
@@ -34,343 +78,260 @@ export default function TroubleshootingGuide() {
 
           {/* Gate Issues */}
           <TabsContent value="gate" className="space-y-4">
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <QrCode className="w-6 h-6 text-red-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-red-700">QR Code Won't Scan</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Poor lighting, damaged code, or low screen brightness</p>
-                    <div className="bg-blue-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Ask person to increase phone brightness to maximum</li>
-                        <li>Have them refresh the app (close and reopen)</li>
-                        <li>Move to better lighting if outdoors at night</li>
-                        <li>Clean your device camera lens</li>
-                        <li>Try holding device closer/further from code</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<QrCode className="w-6 h-6" />}
+              iconColor="#f87171"
+              titleColor="#f87171"
+              title="QR Code Won't Scan"
+              cause="Poor lighting, damaged code, or low screen brightness"
+              solutions={[
+                'Ask person to increase phone brightness to maximum',
+                'Have them refresh the app (close and reopen)',
+                'Move to better lighting if outdoors at night',
+                'Clean your device camera lens',
+                'Try holding device closer/further from code',
+              ]}
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-amber-700">"Pass Already Used"</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Day pass has already been scanned for this event</p>
-                    <div className="bg-amber-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Check if this is a duplicate entry attempt (person already came in)</li>
-                        <li>Verify the pass is for TODAY'S game (not an old pass)</li>
-                        <li>If legitimate issue, contact admin to manually verify and override</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<AlertTriangle className="w-6 h-6" />}
+              iconColor="#FBBF24"
+              titleColor="#FBBF24"
+              title={'"Pass Already Used"'}
+              cause="Day pass has already been scanned for this event"
+              solutions={[
+                'Check if this is a duplicate entry attempt (person already came in)',
+                "Verify the pass is for TODAY'S game (not an old pass)",
+                'If legitimate issue, contact admin to manually verify and override',
+              ]}
+              boxBg="#7C2D12"
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <CreditCard className="w-6 h-6 text-red-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-red-700">"Membership Expired"</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Annual membership has lapsed</p>
-                    <div className="bg-red-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Politely inform them their membership needs renewal</li>
-                        <li>Direct them to renew in the app (Membership tab)</li>
-                        <li>Offer option to purchase a day pass for today</li>
-                        <li>Club office can assist with immediate renewal if open</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<CreditCard className="w-6 h-6" />}
+              iconColor="#f87171"
+              titleColor="#f87171"
+              title={'"Membership Expired"'}
+              cause="Annual membership has lapsed"
+              solutions={[
+                'Politely inform them their membership needs renewal',
+                'Direct them to renew in the app (Membership tab)',
+                'Offer option to purchase a day pass for today',
+                'Club office can assist with immediate renewal if open',
+              ]}
+              boxBg="#7F1D1D"
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <Users className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-blue-700">Person Has No Pass</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Not a member and hasn't purchased day pass</p>
-                    <div className="bg-blue-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Help them purchase day pass on their phone (show QR at gate)</li>
-                        <li>Direct to gate cashier if cash payment preferred</li>
-                        <li>Explain membership benefits if they're interested</li>
-                        <li>Have promotional material ready to hand out</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<Users className="w-6 h-6" />}
+              iconColor={t.cyan}
+              titleColor={t.cyan}
+              title="Person Has No Pass"
+              cause="Not a member and hasn't purchased day pass"
+              solutions={[
+                'Help them purchase day pass on their phone (show QR at gate)',
+                'Direct to gate cashier if cash payment preferred',
+                "Explain membership benefits if they're interested",
+                'Have promotional material ready to hand out',
+              ]}
+            />
           </TabsContent>
 
           {/* Canteen Issues */}
           <TabsContent value="canteen" className="space-y-4">
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <QrCode className="w-6 h-6 text-red-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-red-700">Can't Scan Member QR</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Scanner not reading member's QR code</p>
-                    <div className="bg-blue-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Check your device camera is working properly</li>
-                        <li>Ask member to increase brightness and hold steady</li>
-                        <li>Have member refresh app (close and reopen)</li>
-                        <li>If persistent: process at full price and note for admin to credit points later</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<QrCode className="w-6 h-6" />}
+              iconColor="#f87171"
+              titleColor="#f87171"
+              title="Can't Scan Member QR"
+              cause="Scanner not reading member's QR code"
+              solutions={[
+                'Check your device camera is working properly',
+                'Ask member to increase brightness and hold steady',
+                'Have member refresh app (close and reopen)',
+                'If persistent: process at full price and note for admin to credit points later',
+              ]}
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-amber-700">Discount Not Applying</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Scan successful but discount doesn't show</p>
-                    <div className="bg-amber-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Verify member has active (not expired) membership</li>
-                        <li>Check if location discount is configured for this area</li>
-                        <li>Manually calculate and apply standard discount</li>
-                        <li>Note the issue and contact admin if recurring</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<AlertTriangle className="w-6 h-6" />}
+              iconColor="#FBBF24"
+              titleColor="#FBBF24"
+              title="Discount Not Applying"
+              cause="Scan successful but discount doesn't show"
+              solutions={[
+                'Verify member has active (not expired) membership',
+                'Check if location discount is configured for this area',
+                'Manually calculate and apply standard discount',
+                'Note the issue and contact admin if recurring',
+              ]}
+              boxBg="#7C2D12"
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <CreditCard className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-blue-700">Transaction Failed to Record</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Network issue or system error</p>
-                    <div className="bg-blue-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Check your internet connection</li>
-                        <li>Try submitting the transaction again</li>
-                        <li>If still failing: note purchase details manually</li>
-                        <li>Give member benefit of doubt - apply discount anyway</li>
-                        <li>Report to admin to add transaction and points manually</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<CreditCard className="w-6 h-6" />}
+              iconColor={t.cyan}
+              titleColor={t.cyan}
+              title="Transaction Failed to Record"
+              cause="Network issue or system error"
+              solutions={[
+                'Check your internet connection',
+                'Try submitting the transaction again',
+                'If still failing: note purchase details manually',
+                'Give member benefit of doubt - apply discount anyway',
+                'Report to admin to add transaction and points manually',
+              ]}
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <Users className="w-6 h-6 text-purple-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-purple-700">Member Forgot Phone</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Member has no way to show QR code</p>
-                    <div className="bg-purple-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Process at full (non-member) price for this purchase</li>
-                        <li>Suggest they bring phone next time for discount</li>
-                        <li>If they know their membership number, admin can verify and credit points later</li>
-                        <li>Be friendly - mistakes happen!</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<Users className="w-6 h-6" />}
+              iconColor="#C084FC"
+              titleColor="#C084FC"
+              title="Member Forgot Phone"
+              cause="Member has no way to show QR code"
+              solutions={[
+                'Process at full (non-member) price for this purchase',
+                'Suggest they bring phone next time for discount',
+                'If they know their membership number, admin can verify and credit points later',
+                'Be friendly - mistakes happen!',
+              ]}
+              boxBg="#581C87"
+            />
           </TabsContent>
 
           {/* Technical Issues */}
           <TabsContent value="technical" className="space-y-4">
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <Wifi className="w-6 h-6 text-red-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-red-700">No Internet Connection</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Wi-Fi down or mobile data not working</p>
-                    <div className="bg-red-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Check if Wi-Fi is connected and working</li>
-                        <li>Try switching to mobile data if available</li>
-                        <li>Restart your device</li>
-                        <li>Check other devices - is it just yours or venue-wide?</li>
-                        <li><strong>Fallback:</strong> Note entries/transactions manually on paper</li>
-                        <li>Contact venue manager about Wi-Fi issue</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<Wifi className="w-6 h-6" />}
+              iconColor="#f87171"
+              titleColor="#f87171"
+              title="No Internet Connection"
+              cause="Wi-Fi down or mobile data not working"
+              solutions={[
+                'Check if Wi-Fi is connected and working',
+                'Try switching to mobile data if available',
+                'Restart your device',
+                'Check other devices - is it just yours or venue-wide?',
+                'Fallback: Note entries/transactions manually on paper',
+                'Contact venue manager about Wi-Fi issue',
+              ]}
+              boxBg="#7F1D1D"
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <Battery className="w-6 h-6 text-amber-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-amber-700">Device Battery Low/Dead</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Staff device running out of power</p>
-                    <div className="bg-amber-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Always keep charger and power bank available at station</li>
-                        <li>Have backup device charged and ready</li>
-                        <li>Rotate devices if multiple staff on duty</li>
-                        <li><strong>Emergency:</strong> Use paper system until device charged</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<Battery className="w-6 h-6" />}
+              iconColor="#FBBF24"
+              titleColor="#FBBF24"
+              title="Device Battery Low/Dead"
+              cause="Staff device running out of power"
+              solutions={[
+                'Always keep charger and power bank available at station',
+                'Have backup device charged and ready',
+                'Rotate devices if multiple staff on duty',
+                'Emergency: Use paper system until device charged',
+              ]}
+              boxBg="#7C2D12"
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <Smartphone className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-blue-700">App Frozen/Not Responding</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Software glitch or memory issue</p>
-                    <div className="bg-blue-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li><strong>Step 1:</strong> Force close app and reopen</li>
-                        <li><strong>Step 2:</strong> Clear app from recent apps and restart</li>
-                        <li><strong>Step 3:</strong> Restart your device</li>
-                        <li><strong>Step 4:</strong> Clear browser cache if using web app</li>
-                        <li>If recurring: report to admin - may need app update</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<Smartphone className="w-6 h-6" />}
+              iconColor={t.cyan}
+              titleColor={t.cyan}
+              title="App Frozen/Not Responding"
+              cause="Software glitch or memory issue"
+              solutions={[
+                'Step 1: Force close app and reopen',
+                'Step 2: Clear app from recent apps and restart',
+                'Step 3: Restart your device',
+                'Step 4: Clear browser cache if using web app',
+                'If recurring: report to admin - may need app update',
+              ]}
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <Camera className="w-6 h-6 text-purple-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-purple-700">Camera Not Working</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> App doesn't have camera permission or hardware issue</p>
-                    <div className="bg-purple-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Solutions:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li>Check device settings - ensure app has camera permission</li>
-                        <li>Close other apps that might be using camera</li>
-                        <li>Restart the app</li>
-                        <li>Test camera in default camera app - if broken, use backup device</li>
-                        <li>Clean camera lens</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<Camera className="w-6 h-6" />}
+              iconColor="#C084FC"
+              titleColor="#C084FC"
+              title="Camera Not Working"
+              cause="App doesn't have camera permission or hardware issue"
+              solutions={[
+                'Check device settings - ensure app has camera permission',
+                'Close other apps that might be using camera',
+                'Restart the app',
+                'Test camera in default camera app - if broken, use backup device',
+                'Clean camera lens',
+              ]}
+              boxBg="#581C87"
+            />
 
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-3">
-                <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-red-700">System-Wide Outage</h3>
-                  <div className="mt-2 space-y-2 text-sm text-gray-700">
-                    <p><strong>Cause:</strong> Server down or major technical failure</p>
-                    <div className="bg-red-50 rounded p-3 text-xs space-y-1">
-                      <p><strong>Emergency Procedures:</strong></p>
-                      <ul className="list-disc ml-4 space-y-1">
-                        <li><strong>Gate:</strong> Switch to paper ticketing/manual entry log</li>
-                        <li><strong>Canteen:</strong> Process all sales at full price, note member names</li>
-                        <li>Immediately notify club administrator</li>
-                        <li>Post sign: "System temporarily down - bear with us"</li>
-                        <li>Admin will credit points/discounts after system restored</li>
-                        <li>Stay calm and professional with customers</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <IssueCard
+              icon={<AlertTriangle className="w-6 h-6" />}
+              iconColor="#f87171"
+              titleColor="#f87171"
+              title="System-Wide Outage"
+              cause="Server down or major technical failure"
+              solutions={[
+                'Gate: Switch to paper ticketing/manual entry log',
+                'Canteen: Process all sales at full price, note member names',
+                'Immediately notify club administrator',
+                'Post sign: "System temporarily down - bear with us"',
+                'Admin will credit points/discounts after system restored',
+                'Stay calm and professional with customers',
+              ]}
+              boxBg="#7F1D1D"
+            />
           </TabsContent>
         </Tabs>
 
         {/* Emergency Protocol */}
-        <Card className="p-6 bg-red-50 border-2 border-red-300 mt-6">
-          <h2 className="text-xl font-bold mb-3 text-red-900 flex items-center gap-2">
+        <UtilityCard style={{ borderColor: 'rgba(220,38,38,0.40)' }}>
+          <h2 className="mb-3 flex items-center gap-2" style={{ color: '#f87171', fontFamily: t.fontDisplay, fontSize: 20, fontWeight: 800 }}>
             <AlertTriangle className="w-6 h-6" />
             When All Else Fails
           </h2>
-          <div className="space-y-3 text-sm text-red-900">
-            <div className="bg-white rounded p-3">
-              <p className="font-bold mb-1">1. STAY CALM</p>
-              <p className="text-xs text-gray-700">Don't panic or frustrate customers - technical issues happen</p>
+          <div className="space-y-3">
+            <div className="rounded-lg p-3" style={{ background: t.navy }}>
+              <p className="font-bold mb-1" style={{ color: '#FFFFFF', fontSize: 17 }}>1. STAY CALM</p>
+              <p style={solutionText}>Don't panic or frustrate customers - technical issues happen</p>
             </div>
-            <div className="bg-white rounded p-3">
-              <p className="font-bold mb-1">2. GO MANUAL</p>
-              <p className="text-xs text-gray-700">Paper and pen - write down names, amounts, transaction details</p>
+            <div className="rounded-lg p-3" style={{ background: t.navy }}>
+              <p className="font-bold mb-1" style={{ color: '#FFFFFF', fontSize: 17 }}>2. GO MANUAL</p>
+              <p style={solutionText}>Paper and pen - write down names, amounts, transaction details</p>
             </div>
-            <div className="bg-white rounded p-3">
-              <p className="font-bold mb-1">3. NOTIFY ADMIN</p>
-              <p className="text-xs text-gray-700">Contact club administrator immediately via phone/text</p>
+            <div className="rounded-lg p-3" style={{ background: t.navy }}>
+              <p className="font-bold mb-1" style={{ color: '#FFFFFF', fontSize: 17 }}>3. NOTIFY ADMIN</p>
+              <p style={solutionText}>Contact club administrator immediately via phone/text</p>
             </div>
-            <div className="bg-white rounded p-3">
-              <p className="font-bold mb-1">4. BE GENEROUS</p>
-              <p className="text-xs text-gray-700">If in doubt, give benefit to the customer - better than bad experience</p>
+            <div className="rounded-lg p-3" style={{ background: t.navy }}>
+              <p className="font-bold mb-1" style={{ color: '#FFFFFF', fontSize: 17 }}>4. BE GENEROUS</p>
+              <p style={solutionText}>If in doubt, give benefit to the customer - better than bad experience</p>
             </div>
-            <div className="bg-white rounded p-3">
-              <p className="font-bold mb-1">5. RECONCILE LATER</p>
-              <p className="text-xs text-gray-700">Admin can manually add points/transactions after issue resolved</p>
+            <div className="rounded-lg p-3" style={{ background: t.navy }}>
+              <p className="font-bold mb-1" style={{ color: '#FFFFFF', fontSize: 17 }}>5. RECONCILE LATER</p>
+              <p style={solutionText}>Admin can manually add points/transactions after issue resolved</p>
             </div>
           </div>
-        </Card>
+        </UtilityCard>
 
         {/* Quick Contact */}
-        <Card className="p-6 mt-6">
-          <h2 className="text-xl font-bold mb-3">Need More Help?</h2>
-          <p className="text-sm text-gray-700 mb-3">Contact club administrator for:</p>
-          <ul className="text-sm text-gray-700 space-y-1 ml-4 list-disc">
+        <UtilityCard>
+          <h2 className="mb-3" style={{ color: '#FFFFFF', fontFamily: t.fontDisplay, fontSize: 20, fontWeight: 800 }}>Need More Help?</h2>
+          <p className="mb-3" style={bodyText}>Contact club administrator for:</p>
+          <ul className="space-y-1 ml-4 list-disc" style={bodyText}>
             <li>Recurring technical issues</li>
             <li>System-wide problems</li>
             <li>Manual transaction adjustments</li>
             <li>Training or clarification on procedures</li>
           </ul>
-          <div className="mt-4 pt-4 border-t">
+          <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
             <Link to={createPageUrl('GateStaffGuide')}>
-              <button className="text-blue-600 text-sm underline mr-4">Gate Staff Guide</button>
+              <button className="underline mr-4" style={{ color: t.cyan, fontSize: 15 }}>Gate Staff Guide</button>
             </Link>
             <Link to={createPageUrl('CanteenStaffGuide')}>
-              <button className="text-blue-600 text-sm underline">Canteen Staff Guide</button>
+              <button className="underline" style={{ color: t.cyan, fontSize: 15 }}>Canteen Staff Guide</button>
             </Link>
           </div>
-        </Card>
+        </UtilityCard>
       </div>
     </div>
   );

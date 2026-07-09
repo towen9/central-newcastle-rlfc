@@ -1,30 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { Printer } from 'lucide-react';
+import clubConfig from '@/config/club.config';
+import { UtilityButton, UtilityHeader } from '@/components/ui-kit';
+
+const t = clubConfig.theme;
 
 export default function StaffFAQ() {
   return (
     <div className="min-h-screen bg-white">
       {/* Screen-only header */}
-      <div className="bg-[#1a365d] pt-safe pb-4 print:hidden">
-        <div className="px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to={createPageUrl('AdminDashboard')}>
-              <button className="text-white flex items-center gap-2">
-                <ArrowLeft className="w-5 h-5" />
-                Back
-              </button>
-            </Link>
-          </div>
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 bg-white text-[#1a365d] font-bold px-4 py-2 rounded-lg text-sm"
-          >
-            <Printer className="w-4 h-4" />
-            Print / Save PDF
-          </button>
-        </div>
+      <div className="print:hidden">
+        <UtilityHeader
+          onBack={() => window.location.href = createPageUrl('AdminDashboard')}
+          right={
+            <UtilityButton variant="secondary" onClick={() => window.print()} style={{ width: 'auto', minHeight: 48, fontSize: 14, padding: '8px 16px' }}>
+              <Printer className="w-4 h-4" /> Print / Save PDF
+            </UtilityButton>
+          }
+        />
       </div>
 
       <style>{`

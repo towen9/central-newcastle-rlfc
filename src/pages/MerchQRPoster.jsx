@@ -1,6 +1,9 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
+import clubConfig from '@/config/club.config';
+import { UtilityButton } from '@/components/ui-kit';
+
+const t = clubConfig.theme;
 
 const MERCH_QR_URL = `${window.location.origin}/MemberMerchStatus`;
 const LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';
@@ -9,12 +12,12 @@ export default function MerchQRPoster() {
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(MERCH_QR_URL)}`;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8">
+    <div className="flex flex-col items-center justify-center p-8" style={{ minHeight: '100dvh', background: t.bg0 }}>
       <div className="mb-6 print:hidden">
-        <Button onClick={() => window.print()} className="bg-[#1a365d] hover:bg-[#2c5282]">
-          <Printer className="w-4 h-4 mr-2" />
+        <UtilityButton variant="primary" onClick={() => window.print()} style={{ width: 'auto', minHeight: 48, fontSize: 14, padding: '8px 16px' }}>
+          <Printer className="w-4 h-4" />
           Print Poster
-        </Button>
+        </UtilityButton>
       </div>
 
       <div

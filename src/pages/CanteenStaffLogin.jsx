@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ShoppingBag, LogIn, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ShoppingBag, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
+import clubConfig from '@/config/club.config';
+import { UtilityCard, UtilityButton, StatusBanner, UtilityHeader } from '@/components/ui-kit';
+
+const t = clubConfig.theme;
 
 export default function CanteenStaffLogin() {
   const [loading, setLoading] = useState(false);
@@ -33,39 +36,35 @@ export default function CanteenStaffLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
-            <ShoppingBag className="w-12 h-12 text-amber-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Bar & Canteen</h1>
-          <p className="text-amber-100">Central Newcastle RLFC</p>
-        </div>
+    <div className="flex flex-col" style={{ minHeight: '100dvh', background: t.bg0, fontFamily: t.fontBody }}>
+      <UtilityHeader title="Bar & Canteen" />
 
-        {/* Login Card */}
-        <div className="bg-white rounded-3xl p-8 shadow-2xl">
-          <div className="mb-6 p-4 bg-amber-50 rounded-xl flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-amber-900 text-sm">For Bar & Canteen Staff Only</p>
-              <p className="text-amber-700 text-xs mt-1">Use your club credentials to access the points scanner</p>
+      <div className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-md space-y-6">
+          {/* Logo & Title */}
+          <div className="text-center">
+            <div className="w-!20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4" style={{ background: t.navy, border: `3px solid ${t.gold}`, width: 80, height: 80 }}>
+              <ShoppingBag className="w-12 h-12" style={{ color: t.gold }} />
             </div>
+            <h1 className="text-white text-2xl font-extrabold" style={{ fontFamily: t.fontDisplay }}>Bar & Canteen</h1>
+            <p className="mt-2" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16 }}>{clubConfig.identity.club_name}</p>
           </div>
 
-          <Button
-            onClick={handleLogin}
-            disabled={loading}
-            className="w-full h-14 bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
-          >
-            <LogIn className="w-5 h-5 mr-3" />
-            {loading ? 'Signing In...' : 'Sign In with Club Account'}
-          </Button>
+          {/* Login Card — solid opaque surface */}
+          <UtilityCard>
+            <div className="mb-6">
+              <StatusBanner variant="warning" title="For Bar & Canteen Staff Only" subtitle="Use your club credentials to access the points scanner" />
+            </div>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Need access? Contact your admin
-          </p>
+            <UtilityButton variant="primary" onClick={handleLogin} disabled={loading}>
+              <LogIn className="w-5 h-5" />
+              {loading ? 'Signing In...' : 'Sign In with Club Account'}
+            </UtilityButton>
+
+            <p className="text-center text-sm mt-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              Need access? Contact your admin
+            </p>
+          </UtilityCard>
         </div>
       </div>
     </div>

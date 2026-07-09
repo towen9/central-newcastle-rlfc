@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Printer } from 'lucide-react';
 import clubConfig from '@/config/club.config';
-import GoldButton from '@/components/ui-kit/GoldButton';
+import { UtilityButton } from '@/components/ui-kit';
 
 const t = clubConfig.theme;
 
@@ -35,10 +35,10 @@ export default function GateQRPoster() {
     <div className="flex flex-col items-center justify-center p-8" style={{ minHeight: '100dvh', background: t.bg0 }}>
       {/* Print button — hidden when printing */}
       <div className="mb-6 print:hidden">
-        <GoldButton onClick={() => window.print()} style={{ fontSize: 16, padding: '12px 24px', minHeight: 48 }}>
+        <UtilityButton variant="primary" onClick={() => window.print()} style={{ width: 'auto', minHeight: 48, fontSize: 14, padding: '8px 16px' }}>
           <Printer className="w-4 h-4" />
           Print Poster
-        </GoldButton>
+        </UtilityButton>
       </div>
 
       {/* Poster — print-friendly light surface */}
