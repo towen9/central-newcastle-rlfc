@@ -113,9 +113,9 @@ Deno.serve(async (req) => {
     // Date-driven upcoming selection — the calendar is the truth, status fields are decoration.
     // (match_status proved unreliable: stale values silently blinded the push scheduler.)
     const allFixtures = await sb.entities.Fixture.filter({ team_grade: 'DEC' });
-    const now = new Date();
+    const nowCheck = new Date();
     const upcomingFixtures = allFixtures.filter(f =>
-      f.date_time && new Date(f.date_time) > now &&
+      f.date_time && new Date(f.date_time) > nowCheck &&
       f.status !== 'cancelled' && f.status !== 'postponed'
     );
 
