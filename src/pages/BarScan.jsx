@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Beer, CheckCircle, XCircle, Scan, LogOut, LayoutDashboard } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Beer, Scan, LogOut, LayoutDashboard } from 'lucide-react';
 import jsQR from 'jsqr';
+import clubConfig from '@/config/club.config';
+import { UtilityCard, UtilityButton, StatusBanner, UtilityHeader } from '@/components/ui-kit';
+
+const t = clubConfig.theme;
 
 export default function BarScan() {
   const [user, setUser] = useState(null);
@@ -130,83 +133,68 @@ export default function BarScan() {
     base44.auth.logout('/CanteenStaffLogin');
   };
 
-  if (!user) return <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">Loading...</div>;
+  if (!user) return (
+    <div className="flex flex-col items-center justify-center" style={{ minHeight: '100dvh', background: t.bg0 }}>
+      <Beer className="w-12 h-12 mb-3" style={{ color: t.gold }} />
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16, fontFamily: t.fontBody }}>Loading...</p>
+    </div>
+  );
+
+  const isWarning = !result?.success && result?.message?.toLowerCase().includes('already');
+  const bannerVariant = result?.success ? 'valid' : (isWarning ? 'warning' : 'invalid');
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <Beer className="w-10 h-10 text-amber-400" />
-            <div>
-              <h1 className="text-2xl font-bold">Bar Scanner</h1>
-              <p className="text-gray-400 text-sm">+5 points per drink</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={() => window.location.href = '/AdminDashboard'}
-              variant="ghost" 
-              size="sm"
-              className="text-white hover:bg-white/10"
-            >
-              <LayoutDashboard className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
-            <Button 
-              onClick={handleLogout} 
-              variant="ghost" 
-              size="sm"
-              className="text-white hover:bg-white/10"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
+    <div style={{ minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: t.bg0, fontFamily: t.fontBody }}>
+      <UtilityHeader
+        title="Bar Scanner"
+        right={
+          <>
+            <button onClick={() => window.location.href = '/AdminDashboard'} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-white" style={{ background: t.navy, minHeight: 48 }}>
+              <LayoutDashboard className="w-4 h-4" />Dashboard
+            </button>
+            <button onClick={handleLogout} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-white" style={{ background: t.navy, minHeight: 48 }}>
+              <LogOut className="w-4 h-4" />Logout
+            </button>
+          </>
+        }
+      />
+
+      <div className="px-5 py-6 space-y-4 max-w-md mx-auto">
+        <p className="text-sm" style={{ color: t.gold, fontWeight: 600 }}>+5 points per drink</p>
 
         {!scanning && !result && (
-          <Button 
-            onClick={startScanning}
-            className="w-full h-16 bg-amber-500 hover:bg-amber-600 text-lg"
-          >
-            <Scan className="w-6 h-6 mr-2" />
-            Start Scanning
-          </Button>
+          <UtilityButton variant="primary" onClick={startScanning}>
+            <Scan className="w-6 h-6" />Start Scanning
+          </UtilityButton>
         )}
 
         {scanning && (
           <div className="space-y-4">
-            <div className="relative bg-black rounded-lg overflow-hidden">
-              <video ref={videoRef} className="w-full" playsInline muted />
-              <div className="absolute inset-0 border-4 border-amber-400 opacity-50 pointer-events-none" />
-            </div>
-            <canvas ref={canvasRef} className="hidden" />
-            <Button onClick={stopScanning} variant="outline" className="w-full">Cancel</Button>
+            <UtilityCard style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="relative bg-black" style={{ aspectRatio: '1 / 1' }}>
+                <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+                <canvas ref={canvasRef} className="hidden" />
+              </div>
+            </UtilityCard>
+            <UtilityButton variant="secondary" onClick={stopScanning}>Cancel</UtilityButton>
           </div>
         )}
 
         {result && (
-          <div className={`p-6 rounded-lg ${result.success ? 'bg-green-900' : 'bg-red-900'}`}>
-            {result.success ? (
-              <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            ) : (
-              <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            )}
-            <h2 className="text-xl font-bold text-center mb-2">{result.message}</h2>
+          <UtilityCard>
+            <StatusBanner variant={bannerVariant} title={result.message} />
             {result.success && (
-              <div className="text-center space-y-2">
-                <p className="text-lg">{result.memberName}</p>
-                <p className="text-2xl font-bold text-amber-400">{result.newBalance} Points</p>
+              <div className="text-center space-y-2 mt-4">
+                <p className="text-xl font-bold text-white">{result.memberName}</p>
+                <p className="text-3xl font-extrabold" style={{ color: t.gold }}>{result.newBalance} Points</p>
               </div>
             )}
-            <Button 
-              onClick={() => { setResult(null); startScanning(); }}
-              className="w-full mt-6 bg-amber-500 hover:bg-amber-600"
-            >
-              Scan Next Member
-            </Button>
-          </div>
+            <div className="mt-6">
+              <UtilityButton variant="primary" onClick={() => { setResult(null); startScanning(); }}>
+                Scan Next Member
+              </UtilityButton>
+            </div>
+          </UtilityCard>
         )}
       </div>
     </div>
