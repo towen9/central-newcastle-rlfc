@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Ticket } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import clubConfig from '@/config/club.config';
 
 import HeroPass from '../components/home/HeroPass';
-import MembershipPromo from '../components/home/MembershipPromo';
 import NextMatchDark from '../components/home/NextMatchDark';
 import DayPassGlass from '../components/home/DayPassGlass';
-import GlassCard from '@/components/ui-kit/GlassCard';
+import EntryDecisionCard from '../components/home/EntryDecisionCard';
+import ValueStrip from '../components/home/ValueStrip';
+import SponsorStrip from '../components/home/SponsorStrip';
 
 import StampProgress from '../components/home/StampProgress';
 import QuickActions from '../components/home/QuickActions';
@@ -108,65 +108,61 @@ export default function Home() {
             <LadiesLunchBanner onDismiss={() => setDismissedLunch(true)} />
           )}
 
-          {/* Non-member CTAs */}
-          {!membership && !dayPass && user &&
-            <div className="space-y-3">
-              <MembershipPromo />
+          {/* === NON-MEMBER STATE === */}
+          {!membership && !dayPass && user && !membershipLoading && (
+            <>
+              {/* Next Match — first */}
+              <NextMatchDark />
 
-              {/* Day Pass secondary CTA */}
-              <GlassCard className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${t.royal}22` }}>
-                    <Ticket className="w-5 h-5" style={{ color: t.cyan }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-white" style={{ fontFamily: t.fontBody }}>Just here for one game?</p>
-                    <p className="text-xs text-white/50" style={{ fontFamily: t.fontBody }}>Single-game digital entry — $8</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => window.location.href = createPageUrl('DayPass')}
-                  className="rounded-xl px-4 py-2 text-sm font-semibold flex-shrink-0 transition-all"
-                  style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)' }}
-                >
-                  Day Pass
-                </button>
-              </GlassCard>
-            </div>
-          }
+              {/* Entry Decision Card — hero */}
+              <EntryDecisionCard />
 
-          {/* Membership Pass or Day Pass */}
-          <div className="relative z-10">
-            {membershipLoading ?
-              <div className="h-44 rounded-[22px] animate-pulse" style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))' }} /> :
-              !membership && dayPass ?
-              <DayPassGlass pass={dayPass} fixture={dayPassFixture} user={user} /> :
+              {/* Compact membership value strip */}
+              <ValueStrip />
+
+              {/* Push Opt-In */}
+              <PushOptInCard />
+
+              {/* Quick Actions — filtered (Fixtures + Share App only) */}
+              <QuickActions isNonMember />
+
+              {/* Sponsor strip — slim, bottom */}
+              <SponsorStrip />
+            </>
+          )}
+
+          {/* === DAY-PASS HOLDER STATE (unchanged) === */}
+          {!membership && dayPass && (
+            <>
+              <DayPassGlass pass={dayPass} fixture={dayPassFixture} user={user} />
+              <PushOptInCard />
+              <NextMatchDark />
+              <QuickActions />
+            </>
+          )}
+
+          {/* === MEMBER STATE (unchanged) === */}
+          {membership && (
+            <>
               <HeroPass
                 membership={membership}
                 user={user}
                 onShowQR={() => setShowQR(true)} />
-            }
-          </div>
+              <SupporterPackAlert membership={membership} />
+              <PushOptInCard />
+              <NextMatchDark />
+              <QuickActions />
+              <StampProgress
+                stamps={membership?.stamps || 0}
+                points={membership?.points || 0}
+                rewards={rewards} />
+            </>
+          )}
 
-          {/* Supporter Pack alert */}
-          {membership && <SupporterPackAlert membership={membership} />}
-
-          {/* Push Opt-In */}
-          <PushOptInCard />
-
-          {/* Next Match */}
-          <NextMatchDark />
-
-          {/* Quick Actions */}
-          <QuickActions />
-
-          {/* Points Progress */}
-          {membership &&
-            <StampProgress
-              stamps={membership?.stamps || 0}
-              points={membership?.points || 0}
-              rewards={rewards} />
-          }
+          {/* Loading skeleton */}
+          {membershipLoading && (
+            <div className="h-44 rounded-[22px] animate-pulse" style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))' }} />
+          )}
         </div>
       </PullToRefresh>
 

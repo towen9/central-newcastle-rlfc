@@ -14,7 +14,11 @@ const actions = [
   { icon: Share2, label: 'Share App', action: 'share', color: 'bg-pink-500 dark:bg-pink-600' },
 ];
 
-export default function QuickActions() {
+export default function QuickActions({ isNonMember = false }) {
+  const visibleActions = isNonMember
+    ? actions.filter(a => a.label === 'Fixtures' || a.label === 'Share App')
+    : actions;
+
   const handleShare = async () => {
     const shareData = {
       title: clubConfig.identity.club_name,
@@ -38,8 +42,8 @@ export default function QuickActions() {
   };
 
   return (
-    <div className="grid grid-cols-5 gap-1.5">
-      {actions.map((action, idx) => {
+    <div className={`grid ${isNonMember ? 'grid-cols-2' : 'grid-cols-5'} gap-1.5`}>
+      {visibleActions.map((action, idx) => {
         if (action.action === 'share') {
           return (
             <motion.button
