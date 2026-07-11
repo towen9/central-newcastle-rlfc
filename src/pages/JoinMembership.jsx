@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
 import { toast } from 'sonner';
-import clubConfig from '@/config/club.config';
+import { useClub, getClubConfig } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
+const t = getClubConfig().theme;
 
 const tierConfig = {
   'Supporter Pack': {
@@ -45,6 +45,8 @@ const tierConfig = {
 };
 
 export default function JoinMembership() {
+  const { club } = useClub();
+  const t = club.theme;
   const [selectedTier, setSelectedTier] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [user, setUser] = useState(null);
@@ -160,9 +162,9 @@ export default function JoinMembership() {
             <span className="text-sm" style={{ fontFamily: t.fontBody }}>Back</span>
           </button>
         </Link>
-        <Eyebrow color={t.gold}>{clubConfig.season.year} Season</Eyebrow>
-        <h1 className="text-white text-2xl mb-1" style={{ fontFamily: t.fontDisplay }}>{clubConfig.season.year} Memberships</h1>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Support {clubConfig.identity.club_name} this season</p>
+        <Eyebrow color={t.gold}>{club.season.year} Season</Eyebrow>
+        <h1 className="text-white text-2xl mb-1" style={{ fontFamily: t.fontDisplay }}>{club.season.year} Memberships</h1>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Support {club.identity.club_name} this season</p>
       </div>
 
       <div className="px-5 py-6">

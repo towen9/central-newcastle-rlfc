@@ -4,19 +4,19 @@ import { CheckCircle2, Smartphone, Star, Gift, Building2, ShieldCheck, ArrowRigh
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub, getClubConfig } from '@/contexts/ClubContext';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
+const t = getClubConfig().theme;
 
 const steps = [
   {
     icon: Smartphone,
     title: 'Download & Sign Up',
-    description: `Open the ${clubConfig.identity.club_name} app and create your free account using your email address.`
+    description: `Open the ${getClubConfig().identity.club_name} app and create your free account using your email address.`
   },
   {
     icon: ShieldCheck,
@@ -44,6 +44,8 @@ const perks = [
 ];
 
 export default function PlayerPassInvite() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -60,8 +62,8 @@ export default function PlayerPassInvite() {
       <div className="pt-safe px-5 py-10 text-center">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <img
-            src={clubConfig.identity.logo_url}
-            alt={clubConfig.identity.club_name}
+            src={club.identity.logo_url}
+            alt={club.identity.club_name}
             className="w-20 h-20 object-contain bg-white rounded-full p-1 mx-auto mb-4"
           />
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4" style={{ background: `${t.gold}22`, border: `1px solid ${t.gold}44` }}>
@@ -168,7 +170,7 @@ export default function PlayerPassInvite() {
                 </>
               )}
               <p className="text-center text-xs mt-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                Free for all registered {clubConfig.identity.club_name} players • {clubConfig.season.year} Season
+                Free for all registered {club.identity.club_name} players • {club.season.year} Season
               </p>
             </>
           )}

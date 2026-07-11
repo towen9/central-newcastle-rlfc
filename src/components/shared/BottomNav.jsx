@@ -4,9 +4,7 @@ import { motion } from 'framer-motion';
 import { Home, CreditCard, Award, User, ScanLine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 const leftItems = [
   { icon: Home, label: 'Home', page: 'Home' },
@@ -19,6 +17,8 @@ const rightItems = [
 ];
 
 export default function BottomNav({ currentPage }) {
+  const { club } = useClub();
+  const t = club.theme;
   const renderNavItem = (item, idx) => {
     const isActive = currentPage === item.page;
     const Icon = item.icon;
@@ -44,16 +44,16 @@ export default function BottomNav({ currentPage }) {
         boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
       }}>
         <div className="flex flex-1 items-center justify-around">
-          {leftItems.filter(item => !item.feature || clubConfig.features?.[item.feature]).map(renderNavItem)}
+          {leftItems.filter(item => !item.feature || club.features?.[item.feature]).map(renderNavItem)}
         </div>
 
         <div className="flex-shrink-0" style={{ width: '60px' }} />
 
         <div className="flex flex-1 items-center justify-around">
-          {rightItems.filter(item => !item.feature || clubConfig.features?.[item.feature]).map(renderNavItem)}
+          {rightItems.filter(item => !item.feature || club.features?.[item.feature]).map(renderNavItem)}
         </div>
 
-        {clubConfig.features?.gate_scanning && (
+        {club.features?.gate_scanning && (
           <Link to={createPageUrl('ScanForPoints')} className="absolute left-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%)', top: '-22px', pointerEvents: 'auto' }}>
             <motion.div whileTap={{ scale: 0.9 }} className="flex flex-col items-center">
               <div className="flex items-center justify-center" style={{

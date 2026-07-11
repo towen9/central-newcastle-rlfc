@@ -3,10 +3,10 @@ import { AlertTriangle, Smartphone, Wifi, Battery, Camera, QrCode, CreditCard, U
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import clubConfig from '@/config/club.config';
+import { useClub, getClubConfig } from '@/contexts/ClubContext';
 import { UtilityCard, UtilityHeader } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
+const t = getClubConfig().theme;
 
 const bodyText = {
   color: 'rgba(255,255,255,0.75)',
@@ -35,6 +35,8 @@ const issueTitle = {
 };
 
 function IssueCard({ icon, iconColor, titleColor, title, cause, solutions, boxBg }) {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <UtilityCard>
       <div className="flex items-start gap-3 mb-3">
@@ -57,6 +59,8 @@ function IssueCard({ icon, iconColor, titleColor, title, cause, solutions, boxBg
 }
 
 export default function TroubleshootingGuide() {
+  const { club } = useClub();
+  const t = club.theme;
   const [activeTab, setActiveTab] = useState('gate');
 
   return (

@@ -3,12 +3,12 @@ import { base44 } from '@/api/base44Client';
 import { Camera, Shield, LogOut, LayoutDashboard } from 'lucide-react';
 import { toast } from 'sonner';
 import jsQR from 'jsqr';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { UtilityCard, UtilityButton, StatusBanner, UtilityHeader } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
-
 export default function GateScan() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);

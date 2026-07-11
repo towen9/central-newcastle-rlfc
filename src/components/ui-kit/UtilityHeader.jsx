@@ -1,10 +1,10 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function UtilityHeader({ title, onBack, right }) {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <div
       style={{

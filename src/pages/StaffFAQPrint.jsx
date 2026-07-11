@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Printer } from 'lucide-react';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { UtilityButton } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
-
 export default function StaffFAQPrint() {
+  const { club } = useClub();
+  const t = club.theme;
   useEffect(() => {
     // Auto-trigger print dialog after a short delay for render
     const timer = setTimeout(() => window.print(), 800);
@@ -100,12 +100,12 @@ export default function StaffFAQPrint() {
         {/* Header */}
         <div className="header">
           <img
-            src={clubConfig.identity.logo_url}
-            alt={clubConfig.identity.club_name}
+            src={club.identity.logo_url}
+            alt={club.identity.club_name}
           />
           <div className="header-text">
-            <h1>{clubConfig.identity.club_name}</h1>
-            <p>{clubConfig.season.label} Staff Reference Guide — Membership, Benefits & Troubleshooting</p>
+            <h1>{club.identity.club_name}</h1>
+            <p>{club.season.label} Staff Reference Guide — Membership, Benefits & Troubleshooting</p>
             <p style={{color:'#666', fontSize:'9px', marginTop:'2px'}}>Keep this handy on game day · For staff use only</p>
           </div>
         </div>
@@ -293,7 +293,7 @@ export default function StaffFAQPrint() {
 
         {/* Footer */}
         <div className="footer">
-          <p>{clubConfig.identity.club_name} · {clubConfig.identity.short_name} · {clubConfig.season.label} · Staff Reference Guide</p>
+          <p>{club.identity.club_name} · {club.identity.short_name} · {club.season.label} · Staff Reference Guide</p>
           <p>For system access issues, contact your club administrator · charlestown-rl-community-app-1e1650bd.base44.app</p>
         </div>
 

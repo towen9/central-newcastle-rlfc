@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 
 import HeroPass from '../components/home/HeroPass';
 import NextMatchDark from '../components/home/NextMatchDark';
@@ -21,10 +21,10 @@ import LadiesLunchBanner from '../components/home/LadiesLunchBanner';
 import PushOptInCard from '../components/home/PushOptInCard';
 import SupporterPackAlert from '../components/home/SupporterPackAlert';
 
-const t = clubConfig.theme;
-
 export default function Home() {
   const { user, checkAppState } = useAuth();
+  const { club } = useClub();
+  const t = club.theme;
   const [showQR, setShowQR] = useState(false);
   const [dismissedLunch, setDismissedLunch] = useState(false);
   const queryClient = useQueryClient();

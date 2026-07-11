@@ -8,14 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
-
 export default function GameDayCheckIn() {
+  const { club } = useClub();
+  const t = club.theme;
   const [step, setStep] = useState('loading'); // loading, register, payment, success
   const [eventId, setEventId] = useState(null);
   const [formData, setFormData] = useState({
@@ -128,7 +128,7 @@ export default function GameDayCheckIn() {
             
             <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: t.fontBody }}>Entry Confirmed!</h2>
             <p className="mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              Welcome to {event.opponent} vs {clubConfig.identity.club_name}
+              Welcome to {event.opponent} vs {club.identity.club_name}
             </p>
 
             {/* QR code on solid white opaque background */}
@@ -181,8 +181,8 @@ export default function GameDayCheckIn() {
       <div className="pt-safe pb-24 text-center" style={{ background: `linear-gradient(160deg, ${t.bg1}, ${t.bg0})` }}>
         <div className="px-6 py-6">
           <img 
-            src={clubConfig.identity.logo_url}
-            alt={clubConfig.identity.club_name}
+            src={club.identity.logo_url}
+            alt={club.identity.club_name}
             className="w-20 h-20 mx-auto mb-4 bg-white rounded-full p-2"
           />
           <Eyebrow color={t.gold}>{event.team_grade}</Eyebrow>

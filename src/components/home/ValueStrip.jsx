@@ -2,9 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { GlassCard } from '@/components/ui-kit';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 const benefits = [
   'Unlimited home game entry',
@@ -13,6 +11,8 @@ const benefits = [
 ];
 
 export default function ValueStrip() {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
       <GlassCard className="p-4">

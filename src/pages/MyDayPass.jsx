@@ -7,15 +7,15 @@ import { format } from 'date-fns';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-
 export default function MyDayPass() {
+  const { club } = useClub();
+  const t = club.theme;
   const [passId, setPassId] = useState(null);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function MyDayPass() {
     enabled: !!pass?.event_id
   });
 
-  if (!clubConfig.features?.day_pass) {
+  if (!club.features?.day_pass) {
     return <Navigate to={createPageUrl('Home')} replace />;
   }
 
@@ -78,13 +78,13 @@ export default function MyDayPass() {
       {/* Header */}
       <div className="pt-safe px-5 py-4 text-center">
         <img 
-          src={clubConfig.identity.logo_url}
-          alt={clubConfig.identity.club_name}
+          src={club.identity.logo_url}
+          alt={club.identity.club_name}
           className="w-16 h-16 mx-auto mb-3 bg-white rounded-full p-2"
         />
         <Eyebrow color={t.gold}>Digital Pass</Eyebrow>
         <h1 className="text-white text-2xl" style={{ fontFamily: t.fontDisplay }}>Day Pass</h1>
-        <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.club_name}</p>
+        <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>{club.identity.club_name}</p>
       </div>
 
       <div className="px-5 space-y-5">

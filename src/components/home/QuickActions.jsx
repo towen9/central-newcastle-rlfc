@@ -4,7 +4,7 @@ import { Gift, Calendar, Zap, Share2, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 
 const actions = [
   { icon: Sparkles, label: 'Benefits', page: 'Benefits', color: 'bg-sky-500 dark:bg-sky-600' },
@@ -15,14 +15,15 @@ const actions = [
 ];
 
 export default function QuickActions({ isNonMember = false }) {
+  const { club } = useClub();
   const visibleActions = isNonMember
     ? actions.filter(a => a.label === 'Fixtures' || a.label === 'Share App')
     : actions;
 
   const handleShare = async () => {
     const shareData = {
-      title: clubConfig.identity.club_name,
-      text: `Join ${clubConfig.identity.club_name}! Get your membership, earn rewards, and stay connected with the club.`,
+      title: club.identity.club_name,
+      text: `Join ${club.identity.club_name}! Get your membership, earn rewards, and stay connected with the club.`,
       url: window.location.origin
     };
 

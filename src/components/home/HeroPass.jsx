@@ -5,11 +5,11 @@ import { format } from 'date-fns';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function HeroPass({ membership, user, onShowQR }) {
+  const { club } = useClub();
+  const t = club.theme;
   const isActive = membership?.status === 'active';
   const expiryDate = membership?.expiry_date ? new Date(membership.expiry_date) : null;
   const tierName = membership?.tier_name || '';
@@ -35,10 +35,10 @@ export default function HeroPass({ membership, user, onShowQR }) {
         <div className="relative flex items-center justify-between mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-0.5">
-              <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
+              <img src={club.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
             </div>
             <div>
-              <Eyebrow color={t.gold}>{clubConfig.season.label}</Eyebrow>
+              <Eyebrow color={t.gold}>{club.season.label}</Eyebrow>
               <p className="text-white/60 text-xs" style={{ fontFamily: t.fontBody }}>{tierName || 'No Membership'}</p>
             </div>
           </div>

@@ -10,14 +10,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
 import PullToRefresh from '../components/shared/PullToRefresh';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import SectionHead from '@/components/ui-kit/SectionHead';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
-
-const t = clubConfig.theme;
 
 const categoryConfig = {
   food_drink: { icon: Utensils, label: 'Food & Drink' },
@@ -29,6 +27,8 @@ const categoryConfig = {
 };
 
 export default function Benefits() {
+  const { club } = useClub();
+  const t = club.theme;
   const [activeTab, setActiveTab] = useState('offers');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedOffer, setSelectedOffer] = useState(null);

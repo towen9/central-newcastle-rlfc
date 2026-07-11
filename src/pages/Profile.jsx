@@ -11,16 +11,16 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { subscribePush, unsubscribePush } from '@/lib/pushNotifications';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 import { format } from 'date-fns';
 
-const t = clubConfig.theme;
-
 export default function Profile() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({});
@@ -182,8 +182,8 @@ export default function Profile() {
   const handleShareReferral = async () => {
     if (navigator.share) {
       await navigator.share({
-        title: `Join ${clubConfig.identity.club_name}`,
-        text: `Join me as a member at ${clubConfig.identity.club_name}!`,
+        title: `Join ${club.identity.club_name}`,
+        text: `Join me as a member at ${club.identity.club_name}!`,
         url: referralUrl,
       });
     } else {
@@ -412,7 +412,7 @@ export default function Profile() {
 
         {/* (f) Footer */}
         <p className="text-center text-xs pt-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          {clubConfig.identity.club_name} App v1.0.0
+          {club.identity.club_name} App v1.0.0
         </p>
       </div>
 

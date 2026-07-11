@@ -1,25 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
-
-const VARIANTS = {
-  primary: {
-    background: t.gold,
-    color: '#1A1303'
-  },
-  secondary: {
-    background: t.navy,
-    color: '#FFFFFF'
-  },
-  danger: {
-    background: '#DC2626',
-    color: '#FFFFFF'
-  }
-};
+import { useClub } from '@/contexts/ClubContext';
 
 export default function UtilityButton({ children, variant = 'primary', onClick, disabled = false, className = '', style = {}, ...props }) {
+  const { club } = useClub();
+  const t = club.theme;
+  const VARIANTS = {
+    primary: { background: t.gold, color: '#1A1303' },
+    secondary: { background: t.navy, color: '#FFFFFF' },
+    danger: { background: '#DC2626', color: '#FFFFFF' }
+  };
   const fill = VARIANTS[variant] || VARIANTS.primary;
 
   return (

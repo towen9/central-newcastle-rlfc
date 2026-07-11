@@ -5,9 +5,10 @@ import { format } from 'date-fns';
 import { OfflineCache } from '../offline/OfflineCache';
 import PhotoUpload from '../membership/PhotoUpload';
 import { base44 } from '@/api/base44Client';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 
 export default function QRModal({ isOpen, onClose, membership, user, onPhotoUploaded }) {
+  const { club } = useClub();
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
@@ -128,13 +129,13 @@ export default function QRModal({ isOpen, onClose, membership, user, onPhotoUplo
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white rounded-xl border border-gray-200 flex items-center justify-center p-1">
                 <img 
-                  src={clubConfig.identity.logo_url}
-                  alt={clubConfig.identity.club_name}
+                  src={club.identity.logo_url}
+                  alt={club.identity.club_name}
                   className="w-full h-full object-contain"
                 />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">{clubConfig.identity.club_name}</h3>
+                <h3 className="font-bold text-gray-900">{club.identity.club_name}</h3>
                 <p className="text-xs text-gray-500">Digital Membership Pass</p>
               </div>
             </div>

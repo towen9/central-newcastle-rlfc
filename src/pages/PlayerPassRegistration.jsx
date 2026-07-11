@@ -9,15 +9,15 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-
 export default function PlayerPassRegistration() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [step, setStep] = useState('form'); // 'form' | 'photo'
@@ -168,7 +168,7 @@ export default function PlayerPassRegistration() {
       try {
         await base44.integrations.Core.SendEmail({
           to: 'admin@centralrlfc.com',
-          subject: `${clubConfig.identity.sport_emoji} New Player Pass Application`,
+          subject: `${club.identity.sport_emoji} New Player Pass Application`,
           body: `
             A new player pass application has been submitted:
             
@@ -269,7 +269,7 @@ export default function PlayerPassRegistration() {
           <>
             <GlassCard className="p-4 mb-6">
               <p className="text-sm" style={{ color: t.goldHi, fontFamily: t.fontBody }}>
-                {clubConfig.identity.sport_emoji} This pass is for {clubConfig.identity.club_name} players (Men's & Women's). 
+                {club.identity.sport_emoji} This pass is for {club.identity.club_name} players (Men's & Women's). 
                 Your application will be reviewed by admin before activation.
               </p>
             </GlassCard>

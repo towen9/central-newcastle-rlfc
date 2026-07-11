@@ -7,15 +7,15 @@ import { format, isPast, isToday } from 'date-fns';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { OfflineCache } from '../components/offline/OfflineCache';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-
 export default function GameDayPass() {
+  const { club } = useClub();
+  const t = club.theme;
   const [entryId, setEntryId] = useState(null);
   const [cachedQR, setCachedQR] = useState(null);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -123,13 +123,13 @@ export default function GameDayPass() {
       {/* Header */}
       <div className="pt-safe px-6 py-6 text-center">
         <img 
-          src={clubConfig.identity.logo_url}
-          alt={clubConfig.identity.club_name}
+          src={club.identity.logo_url}
+          alt={club.identity.club_name}
           className="w-16 h-16 mx-auto mb-4 bg-white rounded-full p-2"
         />
         <Eyebrow color={t.gold}>Digital Pass</Eyebrow>
         <h1 className="text-white text-2xl" style={{ fontFamily: t.fontDisplay }}>Game Day Entry Pass</h1>
-        <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.club_name}</p>
+        <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>{club.identity.club_name}</p>
         
         {/* Offline Indicator */}
         {isOffline && (

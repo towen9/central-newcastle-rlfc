@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, CheckCircle, AlertCircle, ArrowLeft, Zap, QrCode } from 'lucide-react';
@@ -12,9 +12,9 @@ import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
-
 export default function CheckIn() {
+  const { club } = useClub();
+  const t = club.theme;
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null); // 'success' | 'error' | null
   const [errorMessage, setErrorMessage] = useState('');
@@ -88,7 +88,7 @@ export default function CheckIn() {
       });
 
       // Award points for check-in
-      const pointsEarned = clubConfig.celebration.points_per_checkin;
+      const pointsEarned = club.celebration.points_per_checkin;
       await base44.entities.Membership.update(membership.id, {
         points: (membership.points || 0) + pointsEarned,
         total_checkins: (membership.total_checkins || 0) + 1
@@ -110,7 +110,7 @@ export default function CheckIn() {
     },
     onSuccess: (location) => {
       setResult('success');
-      setCelebration({ pointsEarned: clubConfig.celebration.points_per_checkin, streak: (membership?.total_checkins || 0) + 1 });
+      setCelebration({ pointsEarned: club.celebration.points_per_checkin, streak: (membership?.total_checkins || 0) + 1 });
       queryClient.invalidateQueries(['membership']);
       queryClient.invalidateQueries(['todayCheckins']);
     },

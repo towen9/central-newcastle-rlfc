@@ -4,15 +4,15 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Send, Bot, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import ReactMarkdown from 'react-markdown';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
-
 export default function MembershipAssistant() {
+  const { club } = useClub();
+  const t = club.theme;
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');

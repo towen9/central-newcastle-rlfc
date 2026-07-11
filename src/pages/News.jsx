@@ -8,23 +8,22 @@ import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import PullToRefresh from '../components/shared/PullToRefresh';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-
-const categoryColors = {
-  announcement: t.royal,
-  match_report: t.green,
-  player_news: '#7c3aed',
-  community: t.gold,
-  sponsor: '#ec4899',
-  general: 'rgba(255,255,255,0.4)'
-};
-
 export default function News() {
+  const { club } = useClub();
+  const t = club.theme;
+  const categoryColors = {
+    announcement: t.royal,
+    match_report: t.green,
+    player_news: '#7c3aed',
+    community: t.gold,
+    sponsor: '#ec4899',
+    general: 'rgba(255,255,255,0.4)'
+  };
   const [selectedNews, setSelectedNews] = useState(null);
   const queryClient = useQueryClient();
 

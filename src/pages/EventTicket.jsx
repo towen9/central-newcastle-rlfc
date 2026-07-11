@@ -4,22 +4,22 @@ import { motion } from 'framer-motion';
 import { Ticket, Calendar, MapPin, Check, Loader2, ArrowLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
 const TICKET_PRICE_ID = 'price_1TjqdoLsW4v58VGVk0YiI9PK';
 const TICKET_PRICE_DISPLAY = 'A$90';
 const TICKET_PRICE_AMOUNT = 9000;
 const TICKET_PRICE = 90;
 const EVENT_NAME = 'Ladies Long Lunch — Old Butchers Day 2026';
 const EVENT_DATE = 'Saturday 1 August 2026';
-const LOGO = clubConfig.identity.logo_url;
-
 export default function EventTicket() {
+  const { club } = useClub();
+  const t = club.theme;
+  const LOGO = club.identity.logo_url;
   const [user, setUser] = useState(null);
   const [step, setStep] = useState('info'); // info | verifying | confirmed
   const [ticket, setTicket] = useState(null);
@@ -178,7 +178,7 @@ export default function EventTicket() {
                 </div>
                 <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.7)', fontFamily: t.fontBody }}>
                   <MapPin className="w-4 h-4" style={{ color: t.gold }} />
-                  <span>{clubConfig.identity.venue_name}, Newcastle</span>
+                  <span>{club.identity.venue_name}, Newcastle</span>
                 </div>
               </div>
             </GlassCard>
@@ -251,7 +251,7 @@ export default function EventTicket() {
             </div>
             <div className="flex items-center gap-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
               <MapPin className="w-5 h-5 shrink-0" style={{ color: t.gold }} />
-              <span className="text-sm" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.venue_name}, Newcastle</span>
+              <span className="text-sm" style={{ fontFamily: t.fontBody }}>{club.identity.venue_name}, Newcastle</span>
             </div>
             <div className="flex items-center gap-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
               <Users className="w-5 h-5 shrink-0" style={{ color: t.gold }} />
@@ -259,7 +259,7 @@ export default function EventTicket() {
             </div>
           </div>
           <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>
-            Join us for a fully catered long lunch with free drinks, as part of Old Butchers Day at {clubConfig.identity.venue_name}. Ticket includes entry to the exclusive Ladies Long Lunch area.
+            Join us for a fully catered long lunch with free drinks, as part of Old Butchers Day at {club.identity.venue_name}. Ticket includes entry to the exclusive Ladies Long Lunch area.
           </p>
           <div className="mt-4 space-y-2">
             {['Fully catered lunch', 'Complimentary drinks on arrival', 'Exclusive Ladies Long Lunch area', 'Part of Old Butchers Day celebrations', 'Digital QR ticket — show at entry'].map((item, i) => (

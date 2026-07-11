@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
-
-const HYPE_LINES = clubConfig.celebration.lines;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function CheckInCelebration({ pointsEarned, streak, onDismiss }) {
+  const { club } = useClub();
+  const t = club.theme;
+  const HYPE_LINES = club.celebration.lines;
   const [visible, setVisible] = useState(true);
   const [count, setCount] = useState(0);
   const hypeLine = useMemo(() => HYPE_LINES[Math.floor(Math.random() * HYPE_LINES.length)], []);
@@ -89,7 +88,7 @@ export default function CheckInCelebration({ pointsEarned, streak, onDismiss }) 
               className="text-xs uppercase tracking-[0.2em] font-semibold mb-3"
               style={{ color: t.gold }}
             >
-              Checked In · {clubConfig.identity.venue_name}
+              Checked In · {club.identity.venue_name}
             </p>
 
             <h2

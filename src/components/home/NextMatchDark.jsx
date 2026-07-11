@@ -7,9 +7,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import MatchDayBadge from '@/components/ui-kit/MatchDayBadge';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 function useCountdown(targetDate) {
   const [timeLeft, setTimeLeft] = useState(null);
@@ -32,10 +30,12 @@ function useCountdown(targetDate) {
 }
 
 export default function NextMatchDark() {
+  const { club } = useClub();
+  const t = club.theme;
   const { data: fixtures = [] } = useQuery({
     queryKey: ['upcomingFixtures'],
     queryFn: async () => {
-      const all = await base44.entities.Fixture.filter({ team_grade: clubConfig.fixtures?.primary_grade || 'DEC' });
+      const all = await base44.entities.Fixture.filter({ team_grade: club.fixtures?.primary_grade || 'DEC' });
       const now = new Date();
       return all
         .filter(f => isAfter(new Date(f.date_time), now) && f.status !== 'cancelled' && f.status !== 'postponed')
@@ -70,9 +70,9 @@ export default function NextMatchDark() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex flex-col items-center gap-1.5 flex-1">
             <div className="w-12 h-12 bg-white rounded-full p-1 flex items-center justify-center">
-              <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
+              <img src={club.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
             </div>
-            <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.team_short}</span>
+            <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>{club.identity.team_short}</span>
           </div>
           <div className="flex flex-col items-center px-4">
             <span className="text-[10px] uppercase tracking-wider text-white/30">vs</span>
@@ -117,7 +117,7 @@ export default function NextMatchDark() {
           </div>
           <div className="flex items-center gap-2 text-white/70">
             <MapPin className="w-3.5 h-3.5" style={{ color: t.gold }} />
-            <span style={{ fontFamily: t.fontBody }}>{nextMatch.venue || clubConfig.identity.venue_name}</span>
+            <span style={{ fontFamily: t.fontBody }}>{nextMatch.venue || club.identity.venue_name}</span>
           </div>
         </div>
 

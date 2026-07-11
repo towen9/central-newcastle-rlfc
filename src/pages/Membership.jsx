@@ -11,14 +11,14 @@ import { format, differenceInDays } from 'date-fns';
 import QRModal from '../components/shared/QRModal';
 import PhotoUpload from '../components/membership/PhotoUpload';
 import { toast } from 'sonner';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
-
 export default function Membership() {
+  const { club } = useClub();
+  const t = club.theme;
   const [showQR, setShowQR] = useState(false);
   const [user, setUser] = useState(null);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
@@ -195,10 +195,10 @@ export default function Membership() {
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1">
-                        <img src={clubConfig.identity.logo_url} alt={clubConfig.identity.club_name} className="w-full h-full object-contain" />
+                        <img src={club.identity.logo_url} alt={club.identity.club_name} className="w-full h-full object-contain" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.club_name.toUpperCase()}</h3>
+                        <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>{club.identity.club_name.toUpperCase()}</h3>
                         <p className="text-white/60 text-sm" style={{ fontFamily: t.fontBody }}>{currentTier?.name || membership.tier_name}</p>
                       </div>
                     </div>
@@ -330,9 +330,9 @@ export default function Membership() {
               <GlassCard className="p-6 text-center relative overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 30%, ${t.gold}15, transparent 60%)` }} />
                 <div className="relative z-10">
-                  <p className="text-[10px] uppercase tracking-[0.25em] font-semibold mb-2" style={{ color: t.gold, fontFamily: t.fontBody }}>{clubConfig.season.label}</p>
-                  <h1 className="text-white mb-2" style={{ fontFamily: t.fontDisplay, fontSize: '32px', lineHeight: 1.1 }}>{clubConfig.terminology.join_headline}</h1>
-                  <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>Support {clubConfig.identity.club_name} and unlock exclusive member benefits, digital passes, rewards and more.</p>
+                  <p className="text-[10px] uppercase tracking-[0.25em] font-semibold mb-2" style={{ color: t.gold, fontFamily: t.fontBody }}>{club.season.label}</p>
+                  <h1 className="text-white mb-2" style={{ fontFamily: t.fontDisplay, fontSize: '32px', lineHeight: 1.1 }}>{club.terminology.join_headline}</h1>
+                  <p className="text-white/50 text-sm" style={{ fontFamily: t.fontBody }}>Support {club.identity.club_name} and unlock exclusive member benefits, digital passes, rewards and more.</p>
                 </div>
               </GlassCard>
 
@@ -340,10 +340,10 @@ export default function Membership() {
               <Link to={createPageUrl('PlayerPassRegistration')}>
                 <GlassCard className="p-5 cursor-pointer" style={{ borderColor: `${t.royal}44` }}>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>{clubConfig.season.year} Player Pass</h3>
+                    <h3 className="font-bold text-white text-lg" style={{ fontFamily: t.fontBody }}>{club.season.year} Player Pass</h3>
                     <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: `${t.royal}22`, color: t.cyan }}>FREE</span>
                   </div>
-                  <p className="text-sm text-white/50 mb-3" style={{ fontFamily: t.fontBody }}>For all registered {clubConfig.identity.club_name} players</p>
+                  <p className="text-sm text-white/50 mb-3" style={{ fontFamily: t.fontBody }}>For all registered {club.identity.club_name} players</p>
                   <button className="w-full py-2.5 rounded-xl font-semibold text-sm transition-all" style={{ background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.12)' }}>
                     Apply Now
                   </button>
@@ -419,8 +419,8 @@ export default function Membership() {
                 </div>
                 <div className="h-3 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
                 <div className="flex items-center gap-1.5">
-                  <img src={clubConfig.identity.logo_url} alt={clubConfig.identity.club_name} className="w-5 h-5 object-contain bg-white rounded-full p-0.5" />
-                  <span className="text-white/30 text-xs" style={{ fontFamily: t.fontBody }}>Est. {clubConfig.identity.est_year}</span>
+                  <img src={club.identity.logo_url} alt={club.identity.club_name} className="w-5 h-5 object-contain bg-white rounded-full p-0.5" />
+                  <span className="text-white/30 text-xs" style={{ fontFamily: t.fontBody }}>Est. {club.identity.est_year}</span>
                 </div>
               </div>
             </>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function GoldButton({ children, onClick, fullWidth, variant = 'solid', className = '', style = {}, ...props }) {
+  const { club } = useClub();
+  const t = club.theme;
   const isSolid = variant === 'solid';
 
   return (

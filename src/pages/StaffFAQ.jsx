@@ -2,12 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Printer } from 'lucide-react';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { UtilityButton, UtilityHeader } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
-
 export default function StaffFAQ() {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <div className="min-h-screen bg-white">
       {/* Screen-only header */}

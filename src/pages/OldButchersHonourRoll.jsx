@@ -6,15 +6,15 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-
 export default function OldButchersHonourRoll() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [membership, setMembership] = useState(null);
   const [editing, setEditing] = useState(false);

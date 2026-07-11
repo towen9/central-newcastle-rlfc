@@ -6,15 +6,15 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-
 export default function PointsRewards() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const queryClient = useQueryClient();
@@ -117,7 +117,7 @@ export default function PointsRewards() {
     }
   };
 
-  if (!clubConfig.features?.points_rewards) {
+  if (!club.features?.points_rewards) {
     return <Navigate to={createPageUrl('Home')} replace />;
   }
 

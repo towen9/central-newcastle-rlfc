@@ -2,10 +2,10 @@ import React from 'react';
 import { ArrowLeft, ShoppingBag, Scan, Trophy, DollarSign, AlertCircle, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub, getClubConfig } from '@/contexts/ClubContext';
 import { UtilityCard, UtilityHeader } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
+const t = getClubConfig().theme;
 
 const bodyText = {
   color: 'rgba(255,255,255,0.75)',
@@ -43,6 +43,8 @@ const stepTitle = {
 };
 
 export default function CanteenStaffGuide() {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <div className="pb-8" style={{ minHeight: '100dvh', background: t.bg0, fontFamily: t.fontBody }}>
       <UtilityHeader

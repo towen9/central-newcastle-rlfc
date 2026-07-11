@@ -7,15 +7,13 @@ import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format, isAfter, isBefore } from 'date-fns';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import SectionHead from '@/components/ui-kit/SectionHead';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 import MatchDayBadge from '@/components/ui-kit/MatchDayBadge';
-
-const t = clubConfig.theme;
 
 const teamLogos = {
   'Kurri Kurri Bulldogs': 'https://mysideline-prod.s3.amazonaws.com/logos/full-size/251954.jpg?1576033278946',
@@ -40,6 +38,8 @@ function gradeChipLabel(fixture) {
 }
 
 export default function Fixtures() {
+  const { club } = useClub();
+  const t = club.theme;
   const [activeTab, setActiveTab] = useState('fixtures');
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [user, setUser] = useState(null);
@@ -123,7 +123,7 @@ export default function Fixtures() {
 
   const hasScore = (f) => typeof f.score_us === 'number' && typeof f.score_them === 'number';
 
-  if (!clubConfig.features?.fixtures) {
+  if (!club.features?.fixtures) {
     return <Navigate to={createPageUrl('Home')} replace />;
   }
 
@@ -131,7 +131,7 @@ export default function Fixtures() {
     <div className="min-h-full pb-24">
       {/* Header */}
       <div className="px-5 pt-6 pb-2">
-        <Eyebrow color={t.gold}>{clubConfig.season.label}</Eyebrow>
+        <Eyebrow color={t.gold}>{club.season.label}</Eyebrow>
         <h1 className="text-white text-2xl mt-1" style={{ fontFamily: t.fontDisplay }}>Fixtures</h1>
       </div>
 
@@ -199,9 +199,9 @@ export default function Fixtures() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col items-center gap-1.5 flex-1">
                           <div className="w-12 h-12 bg-white rounded-full p-1 flex items-center justify-center">
-                            <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
+                            <img src={club.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
                           </div>
-                          <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>{clubConfig.identity.team_short}</span>
+                          <span className="text-[10px] font-semibold text-white/70" style={{ fontFamily: t.fontBody }}>{club.identity.team_short}</span>
                         </div>
                         <div className="flex flex-col items-center px-4">
                           <span className="text-[10px] uppercase tracking-wider text-white/30 mb-1">vs</span>
@@ -229,7 +229,7 @@ export default function Fixtures() {
                         </div>
                         <div className="flex items-center gap-2 text-white/70">
                           <MapPin className="w-3.5 h-3.5" style={{ color: t.gold }} />
-                          <span style={{ fontFamily: t.fontBody }}>{nextMatch.venue || clubConfig.identity.venue_name}</span>
+                          <span style={{ fontFamily: t.fontBody }}>{nextMatch.venue || club.identity.venue_name}</span>
                         </div>
                       </div>
 
@@ -371,6 +371,8 @@ export default function Fixtures() {
 }
 
 function FilterChip({ label, active, onClick }) {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <button
       onClick={onClick}
@@ -386,6 +388,8 @@ function FilterChip({ label, active, onClick }) {
 }
 
 function FixtureRow({ fixture, hasMembership, index, isPast }) {
+  const { club } = useClub();
+  const t = club.theme;
   const fixtureDate = new Date(fixture.date_time);
   const isHome = fixture.fixture_type === 'home';
   const scoreExists = typeof fixture.score_us === 'number' && typeof fixture.score_them === 'number';
@@ -424,7 +428,7 @@ function FixtureRow({ fixture, hasMembership, index, isPast }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               {isHome && (
-                <Eyebrow color={t.gold}>{clubConfig.identity.venue_name}</Eyebrow>
+                <Eyebrow color={t.gold}>{club.identity.venue_name}</Eyebrow>
               )}
               {!isHome && fixture.venue && (
                 <span className="text-[9px] text-white/30 uppercase tracking-wider truncate" style={{ fontFamily: t.fontBody }}>
@@ -493,11 +497,13 @@ function FixtureRow({ fixture, hasMembership, index, isPast }) {
 }
 
 function EmptyState() {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <GlassCard className="p-8 text-center">
       <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
       <p className="text-white/60 text-sm font-semibold" style={{ fontFamily: t.fontBody }}>Season draw coming soon.</p>
-      <p className="text-white/40 text-xs mt-1" style={{ fontFamily: t.fontBody }}>Check back for the full {clubConfig.season.year} fixture list.</p>
+      <p className="text-white/40 text-xs mt-1" style={{ fontFamily: t.fontBody }}>Check back for the full {club.season.year} fixture list.</p>
     </GlassCard>
   );
 }

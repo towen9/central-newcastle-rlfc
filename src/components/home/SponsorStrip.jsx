@@ -1,11 +1,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function SponsorStrip() {
+  const { club } = useClub();
+  const t = club.theme;
   const { data: sponsors = [] } = useQuery({
     queryKey: ['homeSponsors'],
     queryFn: () => base44.entities.Sponsor.filter({ is_active: true }, 'sort_order', 5),

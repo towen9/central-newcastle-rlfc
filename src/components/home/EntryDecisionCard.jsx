@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 import { Ticket, ShieldCheck } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { GlassCard, Eyebrow } from '@/components/ui-kit';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function EntryDecisionCard() {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <GlassCard className="p-4 space-y-3">

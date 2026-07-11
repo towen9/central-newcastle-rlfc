@@ -9,6 +9,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import { ClubProvider } from '@/contexts/ClubContext';
 import PlayerPassInvite from './pages/PlayerPassInvite';
 import AdminReferrals from './pages/AdminReferrals';
 import GateQRPoster from './pages/GateQRPoster';
@@ -23,6 +24,7 @@ import AdminLiveConsole from './pages/AdminLiveConsole';
 import EventTicket from './pages/EventTicket';
 import EventScanner from './pages/EventScanner';
 import EventReport from './pages/EventReport';
+import FindYourClub from './pages/FindYourClub';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -102,6 +104,7 @@ const AuthenticatedApp = () => {
       <Route path="/EventTicket" element={<LayoutWrapper currentPageName="EventTicket"><EventTicket /></LayoutWrapper>} />
       <Route path="/EventScanner" element={<EventScanner />} />
       <Route path="/EventReport" element={<LayoutWrapper currentPageName="EventReport"><EventReport /></LayoutWrapper>} />
+      <Route path="/FindYourClub" element={<LayoutWrapper currentPageName="FindYourClub"><FindYourClub /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </Suspense>
@@ -114,6 +117,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <ClubProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <NavigationTracker />
@@ -121,6 +125,7 @@ function App() {
         </Router>
         <Toaster />
       </QueryClientProvider>
+      </ClubProvider>
     </AuthProvider>
   )
 }

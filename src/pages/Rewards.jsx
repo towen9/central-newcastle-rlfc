@@ -7,14 +7,14 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { format, addDays } from 'date-fns';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
-
 export default function Rewards() {
+  const { club } = useClub();
+  const t = club.theme;
   const [selectedReward, setSelectedReward] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [user, setUser] = useState(null);

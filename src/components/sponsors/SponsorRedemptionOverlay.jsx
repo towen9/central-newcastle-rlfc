@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
-
-const t = clubConfig.theme;
 
 /**
  * Full-screen glass overlay designed to be SHOWN to staff at the counter.
  * Pulsing gold border frame, sponsor logo, offer text, code block, Done button.
  */
 export default function SponsorRedemptionOverlay({ sponsor, offer, onDismiss }) {
+  const { club } = useClub();
+  const t = club.theme;
   const [visible, setVisible] = useState(true);
 
   const handleDone = () => {

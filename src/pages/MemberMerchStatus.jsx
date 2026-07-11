@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { ShoppingBag, Tag, AlertTriangle, Star, LogIn } from 'lucide-react';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-const LOGO = clubConfig.identity.logo_url;
-
 export default function MemberMerchStatus() {
+  const { club } = useClub();
+  const t = club.theme;
+  const LOGO = club.identity.logo_url;
   const [state, setState] = useState('loading'); // loading | not_authenticated | no_membership | ready
   const [member, setMember] = useState(null);
   const [discountUsed, setDiscountUsed] = useState(false);

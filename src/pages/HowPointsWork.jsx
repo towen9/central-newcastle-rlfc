@@ -2,16 +2,16 @@ import React from 'react';
 import { ArrowLeft, Ticket, Beer, Building2, Trophy, Zap } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import SectionHead from '@/components/ui-kit/SectionHead';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
-
 export default function HowPointsWork() {
-  if (!clubConfig.features?.points_rewards) {
+  const { club } = useClub();
+  const t = club.theme;
+  if (!club.features?.points_rewards) {
     return <Navigate to={createPageUrl('Home')} replace />;
   }
   return (
@@ -161,7 +161,7 @@ export default function HowPointsWork() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-bold text-white text-sm" style={{ fontFamily: t.fontBody }}>$20 Merchandise Voucher</p>
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Get some {clubConfig.identity.club_short_name} gear</p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)', fontFamily: t.fontBody }}>Get some {club.identity.club_short_name} gear</p>
                 </div>
                 <span className="text-lg font-bold" style={{ color: t.gold, fontFamily: t.fontDisplay }}>250 pts</span>
               </div>

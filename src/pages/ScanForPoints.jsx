@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Camera, CheckCircle, XCircle, Beer, ArrowLeft, Zap } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
@@ -13,9 +13,9 @@ import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 
-const t = clubConfig.theme;
-
 export default function ScanForPoints() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [membership, setMembership] = useState(null);
   const [scanning, setScanning] = useState(false);
@@ -74,7 +74,7 @@ export default function ScanForPoints() {
       }
 
       const location = qrCodes[0];
-      const pointsEarned = clubConfig.celebration.points_per_scan;
+      const pointsEarned = club.celebration.points_per_scan;
 
       // Update membership points
       await base44.entities.Membership.update(membership.id, {
@@ -187,7 +187,7 @@ export default function ScanForPoints() {
     };
   }, []);
 
-  if (!clubConfig.features?.points_rewards) {
+  if (!club.features?.points_rewards) {
     return <Navigate to={createPageUrl('Home')} replace />;
   }
 

@@ -3,15 +3,15 @@ import { base44 } from '@/api/base44Client';
 import { Download, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
-
 export default function DayPassQR() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -76,8 +76,8 @@ export default function DayPassQR() {
         {/* QR Code Display — solid white background for scanner readability */}
         <div className="bg-white rounded-2xl p-8 shadow-xl text-center">
           <img 
-            src={clubConfig.identity.logo_url}
-            alt={clubConfig.identity.club_name}
+            src={club.identity.logo_url}
+            alt={club.identity.club_name}
             className="w-24 h-24 mx-auto mb-6 bg-white rounded-full p-2"
           />
           
@@ -123,8 +123,8 @@ export default function DayPassQR() {
         <div className="hidden print:block">
           <div className="text-center py-8">
             <img 
-              src={clubConfig.identity.logo_url}
-              alt={clubConfig.identity.club_name}
+              src={club.identity.logo_url}
+              alt={club.identity.club_name}
               className="w-32 h-32 mx-auto mb-8"
             />
             

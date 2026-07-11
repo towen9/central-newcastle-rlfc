@@ -5,16 +5,16 @@ import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import SponsorRedemptionOverlay from '@/components/sponsors/SponsorRedemptionOverlay';
 
-const t = clubConfig.theme;
-
 function LogoChip({ sponsor, size = 56 }) {
+  const { club } = useClub();
+  const t = club.theme;
   if (sponsor.logo_url) {
     return (
       <div
@@ -46,6 +46,8 @@ function LogoChip({ sponsor, size = 56 }) {
 }
 
 export default function Sponsors() {
+  const { club } = useClub();
+  const t = club.theme;
   const [redeemSponsor, setRedeemSponsor] = useState(null);
   const [user, setUser] = useState(null);
 
@@ -112,7 +114,7 @@ export default function Sponsors() {
     } catch {}
   };
 
-  if (!clubConfig.features?.sponsor_portal) {
+  if (!club.features?.sponsor_portal) {
     return <Navigate to={createPageUrl('Home')} replace />;
   }
 

@@ -1,21 +1,19 @@
-import { useMemo } from 'react';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 
 /**
- * Returns the full club configuration object.
+ * Returns the full club configuration object (same shape as the legacy
+ * static clubConfig, but resolved dynamically from the Club database record).
  */
 export function useClubConfig() {
-  return useMemo(() => clubConfig, []);
+  const { club } = useClub();
+  return club;
 }
 
 /**
- * Renders children only when the named feature flag is enabled in the config.
- * Renders nothing when the flag is false or missing.
- *
- * @param {string} feature — key from clubConfig.features
+ * Renders children only when the named feature flag is enabled.
  */
 export function FeatureGate({ feature, children }) {
-  const config = useClubConfig();
-  const enabled = !!config.features?.[feature];
+  const { features } = useClub();
+  const enabled = !!features?.[feature];
   return enabled ? children : null;
 }

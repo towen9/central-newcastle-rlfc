@@ -1,10 +1,10 @@
 import React from 'react';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import Eyebrow from './Eyebrow';
 
-const t = clubConfig.theme;
-
 export default function SectionHead({ kicker, title, action, onAction }) {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <div className="flex items-center justify-between mb-3">
       <div>

@@ -1,9 +1,9 @@
 import React from 'react';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function UtilityCard({ children, className = '', style = {}, ...props }) {
+  const { club } = useClub();
+  const t = club.theme;
   return (
     <div
       className={className}

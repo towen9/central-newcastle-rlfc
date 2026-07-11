@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Shield, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { UtilityCard, UtilityButton, StatusBanner, UtilityHeader } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
-
 export default function GateStaffLogin() {
+  const { club } = useClub();
+  const t = club.theme;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ export default function GateStaffLogin() {
               <Shield className="w-12 h-12" style={{ color: t.gold }} />
             </div>
             <h1 className="text-white text-2xl font-extrabold" style={{ fontFamily: t.fontDisplay }}>Gate Entry</h1>
-            <p className="mt-2" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16 }}>{clubConfig.identity.club_name}</p>
+            <p className="mt-2" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16 }}>{club.identity.club_name}</p>
           </div>
 
           {/* Login Card — solid opaque surface */}

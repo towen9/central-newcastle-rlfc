@@ -6,11 +6,11 @@ import { createPageUrl } from '@/utils';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function DayPassGlass({ pass, fixture, user }) {
+  const { club } = useClub();
+  const t = club.theme;
   const fixtureDate = fixture ? new Date(fixture.date_time) : null;
   const isUsed = pass.status === 'used';
 
@@ -20,10 +20,10 @@ export default function DayPassGlass({ pass, fixture, user }) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-0.5">
-              <img src={clubConfig.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
+              <img src={club.identity.logo_url} alt="" className="w-full h-full object-contain" loading="lazy" />
             </div>
             <div>
-              <Eyebrow color={t.gold}>{clubConfig.season.label}</Eyebrow>
+              <Eyebrow color={t.gold}>{club.season.label}</Eyebrow>
               <p className="text-white/60 text-xs" style={{ fontFamily: t.fontBody }}>Day Pass</p>
             </div>
           </div>

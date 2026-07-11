@@ -1,8 +1,6 @@
 import React from 'react';
 import { differenceInCalendarDays } from 'date-fns';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 /**
  * Compact calendar-day badge: Today / Tomorrow / N days.
@@ -10,6 +8,8 @@ const t = clubConfig.theme;
  * not an elapsed 24-hour ticker.
  */
 export default function MatchDayBadge({ date, className = '' }) {
+  const { club } = useClub();
+  const t = club.theme;
   if (!date) return null;
   const target = new Date(date);
   const days = differenceInCalendarDays(target, new Date());

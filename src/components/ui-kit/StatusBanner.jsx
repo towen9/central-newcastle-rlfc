@@ -1,8 +1,6 @@
 import React from 'react';
 import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 const VARIANTS = {
   valid: {
@@ -23,6 +21,8 @@ const VARIANTS = {
 };
 
 export default function StatusBanner({ variant = 'valid', title, subtitle }) {
+  const { club } = useClub();
+  const t = club.theme;
   const config = VARIANTS[variant] || VARIANTS.valid;
   const Icon = config.icon;
 

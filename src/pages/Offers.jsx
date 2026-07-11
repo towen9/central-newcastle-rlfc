@@ -8,13 +8,13 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import clubConfig from '@/config/club.config';
+import { useClub, getClubConfig } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
 import { SkeletonCard } from '@/components/ui-kit/Skeleton';
 
-const t = clubConfig.theme;
+const t = getClubConfig().theme;
 
 const categoryConfig = {
   food_drink: { icon: Utensils, label: 'Food & Drink', color: '#f97316' },
@@ -26,6 +26,8 @@ const categoryConfig = {
 };
 
 export default function Offers() {
+  const { club } = useClub();
+  const t = club.theme;
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [showCode, setShowCode] = useState(false);

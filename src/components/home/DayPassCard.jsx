@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 import { Ticket, QrCode, Calendar, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 
 export default function DayPassCard({ pass, fixture, user }) {
+  const { club } = useClub();
   const fixtureDate = fixture ? new Date(fixture.date_time) : null;
   const isUsed = pass.status === 'used';
 
@@ -26,13 +27,13 @@ export default function DayPassCard({ pass, fixture, user }) {
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-0.5">
               <img
-                src={clubConfig.identity.logo_url}
-                alt={clubConfig.identity.club_name}
+                src={club.identity.logo_url}
+                alt={club.identity.club_name}
                 className="w-full h-full object-contain"
               />
             </div>
             <div>
-              <h3 className="text-white font-bold text-sm tracking-wide">{clubConfig.identity.club_short_name.toUpperCase()}</h3>
+              <h3 className="text-white font-bold text-sm tracking-wide">{club.identity.club_short_name.toUpperCase()}</h3>
               <p className="text-white/70 text-xs">Day Pass</p>
             </div>
           </div>

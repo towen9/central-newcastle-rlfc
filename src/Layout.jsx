@@ -3,18 +3,18 @@ import { Link } from 'react-router-dom';
 import { Bell, ShieldCheck, Settings } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import BottomNav from './components/shared/BottomNav';
 import PushNotificationManager from './components/shared/PushNotificationManager';
 import PushPromptModal from './components/shared/PushPromptModal';
-
-const t = clubConfig.theme;
 
 const memberPages = ['Home', 'Membership', 'Benefits', 'Sponsors', 'Profile', 'CheckIn', 'Fixtures', 'News', 'PointsRewards'];
 const memberPages2 = ['OldButchers', 'OldButchersHonourRoll'];
 const adminPages = ['AdminDashboard', 'AdminMembers', 'AdminOffers', 'AdminRewards', 'AdminNews', 'AdminQRCodes', 'AdminSponsors', 'AdminFixtures', 'AdminEvents', 'AdminGameDay', 'AdminTransactions', 'AdminLocationDiscounts', 'AdminUsers', 'AdminBulkImport', 'AdminFixturesComms', 'AdminMonitoring', 'AdminPerformance', 'AdminPushNotifications', 'AdminSMSNotifications', 'AdminReferrals', 'GateScan', 'BarScan', 'GateStaffGuide', 'CanteenStaffGuide', 'TroubleshootingGuide', 'GateStaffLogin', 'CanteenStaffLogin', 'LeaguesClubScan', 'MerchandiseScan', 'EventReport'];
 
 export default function Layout({ children, currentPageName }) {
+  const { club } = useClub();
+  const t = club.theme;
   const isAdminPage = adminPages.includes(currentPageName);
   const showBottomNav = memberPages.includes(currentPageName) || memberPages2.includes(currentPageName);
   const [user, setUser] = useState(null);
@@ -50,10 +50,10 @@ export default function Layout({ children, currentPageName }) {
         <header className="relative z-30 pt-safe flex-shrink-0" style={{ background: `${t.bg0}cc`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <img src={clubConfig.identity.logo_url} alt={clubConfig.identity.club_name} className="w-10 h-10 object-contain bg-white rounded-full p-0.5" />
+              <img src={club.identity.logo_url} alt={club.identity.club_name} className="w-10 h-10 object-contain bg-white rounded-full p-0.5" />
               <div>
-                <p className="text-[9px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>{clubConfig.identity.club_name}</p>
-                <h1 className="text-white text-base leading-tight" style={{ fontFamily: t.fontDisplay }}>{clubConfig.identity.short_name}</h1>
+                <p className="text-[9px] uppercase tracking-[0.2em] font-semibold" style={{ color: t.gold }}>{club.identity.club_name}</p>
+                <h1 className="text-white text-base leading-tight" style={{ fontFamily: t.fontDisplay }}>{club.identity.short_name}</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">

@@ -7,11 +7,11 @@ import { createPageUrl } from '@/utils';
 import GlassCard from '@/components/ui-kit/GlassCard';
 import Eyebrow from '@/components/ui-kit/Eyebrow';
 import GoldButton from '@/components/ui-kit/GoldButton';
-import clubConfig from '@/config/club.config';
-
-const t = clubConfig.theme;
+import { useClub } from '@/contexts/ClubContext';
 
 export default function MembershipPromo() {
+  const { club } = useClub();
+  const t = club.theme;
   const { data: tiers = [] } = useQuery({
     queryKey: ['membershipTiers', 'promo'],
     queryFn: async () => {
@@ -29,9 +29,9 @@ export default function MembershipPromo() {
           <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${t.gold}22` }}>
             <ShieldCheck className="w-4 h-4" style={{ color: t.gold }} />
           </div>
-          <Eyebrow color={t.gold}>{clubConfig.season.label}</Eyebrow>
+          <Eyebrow color={t.gold}>{club.season.label}</Eyebrow>
         </div>
-        <h3 className="text-white text-2xl mb-1 leading-tight" style={{ fontFamily: t.fontDisplay }}>Join the {clubConfig.identity.short_name}</h3>
+        <h3 className="text-white text-2xl mb-1 leading-tight" style={{ fontFamily: t.fontDisplay }}>Join the {club.identity.short_name}</h3>
         <p className="text-white/60 text-sm mb-4" style={{ fontFamily: t.fontBody }}>
           {lowestPrice !== null ? `From $${lowestPrice} — season entry, rewards & sponsor deals` : 'Season entry, rewards points & exclusive perks'}
         </p>

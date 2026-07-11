@@ -9,12 +9,12 @@ import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import DayPassDetailsForm from '../components/daypass/DayPassDetailsForm';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import GlassCard from '@/components/ui-kit/GlassCard';
 
-const t = clubConfig.theme;
-
 export default function DayPass() {
+  const { club } = useClub();
+  const t = club.theme;
   const [user, setUser] = useState(null);
   const [selectedFixture, setSelectedFixture] = useState(null);
   const [processing, setProcessing] = useState(false);
@@ -176,7 +176,7 @@ export default function DayPass() {
     }
   };
 
-  if (!clubConfig.features?.day_pass) {
+  if (!club.features?.day_pass) {
     return <Navigate to={createPageUrl('Home')} replace />;
   }
 
@@ -424,8 +424,8 @@ export default function DayPass() {
           </button>
         </Link>
         <img
-          src={clubConfig.identity.logo_url}
-          alt={clubConfig.identity.club_name}
+          src={club.identity.logo_url}
+          alt={club.identity.club_name}
           className="w-16 h-16 mb-4 bg-white rounded-full p-2"
         />
         <h1 className="text-white text-2xl mb-2" style={{ fontFamily: t.fontDisplay }}>Day Pass</h1>
