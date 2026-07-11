@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Printer } from 'lucide-react';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { UtilityButton } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
-
 export default function GateQRPoster() {
+  const { club } = useClub();
+  const t = club.theme;
   const urlParams = new URLSearchParams(window.location.search);
   const qrId = urlParams.get('qr_id');
 
@@ -50,12 +50,12 @@ export default function GateQRPoster() {
         {/* Header */}
         <div className="px-8 py-8 text-center" style={{ background: t.navy }}>
           <img
-            src={clubConfig.identity.logo_url}
-            alt={clubConfig.identity.club_name}
+            src={club.identity.logo_url}
+            alt={club.identity.club_name}
             className="w-24 h-24 object-contain bg-white rounded-full p-1.5 mx-auto mb-4"
           />
           <h1 className="text-white text-3xl font-extrabold tracking-tight">GATE ENTRY</h1>
-          <p className="text-base mt-1" style={{ color: '#93c5fd' }}>{clubConfig.identity.club_name}</p>
+          <p className="text-base mt-1" style={{ color: '#93c5fd' }}>{club.identity.club_name}</p>
         </div>
 
         {/* Instruction */}
@@ -79,7 +79,7 @@ export default function GateQRPoster() {
         <div className="px-8 pb-6 space-y-3">
           <div className="flex items-start gap-3 rounded-xl p-3" style={{ background: '#f9fafb' }}>
             <span className="text-2xl">1️⃣</span>
-            <p className="text-gray-700 text-sm font-medium">Open the {clubConfig.identity.club_name} app on your phone</p>
+            <p className="text-gray-700 text-sm font-medium">Open the {club.identity.club_name} app on your phone</p>
           </div>
           <div className="flex items-start gap-3 rounded-xl p-3" style={{ background: '#f9fafb' }}>
             <span className="text-2xl">2️⃣</span>
