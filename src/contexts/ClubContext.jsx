@@ -27,9 +27,12 @@ export function getClubConfig() {
 function buildConfig(club) {
   if (!club) return null;
 
-  const primary = club.primary_color || staticConfig.theme.gold;
-  const secondary = club.secondary_color || staticConfig.theme.royal;
-  const accent = club.accent_color || secondary;
+  // Mapping: primary = structural brand color (navy), secondary = CTA/highlight (gold), accent = cyan.
+  // For Central Newcastle these equal the static theme exactly — zero visual change (golden rule).
+  const navy = club.primary_color || staticConfig.theme.navy;
+  const gold = club.secondary_color || staticConfig.theme.gold;
+  const cyan = club.accent_color || staticConfig.theme.cyan;
+  const goldHi = gold === staticConfig.theme.gold ? staticConfig.theme.goldHi : gold;
 
   return {
     ...club,
@@ -43,20 +46,24 @@ function buildConfig(club) {
       logo_url: club.logo_url || staticConfig.identity.logo_url,
       app_url: club.app_url || staticConfig.identity.app_url,
       team_short: club.team_short || staticConfig.identity.team_short,
-      club_short_name: club.short_name || staticConfig.identity.club_short_name,
+      club_short_name: club.club_short_name || staticConfig.identity.club_short_name,
       sport_emoji: club.sport_emoji || staticConfig.identity.sport_emoji,
     },
 
     theme: {
       ...staticConfig.theme,
-      gold: primary,
-      goldHi: primary,
-      royal: secondary,
-      cyan: accent,
+      navy,
+      gold,
+      goldHi,
+      cyan,
     },
 
     product_tier: club.product_tier || 'starter',
-    features: resolveFeatures(club.product_tier || 'starter'),
+    // Club record's stored feature flags are authoritative (wizard can override per-club);
+    // fall back to tier preset only when the record has none.
+    features: (club.features && Object.keys(club.features).length > 0)
+      ? club.features
+      : resolveFeatures(club.product_tier || 'starter'),
 
     fixtures: staticConfig.fixtures,
     tiers: staticConfig.tiers,
