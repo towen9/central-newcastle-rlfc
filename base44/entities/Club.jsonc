@@ -1,0 +1,111 @@
+{
+  "name": "Club",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full club name e.g. Central Newcastle RLFC"
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL-safe unique identifier e.g. central-newcastle"
+    },
+    "short_name": {
+      "type": "string",
+      "description": "Short form e.g. Central Newcastle"
+    },
+    "nickname": {
+      "type": "string",
+      "description": "Club nickname e.g. Butcher Boys"
+    },
+    "team_short": {
+      "type": "string",
+      "description": "Shortest form e.g. Central"
+    },
+    "sport": {
+      "type": "string",
+      "description": "Sport code e.g. rugby_league, afl"
+    },
+    "sport_emoji": {
+      "type": "string",
+      "description": "Emoji used in comms e.g. \ud83c\udfc9"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "demo",
+        "inactive"
+      ],
+      "default": "active",
+      "description": "Tenant status \u2014 demo clubs are canary/test tenants"
+    },
+    "product_tier": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "pro",
+        "elite"
+      ],
+      "default": "starter",
+      "description": "ClubBase product tier controlling feature flags"
+    },
+    "venue_name": {
+      "type": "string",
+      "description": "Home ground e.g. St John Oval"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Club contact/reply-to email"
+    },
+    "app_url": {
+      "type": "string",
+      "description": "Public app URL for this club"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "primary_color": {
+      "type": "string",
+      "description": "Hex brand color"
+    },
+    "secondary_color": {
+      "type": "string",
+      "description": "Hex brand color"
+    },
+    "timezone": {
+      "type": "string",
+      "default": "Australia/Sydney"
+    }
+  },
+  "required": [
+    "name",
+    "slug"
+  ],
+  "indexes": [
+    {
+      "fields": [
+        "slug"
+      ],
+      "unique": true
+    }
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

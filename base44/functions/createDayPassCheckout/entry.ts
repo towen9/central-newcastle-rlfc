@@ -22,8 +22,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Fixture not found' }, { status: 404 });
     }
 
-    // Runtime price lookup — white-label safe, no hardcoded Stripe IDs
-    const dayPassTiers = await base44.entities.MembershipTier.filter({ tier_type: 'day_pass', is_active: true });
+    // Resolve tenant club_id from ClubSettings singleton (Module 0 multi-tenancy)
+    let clubId = null;
+    try {
+      const settings = await base44.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]?.club_id) clubId = settings[0].club_id;
+    } catch (_) { /* non-fatal */ }
+
+    // Runtime price lookup — white-label safe, no hardcoded Stripe IDs, scoped to tenant
+    const dayPassTiers = await base44.entities.MembershipTier.filter({ tier_type: 'day_pass', is_active: true, ...(clubId && { club_id: clubId }) });
     const dayPassTier = dayPassTiers[0];
 
     if (!dayPassTier?.stripe_price_id) {
@@ -46,7 +53,8 @@ Deno.serve(async (req) => {
         user_email: user.email,
         user_name: user.full_name,
         fixture_id: fixture_id,
-        product_type: 'day_pass'
+        product_type: 'day_pass',
+        club_id: clubId || ''
       }
     });
 
