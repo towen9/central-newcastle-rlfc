@@ -76,7 +76,8 @@ Deno.serve(async (req) => {
         stripe_payment_id,
         ticket_price: ticket_price_dollars,
         status: 'active',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        ...(club.club_id && { club_id: club.club_id })
       });
     } catch (createErr) {
       console.error('createEventTicket: entity create failed:', createErr.message);
