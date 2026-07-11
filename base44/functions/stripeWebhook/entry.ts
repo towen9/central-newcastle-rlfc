@@ -24,7 +24,16 @@ Deno.serve(async (req) => {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const { user_id, tier_id, user_email, user_name, product_type, fixture_id, referral_code } = session.metadata;
+      const { user_id, tier_id, user_email, user_name, product_type, fixture_id, referral_code, club_id: metaClubId } = session.metadata;
+
+      // Resolve tenant club_id: prefer checkout metadata, fall back to ClubSettings singleton (Module 0 multi-tenancy)
+      let clubId = metaClubId || null;
+      if (!clubId) {
+        try {
+          const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+          if (settings && settings[0]?.club_id) clubId = settings[0].club_id;
+        } catch (_) { /* non-fatal */ }
+      }
 
       // Handle Day Pass purchases
       if (product_type === 'day_pass') {
@@ -42,7 +51,8 @@ Deno.serve(async (req) => {
           payment_amount: 8,
           pass_qr_code: qrCode,
           status: 'valid',
-          user_id: user_id
+          user_id: user_id,
+          ...(clubId && { club_id: clubId })
         });
         console.log('Day Pass created:', qrCode, '| User:', user_email);
         return Response.json({ received: true });
@@ -90,7 +100,8 @@ Deno.serve(async (req) => {
         points: 0,
         total_checkins: 0,
         games_used: 0,
-        ...(isSupporter && { games_remaining: gamesIncluded || 5 })
+        ...(isSupporter && { games_remaining: gamesIncluded || 5 }),
+        ...((tierData.club_id || clubId) && { club_id: tierData.club_id || clubId })
       });
 
       console.log('Membership created:', membership.id, '| Tier:', tierData.name);
@@ -230,7 +241,8 @@ Deno.serve(async (req) => {
               referred_tier_name: tierData.name,
               referral_code: referral_code,
               status: 'converted',
-              converted_at: new Date().toISOString()
+              converted_at: new Date().toISOString(),
+              ...(clubId && { club_id: clubId })
             });
             console.log('Referral recorded:', referral_code, '| Referrer:', referrer.user_name);
           }
