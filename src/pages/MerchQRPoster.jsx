@@ -1,14 +1,14 @@
 import React from 'react';
 import { Printer } from 'lucide-react';
-import clubConfig from '@/config/club.config';
+import { useClub } from '@/contexts/ClubContext';
 import { UtilityButton } from '@/components/ui-kit';
 
-const t = clubConfig.theme;
-
 const MERCH_QR_URL = `${window.location.origin}/MemberMerchStatus`;
-const LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg';
 
 export default function MerchQRPoster() {
+  const { club } = useClub();
+  const t = club.theme;
+  const LOGO = club.identity.logo_url;
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(MERCH_QR_URL)}`;
 
   return (
@@ -27,9 +27,9 @@ export default function MerchQRPoster() {
       >
         {/* Header */}
         <div className="bg-[#1a365d] px-8 py-8 text-center">
-          <img src={LOGO} alt="Central Newcastle RLFC" className="w-24 h-24 object-contain bg-white rounded-full p-1.5 mx-auto mb-4" />
+          <img src={LOGO} alt={club.identity.club_name} className="w-24 h-24 object-contain bg-white rounded-full p-1.5 mx-auto mb-4" />
           <h1 className="text-white text-3xl font-extrabold tracking-tight">MERCH TENT</h1>
-          <p className="text-blue-200 text-base mt-1">Central Newcastle RLFC</p>
+          <p className="text-blue-200 text-base mt-1">{club.identity.club_name}</p>
         </div>
 
         {/* Callout */}
