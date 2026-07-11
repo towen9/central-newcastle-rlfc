@@ -36,6 +36,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Not a day pass session' }, { status: 400 });
     }
 
+    // Resolve tenant club_id: prefer checkout metadata, fall back to ClubSettings singleton (Module 0 multi-tenancy)
+    let clubId = session.metadata.club_id || null;
+    if (!clubId) {
+      try {
+        const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+        if (settings && settings[0]?.club_id) clubId = settings[0].club_id;
+      } catch (_) { /* non-fatal */ }
+    }
+
     // Check if a pass was already created for this session (idempotency)
     const existing = await base44.asServiceRole.entities.GameDayEntry.filter({
       payment_reference: session.payment_intent
@@ -72,7 +81,8 @@ Deno.serve(async (req) => {
       payment_amount: 8,
       pass_qr_code: qrCode,
       status: 'valid',
-      user_id: user.id
+      user_id: user.id,
+      ...(clubId && { club_id: clubId })
     });
 
     console.log('Day Pass created via verify:', qrCode, '| User:', user.email);
@@ -104,7 +114,7 @@ Deno.serve(async (req) => {
           // Resolve the real Day Pass tier record; fall back to legacy string if lookup fails (non-fatal path)
           let dayPassTierId = 'day_pass';
           try {
-            const dpTiers = await base44.asServiceRole.entities.MembershipTier.filter({ tier_type: 'day_pass' });
+            const dpTiers = await base44.asServiceRole.entities.MembershipTier.filter({ tier_type: 'day_pass', ...(clubId && { club_id: clubId }) });
             if (dpTiers && dpTiers[0]) dayPassTierId = dpTiers[0].id;
           } catch (_) { /* keep string fallback */ }
           const nameParts2 = (user.full_name || '').split(' ');
@@ -122,7 +132,8 @@ Deno.serve(async (req) => {
             stamps: 0,
             points: 0,
             total_checkins: 0,
-            games_used: 0
+            games_used: 0,
+            ...(clubId && { club_id: clubId })
           });
           console.log('Day Pass comms: created new Day Pass membership for', user.email);
         }
