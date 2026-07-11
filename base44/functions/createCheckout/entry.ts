@@ -14,6 +14,13 @@ Deno.serve(async (req) => {
 
     const { tier_id, price_id, success_url, cancel_url, referral_code } = await req.json();
 
+    // Resolve tenant club_id from ClubSettings singleton (Module 0 multi-tenancy)
+    let clubId = null;
+    try {
+      const settings = await base44.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]?.club_id) clubId = settings[0].club_id;
+    } catch (_) { /* non-fatal */ }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -31,6 +38,7 @@ Deno.serve(async (req) => {
         user_name: user.full_name,
         tier_id: tier_id,
         product_type: 'membership',
+        club_id: clubId || '',
         ...(referral_code && { referral_code })
       }
     });
