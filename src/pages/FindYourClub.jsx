@@ -13,7 +13,7 @@ export default function FindYourClub() {
     queryFn: () => base44.entities.Club.filter({})
   });
 
-  const activeClubs = clubs.filter(c => c.status !== 'inactive');
+  const activeClubs = clubs.filter(c => c.is_active !== false && (c.status === 'live' || c.status === 'onboarding'));
 
   return (
     <div className="min-h-screen p-6" style={{ background: '#000' }}>
