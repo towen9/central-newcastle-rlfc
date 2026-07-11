@@ -15,6 +15,13 @@ Deno.serve(async (req) => {
 
     const { success_url, cancel_url, purchaser_name, purchaser_email, membership_id } = await req.json();
 
+    // Resolve tenant club_id from ClubSettings singleton (Module 0 multi-tenancy)
+    let clubId = null;
+    try {
+      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+      if (settings && settings[0]?.club_id) clubId = settings[0].club_id;
+    } catch (_) { /* non-fatal */ }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
     const session = await stripe.checkout.sessions.create({
@@ -30,7 +37,8 @@ Deno.serve(async (req) => {
         purchaser_name,
         purchaser_email: purchaser_email || user.email,
         membership_id: membership_id || '',
-        product_type: 'event_ticket'
+        product_type: 'event_ticket',
+        club_id: clubId || ''
       }
     });
 
