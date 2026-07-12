@@ -1,8 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
+import { useClub } from '@/contexts/ClubContext';
 
 export default function LadiesLunchBanner({ onDismiss }) {
+  const { club } = useClub();
+
+  // Central-only event promo — never render for another tenant.
+  // When per-club event promos become a feature, this moves to club-scoped Event data.
+  if (club?.slug !== 'central-newcastle') return null;
+
   return (
     <div className="relative rounded-2xl overflow-hidden shadow-lg border-2 border-pink-400">
       <div className="absolute inset-0 bg-gradient-to-br from-[#1a365d] to-[#0f2340]" />
