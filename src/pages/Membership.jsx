@@ -127,14 +127,16 @@ export default function Membership() {
       )}
 
       <div className="relative flex flex-col pb-24" style={{ minHeight: '100dvh', background: `radial-gradient(ellipse at top, ${t.bg1} 0%, ${t.bg0} 70%)`, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        {/* Sponsor bar */}
-        <div className="flex items-center justify-center gap-2 px-4 py-1.5" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="text-white/40 text-[9px] uppercase tracking-[0.15em] font-semibold" style={{ fontFamily: t.fontBody }}>Proudly brought to you by</span>
-          <div className="h-px w-3" style={{ background: 'rgba(255,255,255,0.15)' }} />
-          <div className="bg-white rounded px-2 py-0.5">
-            <img src="https://media.base44.com/images/public/6966ba172da6c09d1e1650bd/1e9b65742_ZoomEnergy.png" alt="Zoom Energy" className="h-4 w-auto object-contain" />
+        {/* Official Digital Membership Partner — per-club placement from the Club record */}
+        {club.membership_partner_logo_url && (
+          <div className="flex items-center justify-center gap-2 px-4 py-1.5" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="text-white/40 text-[9px] uppercase tracking-[0.15em] font-semibold" style={{ fontFamily: t.fontBody }}>Proudly brought to you by</span>
+            <div className="h-px w-3" style={{ background: 'rgba(255,255,255,0.15)' }} />
+            <div className="bg-white rounded px-2 py-0.5">
+              <img src={club.membership_partner_logo_url} alt={club.membership_partner_name || 'Club partner'} className="h-4 w-auto object-contain" />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Header */}
         <div className="px-4 pt-4 pb-2 flex items-center gap-3">
