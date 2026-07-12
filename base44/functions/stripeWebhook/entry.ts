@@ -40,6 +40,12 @@ Deno.serve(async (req) => {
 
       // Handle Day Pass purchases
       if (product_type === 'day_pass') {
+        // Idempotency: Stripe can retry/resend events — never mint a duplicate pass
+        const existingPass = await base44.asServiceRole.entities.GameDayEntry.filter({ payment_reference: session.payment_intent });
+        if (existingPass && existingPass.length > 0) {
+          console.log('Day Pass already exists for payment:', session.payment_intent, '— skipping duplicate');
+          return Response.json({ received: true, duplicate: true });
+        }
         const qrCode = `DP${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
         await base44.asServiceRole.entities.GameDayEntry.create({
           first_name: user_name?.split(' ')[0] || '',
