@@ -56,21 +56,23 @@ export default function Sponsors() {
   }, []);
 
   const { data: sponsors = [], isLoading } = useQuery({
-    queryKey: ['sponsors'],
+    queryKey: ['sponsors', club.id],
     queryFn: async () => {
-      const allSponsors = await base44.entities.Sponsor.filter({ is_active: true });
+      const allSponsors = await base44.entities.Sponsor.filter({ club_id: club.id, is_active: true });
       return allSponsors.sort((a, b) => {
         const orderA = a.sort_order ?? 999;
         const orderB = b.sort_order ?? 999;
         if (orderA !== orderB) return orderA - orderB;
         return a.name.localeCompare(b.name);
       });
-    }
+    },
+    enabled: !!club?.id
   });
 
   const { data: offers = [] } = useQuery({
-    queryKey: ['offers'],
-    queryFn: () => base44.entities.Offer.filter({ is_active: true })
+    queryKey: ['offers', club.id],
+    queryFn: () => base44.entities.Offer.filter({ club_id: club.id, is_active: true }),
+    enabled: !!club?.id
   });
 
   const { data: membership } = useQuery({

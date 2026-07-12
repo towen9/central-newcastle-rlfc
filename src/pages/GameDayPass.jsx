@@ -100,8 +100,9 @@ export default function GameDayPass() {
   }, [entryId]);
 
   const { data: offers = [] } = useQuery({
-    queryKey: ['casualOffers'],
-    queryFn: () => base44.entities.Offer.filter({ is_active: true }, '-is_featured', 3)
+    queryKey: ['casualOffers', club.id],
+    queryFn: () => base44.entities.Offer.filter({ club_id: club.id, is_active: true }, '-is_featured', 3),
+    enabled: !!club?.id
   });
 
   if (!entry || !event) {

@@ -68,7 +68,7 @@ export default function CheckIn() {
       }
 
       // Verify club QR exists
-      const clubQRs = await base44.entities.ClubQRCode.filter({ qr_id: parsed.id, is_active: true });
+      const clubQRs = await base44.entities.ClubQRCode.filter({ club_id: club.id, qr_id: parsed.id, is_active: true });
       if (clubQRs.length === 0) {
         throw new Error('Invalid or inactive check-in location');
       }

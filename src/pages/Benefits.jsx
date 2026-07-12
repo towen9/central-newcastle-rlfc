@@ -56,13 +56,15 @@ export default function Benefits() {
   });
 
   const { data: offers = [] } = useQuery({
-    queryKey: ['offers'],
-    queryFn: () => base44.entities.Offer.filter({ is_active: true }, '-is_featured')
+    queryKey: ['offers', club.id],
+    queryFn: () => base44.entities.Offer.filter({ club_id: club.id, is_active: true }, '-is_featured'),
+    enabled: !!club?.id
   });
 
   const { data: rewards = [] } = useQuery({
-    queryKey: ['rewards'],
-    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'stamps_required')
+    queryKey: ['rewards', club.id],
+    queryFn: () => base44.entities.Reward.filter({ club_id: club.id, is_active: true }, 'stamps_required'),
+    enabled: !!club?.id
   });
 
   const { data: redemptions = [] } = useQuery({

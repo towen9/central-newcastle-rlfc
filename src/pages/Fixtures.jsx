@@ -49,13 +49,15 @@ export default function Fixtures() {
   }, []);
 
   const { data: fixtures = [], isLoading: fixturesLoading } = useQuery({
-    queryKey: ['fixtures'],
-    queryFn: () => base44.entities.Fixture.list('date_time')
+    queryKey: ['fixtures', club.id],
+    queryFn: () => base44.entities.Fixture.filter({ club_id: club.id }, 'date_time'),
+    enabled: !!club?.id
   });
 
   const { data: events = [] } = useQuery({
-    queryKey: ['events'],
-    queryFn: () => base44.entities.Event.filter({ is_active: true }, 'date_time')
+    queryKey: ['events', club.id],
+    queryFn: () => base44.entities.Event.filter({ club_id: club.id, is_active: true }, 'date_time'),
+    enabled: !!club?.id
   });
 
   // Membership query — same pattern as Home

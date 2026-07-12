@@ -7,8 +7,9 @@ export default function SponsorStrip() {
   const { club } = useClub();
   const t = club.theme;
   const { data: sponsors = [] } = useQuery({
-    queryKey: ['homeSponsors'],
-    queryFn: () => base44.entities.Sponsor.filter({ is_active: true }, 'sort_order', 5),
+    queryKey: ['homeSponsors', club.id],
+    queryFn: () => base44.entities.Sponsor.filter({ club_id: club.id, is_active: true }, 'sort_order', 5),
+    enabled: !!club?.id,
     staleTime: 60000,
   });
 

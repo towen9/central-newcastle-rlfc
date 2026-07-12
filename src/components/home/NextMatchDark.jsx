@@ -33,14 +33,15 @@ export default function NextMatchDark() {
   const { club } = useClub();
   const t = club.theme;
   const { data: fixtures = [] } = useQuery({
-    queryKey: ['upcomingFixtures'],
+    queryKey: ['upcomingFixtures', club.id],
     queryFn: async () => {
-      const all = await base44.entities.Fixture.filter({ team_grade: club.fixtures?.primary_grade || 'DEC' });
+      const all = await base44.entities.Fixture.filter({ club_id: club.id, team_grade: club.fixtures?.primary_grade || 'DEC' });
       const now = new Date();
       return all
         .filter(f => isAfter(new Date(f.date_time), now) && f.status !== 'cancelled' && f.status !== 'postponed')
         .sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
     },
+    enabled: !!club?.id,
     staleTime: 0,
     gcTime: 0
   });

@@ -28,8 +28,9 @@ export default function News() {
   const queryClient = useQueryClient();
 
   const { data: news = [] } = useQuery({
-    queryKey: ['news'],
-    queryFn: () => base44.entities.News.filter({ is_published: true }, '-publish_date')
+    queryKey: ['news', club.id],
+    queryFn: () => base44.entities.News.filter({ club_id: club.id, is_published: true }, '-publish_date'),
+    enabled: !!club?.id
   });
 
   const handleRefresh = async () => {

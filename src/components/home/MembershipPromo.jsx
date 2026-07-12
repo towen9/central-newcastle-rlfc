@@ -13,11 +13,12 @@ export default function MembershipPromo() {
   const { club } = useClub();
   const t = club.theme;
   const { data: tiers = [] } = useQuery({
-    queryKey: ['membershipTiers', 'promo'],
+    queryKey: ['membershipTiers', 'promo', club.id],
     queryFn: async () => {
-      const all = await base44.entities.MembershipTier.filter({ is_active: true }, 'sort_order');
+      const all = await base44.entities.MembershipTier.filter({ club_id: club.id, is_active: true }, 'sort_order');
       return all;
-    }
+    },
+    enabled: !!club?.id
   });
 
   const lowestPrice = tiers.length > 0 ? Math.min(...tiers.map(tier => tier.price)) : null;

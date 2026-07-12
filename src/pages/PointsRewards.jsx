@@ -41,8 +41,9 @@ export default function PointsRewards() {
   });
 
   const { data: rewards = [] } = useQuery({
-    queryKey: ['rewards'],
-    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required')
+    queryKey: ['rewards', club.id],
+    queryFn: () => base44.entities.Reward.filter({ club_id: club.id, is_active: true }, 'points_required'),
+    enabled: !!club?.id
   });
 
   const { data: transactions = [] } = useQuery({

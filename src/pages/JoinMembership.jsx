@@ -73,8 +73,9 @@ export default function JoinMembership() {
   }, []);
 
   const { data: tiers = [] } = useQuery({
-    queryKey: ['membershipTiers'],
-    queryFn: () => base44.entities.MembershipTier.filter({ is_active: true, is_admin_only: false }, 'sort_order')
+    queryKey: ['membershipTiers', club.id],
+    queryFn: () => base44.entities.MembershipTier.filter({ club_id: club.id, is_active: true, is_admin_only: false }, 'sort_order'),
+    enabled: !!club?.id
   });
 
   const handlePurchase = async (tier) => {

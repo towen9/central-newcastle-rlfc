@@ -41,9 +41,9 @@ export default function Home() {
 
   // Defer rewards until after membership loads
   const { data: rewards = [] } = useQuery({
-    queryKey: ['rewards'],
-    queryFn: () => base44.entities.Reward.filter({ is_active: true }, 'points_required'),
-    enabled: membership !== undefined
+    queryKey: ['rewards', club.id],
+    queryFn: () => base44.entities.Reward.filter({ club_id: club.id, is_active: true }, 'points_required'),
+    enabled: membership !== undefined && !!club?.id
   });
 
   // Fetch valid day pass for non-members

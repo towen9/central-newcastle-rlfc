@@ -27,7 +27,7 @@ export default function MemberMerchStatus() {
         if (!memberships || memberships.length === 0) { setState('no_membership'); return; }
 
         const m = memberships[0];
-        const tiers = await base44.entities.MembershipTier.filter({ name: m.tier_name });
+        const tiers = await base44.entities.MembershipTier.filter({ club_id: club.id, name: m.tier_name });
         const tier = tiers[0] || null;
         const pct = tier?.merchandise_discount || 0;
 

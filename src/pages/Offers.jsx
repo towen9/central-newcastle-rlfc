@@ -53,8 +53,9 @@ export default function Offers() {
   }, []);
 
   const { data: offers = [] } = useQuery({
-    queryKey: ['offers'],
-    queryFn: () => base44.entities.Offer.filter({ is_active: true }, '-is_featured')
+    queryKey: ['offers', club.id],
+    queryFn: () => base44.entities.Offer.filter({ club_id: club.id, is_active: true }, '-is_featured'),
+    enabled: !!club?.id
   });
 
   const { data: membership } = useQuery({

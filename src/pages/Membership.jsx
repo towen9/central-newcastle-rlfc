@@ -82,8 +82,9 @@ export default function Membership() {
   });
 
   const { data: tiers = [] } = useQuery({
-    queryKey: ['tiers'],
-    queryFn: () => base44.entities.MembershipTier.filter({ is_active: true }, 'sort_order')
+    queryKey: ['tiers', club.id],
+    queryFn: () => base44.entities.MembershipTier.filter({ club_id: club.id, is_active: true }, 'sort_order'),
+    enabled: !!club?.id
   });
 
   useEffect(() => {

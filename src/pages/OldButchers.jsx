@@ -36,11 +36,12 @@ export default function OldButchers() {
   }, []);
 
   const { data: tier } = useQuery({
-    queryKey: ['oldButchersTier'],
+    queryKey: ['oldButchersTier', club.id],
     queryFn: async () => {
-      const tiers = await base44.entities.MembershipTier.filter({ name: 'Old Butchers Membership', is_active: true });
+      const tiers = await base44.entities.MembershipTier.filter({ club_id: club.id, name: 'Old Butchers Membership', is_active: true });
       return tiers[0] || null;
-    }
+    },
+    enabled: !!club?.id
   });
 
   const isOldButcher = membership?.tier_type ? membership.tier_type === 'legacy' : membership?.tier_name === 'Old Butchers Membership';

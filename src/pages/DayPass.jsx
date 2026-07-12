@@ -39,11 +39,12 @@ export default function DayPass() {
   }, []);
 
   const { data: upcomingFixtures = [] } = useQuery({
-    queryKey: ['upcomingFixtures'],
+    queryKey: ['upcomingFixtures', club.id],
     queryFn: async () => {
       const now = new Date();
 
       const fixtures = await base44.entities.Fixture.filter({
+        club_id: club.id,
         fixture_type: 'home'
       }, 'date_time');
 
@@ -51,12 +52,14 @@ export default function DayPass() {
         const fixtureDate = new Date(f.date_time);
         return fixtureDate > now && f.status !== 'cancelled' && f.status !== 'postponed';
       });
-    }
+    },
+    enabled: !!club?.id
   });
 
   const { data: dayPassTiers = [] } = useQuery({
-    queryKey: ['dayPassTier'],
-    queryFn: () => base44.entities.MembershipTier.filter({ is_active: true }, 'sort_order')
+    queryKey: ['dayPassTier', club.id],
+    queryFn: () => base44.entities.MembershipTier.filter({ club_id: club.id, is_active: true }, 'sort_order'),
+    enabled: !!club?.id
   });
   const dayPassTier = dayPassTiers.find(tier => tier.name?.toLowerCase().includes('day pass'));
 

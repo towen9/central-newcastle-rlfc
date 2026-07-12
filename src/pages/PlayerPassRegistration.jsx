@@ -127,7 +127,7 @@ export default function PlayerPassRegistration() {
   const registrationMutation = useMutation({
     mutationFn: async (data) => {
       // Find the Player Pass tier
-      const tiers = await base44.entities.MembershipTier.filter({ name: '2026 Player Pass' });
+      const tiers = await base44.entities.MembershipTier.filter({ club_id: club.id, name: '2026 Player Pass' });
       if (!tiers || tiers.length === 0) {
         throw new Error('Player Pass tier not found. Please contact admin.');
       }

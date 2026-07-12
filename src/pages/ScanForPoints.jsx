@@ -68,7 +68,7 @@ export default function ScanForPoints() {
       }
 
       // Verify QR code exists
-      const qrCodes = await base44.entities.ClubQRCode.filter({ qr_id: qrId, is_active: true });
+      const qrCodes = await base44.entities.ClubQRCode.filter({ club_id: club.id, qr_id: qrId, is_active: true });
       if (qrCodes.length === 0) {
         throw new Error('Invalid QR code');
       }
