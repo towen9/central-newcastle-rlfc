@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useClub } from '@/contexts/ClubContext';
 import ClubTable from '@/components/owner/ClubTable';
 import NewClubWizard from '@/components/owner/NewClubWizard';
-import { Plus, Building2, RefreshCw } from 'lucide-react';
+import { Plus, Building2, RefreshCw, ArrowLeft } from 'lucide-react';
 
 function computeStats(clubs, memberships, users) {
   const userClubMap = {};
@@ -73,7 +73,7 @@ export default function OwnerDashboard() {
   };
 
   const totalClubs = clubs?.length || 0;
-  const liveClubs = clubs?.filter(c => c.status === 'active' && (c.onboarding_progress || 0) >= 100).length || 0;
+  const liveClubs = clubs?.filter(c => c.status === 'live' && (c.onboarding_progress || 0) >= 100).length || 0;
   const totalMembers = clubs ? clubs.reduce((sum, c) => sum + (stats[c.id]?.memberCount || 0), 0) : 0;
 
   return (
@@ -82,6 +82,13 @@ export default function OwnerDashboard() {
       <div className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => { window.location.href = '/'; }}
+              aria-label="Back to app"
+              className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
             <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
               <Building2 className="w-5 h-5 text-amber-400" />
             </div>
