@@ -45,7 +45,11 @@ function buildConfig(club) {
       sport: club.sport || staticConfig.identity.sport,
       est_year: staticConfig.identity.est_year,
       venue_name: club.venue_name || staticConfig.identity.venue_name,
-      logo_url: club.logo_url || staticConfig.identity.logo_url,
+      // Never leak the fallback club's crest to another tenant — clubs without a
+      // logo get a neutral initials avatar instead of Central's logo.
+      logo_url: club.logo_url || (club.slug === FALLBACK_SLUG
+        ? staticConfig.identity.logo_url
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent((club.name || 'Club').split(' ').slice(0, 2).map(w => w[0]).join('+'))}&background=1F2937&color=ffffff&size=256&bold=true`),
       app_url: club.app_url || staticConfig.identity.app_url,
       team_short: club.team_short || staticConfig.identity.team_short,
       club_short_name: club.club_short_name || staticConfig.identity.club_short_name,
