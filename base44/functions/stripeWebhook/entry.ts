@@ -3,8 +3,11 @@ import Stripe from 'npm:stripe';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
+const FN_VERSION = 'stripeWebhook m0-tenancy 2026-07-13';
+
 Deno.serve(async (req) => {
   try {
+    console.log(FN_VERSION);
     const signature = req.headers.get('stripe-signature');
     const body = await req.text();
     
