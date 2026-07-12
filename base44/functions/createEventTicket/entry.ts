@@ -12,10 +12,17 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, error: 'Unauthorised' }, { status: 401 });
     }
 
-    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '' };
+    // Club record is the tenant source of truth (Module 0 step 7b); ClubSettings then hardcoded fallback
+    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '', logo_url: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg' };
     try {
-      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
-      if (settings && settings[0]) club = { ...club, ...settings[0] };
+      const live = await base44.asServiceRole.entities.Club.filter({ status: 'live', is_active: true });
+      if (live && live.length === 1) {
+        const c = live[0];
+        club = { ...club, club_name: c.name || club.club_name, short_name: c.short_name || club.short_name, club_short_name: c.club_short_name || club.club_short_name, team_short: c.team_short || club.team_short, venue_name: c.venue_name || club.venue_name, sport_emoji: c.sport_emoji || club.sport_emoji, app_url: c.app_url || club.app_url, logo_url: c.logo_url || club.logo_url };
+      } else {
+        const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+        if (settings && settings[0]) club = { ...club, ...settings[0] };
+      }
     } catch (_) { /* fall back to defaults */ }
 
     let body;
@@ -94,7 +101,7 @@ Deno.serve(async (req) => {
         body: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
-    <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <img src="${club.logo_url}" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
     <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">You're in! 🎉</h1>
     <p style="color: #93c5fd; margin: 0; font-size: 14px;">Ladies Long Lunch — Old Butchers Day 2026</p>
   </div>
