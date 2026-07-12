@@ -122,11 +122,17 @@ Deno.serve(async (req) => {
 
       // Send welcome email prompting photo upload
       try {
-        // White-label: club identity from ClubSettings with hardcoded fallback
+        // White-label: club identity from the Club record (tenant source of truth), ClubSettings then hardcoded fallback
         let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', app_url: 'https://charlestown-rl-community-app-1e1650bd.base44.app', logo_url: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg' };
         try {
-          const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
-          if (settings && settings[0]) club = { ...club, ...settings[0], app_url: settings[0].app_url || club.app_url };
+          const clubs = clubId ? await base44.asServiceRole.entities.Club.filter({ id: clubId }) : [];
+          if (clubs && clubs[0]) {
+            const c = clubs[0];
+            club = { ...club, club_name: c.name || club.club_name, short_name: c.short_name || club.short_name, app_url: c.app_url || club.app_url, logo_url: c.logo_url || club.logo_url };
+          } else {
+            const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
+            if (settings && settings[0]) club = { ...club, ...settings[0], app_url: settings[0].app_url || club.app_url };
+          }
         } catch (_) { /* fall back to defaults */ }
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: user_email,
@@ -136,7 +142,7 @@ Deno.serve(async (req) => {
 
   <!-- Header -->
   <div style="background: #1a365d; padding: 32px 24px; text-align: center;">
-    <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ba172da6c09d1e1650bd/6b3832f4a_Butcherboyslogo.jpg" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
+    <img src="${club.logo_url}" alt="${club.club_name}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid white; object-fit: contain; background: white;" />
     <h1 style="color: white; margin: 16px 0 4px; font-size: 24px;">Welcome to ${club.club_name}!</h1>
     <p style="color: #93c5fd; margin: 0; font-size: 14px;">${tierData.name} · Season 2026</p>
   </div>
