@@ -3,10 +3,10 @@ import { ArrowRight } from 'lucide-react';
 
 function HealthChip({ club }) {
   let color, label;
-  if (club.status === 'inactive' || club.is_active === false) {
+  if (club.status === 'churned' || club.is_active === false) {
     color = '#ef4444';
     label = 'Red';
-  } else if (club.status === 'active' && (club.onboarding_progress || 0) >= 100) {
+  } else if (club.status === 'live' && (club.onboarding_progress || 0) >= 100) {
     color = '#22c55e';
     label = 'Green';
   } else {
@@ -29,7 +29,54 @@ function formatDate(dateStr) {
 
 export default function ClubTable({ clubs, stats, onActAs }) {
   return (
-    <div className="overflow-x-auto">
+    <>
+    {/* Mobile: card list — every action reachable without horizontal scroll */}
+    <div className="md:hidden divide-y divide-white/5">
+      {clubs.map((club) => {
+        const s = stats[club.id] || { memberCount: 0, pushOptInRate: 0, lastActive: null };
+        const progress = club.onboarding_progress || 0;
+        return (
+          <div key={club.id} className="p-4 space-y-3">
+            <div className="flex items-center gap-3">
+              {club.logo_url ? (
+                <img src={club.logo_url} alt="" className="w-10 h-10 rounded-full object-cover bg-white/10" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold text-white/50">
+                  {(club.name || '?')[0]}
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white truncate">{club.name}</p>
+                <p className="text-xs text-white/40 font-mono truncate">{club.slug}</p>
+              </div>
+              <HealthChip club={club} />
+            </div>
+            <div className="flex items-center gap-2 flex-wrap text-xs text-white/60">
+              <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/70 font-medium">{club.product_tier || 'starter'}</span>
+              <span className="capitalize">{club.status || '—'}</span>
+              <span>· {s.memberCount} members</span>
+              <span>· {s.pushOptInRate}% push</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div className="h-full rounded-full" style={{ width: `${progress}%`, background: progress >= 100 ? '#22c55e' : '#f59e0b' }} />
+              </div>
+              <span className="text-xs text-white/50">{progress}%</span>
+            </div>
+            <button
+              onClick={() => onActAs(club)}
+              className="w-full flex items-center justify-center gap-1.5 text-sm font-semibold rounded-xl bg-amber-500/15 text-amber-400 active:bg-amber-500/25 transition-colors"
+              style={{ minHeight: 48 }}
+            >
+              Act as {club.name} <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      })}
+    </div>
+
+    {/* Desktop: full table */}
+    <div className="hidden md:block overflow-x-auto">
       <table className="w-full text-left">
         <thead>
           <tr className="border-b border-white/10 text-[10px] uppercase tracking-wider text-white/40">
@@ -96,5 +143,6 @@ export default function ClubTable({ clubs, stats, onActAs }) {
         </tbody>
       </table>
     </div>
+    </>
   );
 }
