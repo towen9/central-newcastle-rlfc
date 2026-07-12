@@ -6,57 +6,50 @@
       "type": "string",
       "description": "Full club name e.g. Central Newcastle RLFC"
     },
-    "slug": {
-      "type": "string",
-      "description": "URL-safe unique identifier e.g. central-newcastle"
-    },
     "short_name": {
       "type": "string",
-      "description": "Short form e.g. Central Newcastle"
+      "description": "Nickname e.g. Butcher Boys"
     },
-    "nickname": {
+    "club_short_name": {
       "type": "string",
-      "description": "Club nickname e.g. Butcher Boys"
+      "description": "Short form e.g. Central Newcastle"
     },
     "team_short": {
       "type": "string",
       "description": "Shortest form e.g. Central"
     },
+    "nickname": {
+      "type": "string",
+      "description": "Legacy alias of short_name \u2014 kept for back-compat"
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL-safe unique identifier e.g. central-newcastle"
+    },
     "sport": {
       "type": "string",
-      "description": "Sport code e.g. rugby_league, afl"
+      "enum": [
+        "rugby_league",
+        "rugby_union",
+        "afl",
+        "netball",
+        "football",
+        "cricket",
+        "other"
+      ],
+      "description": "Sport code"
     },
     "sport_emoji": {
       "type": "string",
       "description": "Emoji used in comms e.g. \ud83c\udfc9"
     },
-    "status": {
-      "type": "string",
-      "enum": [
-        "active",
-        "demo",
-        "inactive",
-        "onboarding"
-      ],
-      "default": "active",
-      "description": "Tenant status \u2014 onboarding = new club in setup, demo = canary/test, inactive = churned"
-    },
-    "product_tier": {
-      "type": "string",
-      "enum": [
-        "starter",
-        "club",
-        "club_pro",
-        "pro",
-        "elite",
-        "founder"
-      ],
-      "default": "starter",
-      "description": "ClubBase product tier controlling feature flags"
-    },
     "venue_name": {
       "type": "string",
       "description": "Home ground e.g. St John Oval"
+    },
+    "venue_address": {
+      "type": "string",
+      "description": "Home ground street address"
     },
     "contact_email": {
       "type": "string",
@@ -71,33 +64,85 @@
     },
     "primary_color": {
       "type": "string",
-      "description": "Hex brand color"
+      "description": "Hex brand color (structural, e.g. navy)"
     },
     "secondary_color": {
       "type": "string",
-      "description": "Hex brand color"
+      "description": "Hex brand color (CTA/highlight, e.g. gold)"
     },
     "accent_color": {
       "type": "string",
-      "description": "Hex accent color (cyan)"
+      "description": "Hex brand color (accent, e.g. cyan)"
+    },
+    "product_tier": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "club",
+        "club_pro",
+        "elite",
+        "founder"
+      ],
+      "default": "starter",
+      "description": "ClubBase product tier (GTM-aligned) controlling feature flags"
     },
     "features": {
       "type": "object",
-      "description": "Resolved feature flags from product tier"
+      "description": "Resolved feature flags, seeded from productTiers presets by product_tier; wizard can override per-club"
     },
-    "onboarding_progress": {
-      "type": "number",
-      "default": 0,
-      "description": "Onboarding completion percentage 0-100"
-    },
-    "is_active": {
-      "type": "boolean",
-      "default": true,
-      "description": "Club active flag \u2014 false = churned"
+    "primary_grade": {
+      "type": "string",
+      "description": "Primary/first grade label e.g. DEC"
     },
     "timezone": {
       "type": "string",
       "default": "Australia/Sydney"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "onboarding",
+        "live",
+        "paused",
+        "churned"
+      ],
+      "default": "onboarding",
+      "description": "Tenant lifecycle status"
+    },
+    "onboarding_progress": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 setup completion"
+    },
+    "stripe_publishable_key": {
+      "type": "string",
+      "description": "Club's Stripe publishable key (safe client-side)"
+    },
+    "stripe_secret_key_ref": {
+      "type": "string",
+      "description": "NAME of the backend secret holding this club's Stripe secret key \u2014 never the raw secret",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "stripe_webhook_secret_ref": {
+      "type": "string",
+      "description": "NAME of the backend secret holding this club's Stripe webhook secret \u2014 never the raw secret",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [
