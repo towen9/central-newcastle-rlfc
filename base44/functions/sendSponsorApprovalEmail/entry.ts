@@ -1,13 +1,40 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// Module 0 step 7b: Club record is the tenant source of truth; ClubSettings is legacy fallback.
+async function resolveClub(sb, clubId) {
+  let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: '', contact_email: '' };
+  try {
+    let rec = null;
+    if (clubId) {
+      const byId = await sb.entities.Club.filter({ id: clubId });
+      rec = byId && byId[0];
+    }
+    if (!rec) {
+      const live = await sb.entities.Club.filter({ status: 'live', is_active: true });
+      if (live && live.length === 1) rec = live[0];
+    }
+    if (rec) {
+      return {
+        ...club,
+        club_name: rec.name || club.club_name,
+        short_name: rec.short_name || club.short_name,
+        club_short_name: rec.club_short_name || club.club_short_name,
+        team_short: rec.team_short || club.team_short,
+        venue_name: rec.venue_name || club.venue_name,
+        sport_emoji: rec.sport_emoji || club.sport_emoji,
+        app_url: rec.app_url || club.app_url,
+        contact_email: rec.contact_email || club.contact_email
+      };
+    }
+    const settings = await sb.entities.ClubSettings.filter({ is_active: true });
+    if (settings && settings[0]) club = { ...club, ...settings[0] };
+  } catch (_) { /* fall back to defaults */ }
+  return club;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    let club = { club_name: 'Central Newcastle RLFC', short_name: 'Butcher Boys', club_short_name: 'Central Newcastle', team_short: 'Central', venue_name: 'St John Oval', sport_emoji: '🏉', app_url: 'https://butcher-boy-c0b7e412.base44.app' };
-    try {
-      const settings = await base44.asServiceRole.entities.ClubSettings.filter({ is_active: true });
-      if (settings && settings[0]) club = { ...club, ...settings[0] };
-    } catch (_) { /* fall back to defaults */ }
 
     const { membership_id } = await req.json();
 
@@ -31,6 +58,10 @@ Deno.serve(async (req) => {
       console.log(`Skipping: approval email already sent at ${membership.approval_email_sent_at} for membership ${membership_id}`);
       return Response.json({ skipped: true, reason: 'approval email already sent' });
     }
+
+    // Resolve club identity from the membership's tenant
+    const club = await resolveClub(base44.asServiceRole, membership.club_id);
+    if (!club.app_url) club.app_url = 'https://butcher-boy-c0b7e412.base44.app';
 
     const toEmail = membership.user_email;
     const toName = membership.user_name || 'Sponsor';
