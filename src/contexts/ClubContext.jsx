@@ -144,6 +144,12 @@ export function ClubProvider({ children }) {
       const clubs = await base44.entities.Club.filter({ slug });
       if (clubs[0]) {
         setResolved(clubs[0]);
+        // Module 0 step 5: stamp club_id onto users on their first resolution so
+        // club-scoped RLS can identify them. Never stamp the platform owner —
+        // acting-as must not rewrite their tenancy. Fire-and-forget, non-fatal.
+        if (authUser && !authUser.club_id && !authUser.is_platform_owner) {
+          base44.auth.updateMe({ club_id: clubs[0].id }).catch(() => {});
+        }
       } else {
         console.warn(`[ClubContext] Club slug "${slug}" not found — falling back to static config`);
         _currentConfig = staticConfig;
