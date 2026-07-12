@@ -3,10 +3,12 @@ import { base44 } from '@/api/base44Client';
 import { resolveFeatures } from '@/config/productTiers';
 import { useAuth } from '@/lib/AuthContext';
 import staticConfig from '@/config/club.config';
+import ActingAsBanner from '@/components/owner/ActingAsBanner';
 
 const ClubContext = createContext(null);
 const SS_KEY = 'base44_club_slug';
 const FALLBACK_SLUG = 'central-newcastle';
+const OWNER_ACTING_KEY = 'owner_acting_club_slug';
 
 let _currentConfig = null;
 
@@ -77,6 +79,7 @@ export function ClubProvider({ children }) {
   const { user, isLoadingAuth } = useAuth();
   const [club, setClub] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [actingAs, setActingAs] = useState(null);
   const resolvedRef = useRef(false);
 
   useEffect(() => {
@@ -96,6 +99,19 @@ export function ClubProvider({ children }) {
   const resolveClub = async (authUser) => {
     setLoading(true);
     try {
+      // (0) Platform owner acting-as → resolve that club first
+      if (authUser?.is_platform_owner && sessionStorage.getItem(OWNER_ACTING_KEY)) {
+        const actingSlug = sessionStorage.getItem(OWNER_ACTING_KEY);
+        try {
+          const actingClubs = await base44.entities.Club.filter({ slug: actingSlug });
+          if (actingClubs[0]) {
+            setResolved(actingClubs[0]);
+            setActingAs(actingClubs[0]);
+            return;
+          }
+        } catch { /* fall through to normal resolution */ }
+      }
+
       // (a) Logged-in user's club_id → load that Club record
       if (authUser?.club_id) {
         try {
@@ -144,6 +160,11 @@ export function ClubProvider({ children }) {
 
   const features = club?.features || {};
 
+  const exitActingAs = () => {
+    sessionStorage.removeItem(OWNER_ACTING_KEY);
+    window.location.reload();
+  };
+
   // Neutral loading screen — no branding flash
   if (loading) {
     return (
@@ -154,7 +175,8 @@ export function ClubProvider({ children }) {
   }
 
   return (
-    <ClubContext.Provider value={{ club, features, loading }}>
+    <ClubContext.Provider value={{ club, features, loading, actingAs, exitActingAs }}>
+      {actingAs && <ActingAsBanner clubName={actingAs.name} onExit={exitActingAs} />}
       {children}
     </ClubContext.Provider>
   );

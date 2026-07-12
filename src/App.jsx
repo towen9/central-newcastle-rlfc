@@ -25,6 +25,8 @@ import EventTicket from './pages/EventTicket';
 import EventScanner from './pages/EventScanner';
 import EventReport from './pages/EventReport';
 import FindYourClub from './pages/FindYourClub';
+import OwnerDashboard from './pages/OwnerDashboard';
+import ProtectedOwnerRoute from '@/components/owner/ProtectedOwnerRoute';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -105,6 +107,7 @@ const AuthenticatedApp = () => {
       <Route path="/EventScanner" element={<EventScanner />} />
       <Route path="/EventReport" element={<LayoutWrapper currentPageName="EventReport"><EventReport /></LayoutWrapper>} />
       <Route path="/FindYourClub" element={<LayoutWrapper currentPageName="FindYourClub"><FindYourClub /></LayoutWrapper>} />
+      <Route path="/OwnerDashboard" element={<ProtectedOwnerRoute><LayoutWrapper currentPageName="OwnerDashboard"><OwnerDashboard /></LayoutWrapper></ProtectedOwnerRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </Suspense>

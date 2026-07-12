@@ -35,17 +35,21 @@
       "enum": [
         "active",
         "demo",
-        "inactive"
+        "inactive",
+        "onboarding"
       ],
       "default": "active",
-      "description": "Tenant status \u2014 demo clubs are canary/test tenants"
+      "description": "Tenant status \u2014 onboarding = new club in setup, demo = canary/test, inactive = churned"
     },
     "product_tier": {
       "type": "string",
       "enum": [
         "starter",
+        "club",
+        "club_pro",
         "pro",
-        "elite"
+        "elite",
+        "founder"
       ],
       "default": "starter",
       "description": "ClubBase product tier controlling feature flags"
@@ -72,6 +76,24 @@
     "secondary_color": {
       "type": "string",
       "description": "Hex brand color"
+    },
+    "accent_color": {
+      "type": "string",
+      "description": "Hex accent color (cyan)"
+    },
+    "features": {
+      "type": "object",
+      "description": "Resolved feature flags from product tier"
+    },
+    "onboarding_progress": {
+      "type": "number",
+      "default": 0,
+      "description": "Onboarding completion percentage 0-100"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Club active flag \u2014 false = churned"
     },
     "timezone": {
       "type": "string",
