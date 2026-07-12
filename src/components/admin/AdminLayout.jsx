@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
 import { 
   Shield, Users, Gift, Percent, QrCode, Newspaper, 
-  Calendar, LayoutDashboard, ArrowLeft, Ticket, ShoppingBag, UserCog, Upload, Share2, Radio
+  Calendar, LayoutDashboard, ArrowLeft, Ticket, ShoppingBag, UserCog, Upload, Share2, Radio, Building2
 } from 'lucide-react';
 
 const menuItems = [
@@ -29,6 +30,7 @@ const menuItems = [
 ];
 
 export default function AdminLayout({ children, title, currentPage }) {
+  const { user } = useAuth();
   const { data: pendingMemberships = [] } = useQuery({
     queryKey: ['pendingMemberships'],
     queryFn: () => base44.entities.Membership.filter({ status: 'pending' }),
@@ -57,12 +59,22 @@ export default function AdminLayout({ children, title, currentPage }) {
                 </div>
               </Link>
             </div>
-            <Link to={createPageUrl('Home')}>
-              <button className="text-sm text-blue-200 hover:text-white flex items-center gap-1">
-                <ArrowLeft className="w-4 h-4" />
-                Back to App
-              </button>
-            </Link>
+            <div className="flex items-center gap-3">
+              {user?.is_platform_owner && (
+                <Link to="/OwnerDashboard">
+                  <button className="text-sm font-semibold text-amber-300 hover:text-amber-200 flex items-center gap-1.5 bg-white/10 rounded-lg px-3 py-1.5">
+                    <Building2 className="w-4 h-4" />
+                    Platform Owner
+                  </button>
+                </Link>
+              )}
+              <Link to={createPageUrl('Home')}>
+                <button className="text-sm text-blue-200 hover:text-white flex items-center gap-1">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to App
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
