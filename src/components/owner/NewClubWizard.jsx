@@ -28,6 +28,18 @@ function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+// Infer the semantic tier_type from the tier name so day passes, family and
+// player tiers work out of the box for wizard-created clubs (Blocker B pattern).
+function inferTierType(name) {
+  const n = name.toLowerCase();
+  if (n.includes('day pass') || n.includes('game day') || n.includes('match day')) return 'day_pass';
+  if (n.includes('family')) return 'family';
+  if (n.includes('player')) return 'player';
+  if (n.includes('sponsor')) return 'sponsor';
+  if (n.includes('supporter')) return 'supporter';
+  return 'premium';
+}
+
 export default function NewClubWizard({ onClose, onComplete }) {
   const [step, setStep] = useState(0);
   const [creating, setCreating] = useState(false);
@@ -102,6 +114,7 @@ export default function NewClubWizard({ onClose, onComplete }) {
           name: t.name.trim(),
           price: Number(t.price) || 0,
           club_id: club.id,
+          tier_type: inferTierType(t.name),
           sort_order: i,
           is_active: true,
         });
