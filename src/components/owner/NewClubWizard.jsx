@@ -3,13 +3,15 @@ import { base44 } from '@/api/base44Client';
 import { resolveFeatures, PRODUCT_TIERS } from '@/config/productTiers';
 import { X, Plus, Trash2, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 
+// Values MUST match the Club schema sport enum
 const SPORTS = [
   { value: 'rugby_league', label: 'Rugby League', emoji: '🏉' },
+  { value: 'rugby_union', label: 'Rugby Union', emoji: '🏉' },
   { value: 'afl', label: 'AFL', emoji: '🏈' },
-  { value: 'soccer', label: 'Soccer', emoji: '⚽' },
-  { value: 'cricket', label: 'Cricket', emoji: '🏏' },
+  { value: 'football', label: 'Football (Soccer)', emoji: '⚽' },
   { value: 'netball', label: 'Netball', emoji: '🏐' },
-  { value: 'basketball', label: 'Basketball', emoji: '🏀' },
+  { value: 'cricket', label: 'Cricket', emoji: '🏏' },
+  { value: 'other', label: 'Other', emoji: '🏅' },
 ];
 
 const TIER_INFO = {
@@ -73,9 +75,10 @@ export default function NewClubWizard({ onClose, onComplete }) {
       const clubData = {
         name: form.name.trim(),
         slug: form.slug.trim(),
-        short_name: form.name.trim(),
+        short_name: form.nickname.trim() || form.name.trim(),
+        club_short_name: form.name.trim(),
         nickname: form.nickname.trim() || form.name.trim(),
-        team_short: form.nickname.trim() || form.name.trim().split(' ')[0],
+        team_short: form.name.trim().split(' ')[0],
         sport: form.sport,
         sport_emoji: sportObj?.emoji || '🏉',
         status: 'onboarding',
@@ -93,16 +96,15 @@ export default function NewClubWizard({ onClose, onComplete }) {
       const club = await base44.entities.Club.create(clubData);
 
       const validTiers = form.tiers.filter(t => t.name.trim());
-      if (validTiers.length > 0) {
-        await base44.entities.MembershipTier.bulkCreate(
-          validTiers.map((t, i) => ({
-            name: t.name.trim(),
-            price: Number(t.price) || 0,
-            club_id: club.id,
-            sort_order: i,
-            is_active: true,
-          }))
-        );
+      for (let i = 0; i < validTiers.length; i++) {
+        const t = validTiers[i];
+        await base44.entities.MembershipTier.create({
+          name: t.name.trim(),
+          price: Number(t.price) || 0,
+          club_id: club.id,
+          sort_order: i,
+          is_active: true,
+        });
       }
       onComplete();
     } catch (err) {
@@ -237,7 +239,7 @@ export default function NewClubWizard({ onClose, onComplete }) {
                 )}
                 <div>
                   <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: form.secondaryColor }}>
-                    {form.sport_emoji || '🏉'} {form.sport || 'Sport'}
+                    {SPORTS.find(s => s.value === form.sport)?.emoji || '🏉'} {SPORTS.find(s => s.value === form.sport)?.label || 'Sport'}
                   </p>
                   <h3 className="text-white text-lg font-bold">{form.name || 'Your Club Name'}</h3>
                   <p className="text-xs" style={{ color: form.accentColor }}>{form.nickname || 'Nickname'}</p>
