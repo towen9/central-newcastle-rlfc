@@ -61,7 +61,7 @@ export default function DayPass() {
     queryFn: () => base44.entities.MembershipTier.filter({ club_id: club.id, is_active: true }, 'sort_order'),
     enabled: !!club?.id
   });
-  const dayPassTier = dayPassTiers.find(tier => tier.name?.toLowerCase().includes('day pass'));
+  const dayPassTier = dayPassTiers.find(tier => tier.tier_type === 'day_pass') || dayPassTiers.find(tier => tier.name?.toLowerCase().includes('day pass'));
 
   const { data: existingPass } = useQuery({
     queryKey: ['myDayPass', user?.id],
