@@ -114,6 +114,14 @@
       "default": 0,
       "description": "0-100 setup completion"
     },
+    "membership_partner_name": {
+      "type": "string",
+      "description": "Official Digital Membership Partner \u2014 sponsor name shown on pass surfaces"
+    },
+    "membership_partner_logo_url": {
+      "type": "string",
+      "description": "Official Digital Membership Partner \u2014 logo shown on pass surfaces; empty = hide the placement"
+    },
     "stripe_publishable_key": {
       "type": "string",
       "description": "Club's Stripe publishable key (safe client-side)"
