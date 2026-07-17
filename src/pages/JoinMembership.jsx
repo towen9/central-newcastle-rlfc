@@ -91,6 +91,7 @@ export default function JoinMembership() {
       if (tier.price === 0) {
         const qrCodeId = `SPONSOR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         await base44.entities.Membership.create({
+          club_id: club.id,
           user_id: user.id,
           user_email: user.email,
           user_name: user.full_name,
