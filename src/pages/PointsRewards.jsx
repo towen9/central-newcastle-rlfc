@@ -65,6 +65,7 @@ export default function PointsRewards() {
       });
 
       await base44.entities.PointsTransaction.create({
+        club_id: club.id,
         user_id: membership.user_id,
         membership_id: membership.id,
         points: -reward.points_required,
@@ -75,6 +76,7 @@ export default function PointsRewards() {
       });
 
       await base44.entities.RewardRedemption.create({
+        club_id: club.id,
         user_id: membership.user_id,
         membership_id: membership.id,
         reward_id: reward.id,
