@@ -62,6 +62,7 @@ export default function Rewards() {
       const expiresAt = reward.expiry_days ? addDays(new Date(), reward.expiry_days).toISOString() : null;
 
       await base44.entities.RewardRedemption.create({
+        club_id: club.id,
         user_id: user.id,
         membership_id: membership.id,
         reward_id: reward.id,
@@ -77,6 +78,7 @@ export default function Rewards() {
       });
 
       await base44.entities.PointsTransaction.create({
+        club_id: club.id,
         user_id: user.id,
         membership_id: membership.id,
         points: -reward.points_required,
