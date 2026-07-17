@@ -66,6 +66,7 @@ export default function GameDayCheckIn() {
     const passCode = Math.random().toString(36).substring(2, 15).toUpperCase();
     
     const entry = await base44.entities.GameDayEntry.create({
+      club_id: club.id,
       first_name: formData.first_name,
       last_name: formData.last_name,
       email: formData.email,
