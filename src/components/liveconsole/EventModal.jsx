@@ -56,6 +56,7 @@ export default function EventModal({ eventType, fixture, user, onClose, onSucces
     try {
       const now = new Date().toISOString();
       const eventData = {
+        club_id: fixture.club_id,
         fixture: fixture.id,
         type: eventType,
         occurred_at: now,
