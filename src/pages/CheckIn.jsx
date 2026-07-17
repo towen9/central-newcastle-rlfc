@@ -80,6 +80,7 @@ export default function CheckIn() {
 
       // Create check-in
       await base44.entities.CheckIn.create({
+        club_id: club.id,
         user_id: user.id,
         membership_id: membership.id,
         location: clubQRs[0].name,
@@ -96,6 +97,7 @@ export default function CheckIn() {
 
       // Create points transaction
       await base44.entities.PointsTransaction.create({
+        club_id: club.id,
         user_id: user.id,
         membership_id: membership.id,
         points: pointsEarned,
