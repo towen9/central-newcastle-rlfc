@@ -80,6 +80,7 @@ export default function Benefits() {
       });
 
       await base44.entities.OfferRedemption.create({
+        club_id: club.id,
         offer_id: offer.id,
         offer_title: offer.title,
         sponsor_id: offer.sponsor_id,
@@ -117,6 +118,7 @@ export default function Benefits() {
       });
 
       await base44.entities.RewardRedemption.create({
+        club_id: club.id,
         user_id: user.id,
         membership_id: membership.id,
         reward_id: reward.id,
