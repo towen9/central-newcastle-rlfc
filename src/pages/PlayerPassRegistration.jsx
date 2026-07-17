@@ -146,6 +146,7 @@ export default function PlayerPassRegistration() {
       }
 
       const membershipData = {
+        club_id: club.id,
         user_id: user?.id || 'pending',
         user_email: data.email,
         user_name: data.full_name,
