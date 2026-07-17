@@ -83,6 +83,7 @@ export default function ScanForPoints() {
 
       // Create transaction
       await base44.entities.PointsTransaction.create({
+        club_id: club.id,
         user_id: user.id,
         membership_id: membership.id,
         points: pointsEarned,
