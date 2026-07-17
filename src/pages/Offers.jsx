@@ -77,6 +77,7 @@ export default function Offers() {
 
       // Create redemption record
       await base44.entities.OfferRedemption.create({
+        club_id: club.id,
         offer_id: offer.id,
         offer_title: offer.title,
         sponsor_id: offer.sponsor_id,
