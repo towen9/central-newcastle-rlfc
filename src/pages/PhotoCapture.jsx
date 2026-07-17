@@ -106,6 +106,7 @@ export default function PhotoCapture() {
 
       // Create GameDayEntry with photo
       const entry = await base44.entities.GameDayEntry.create({
+        club_id: fixture.club_id,
         user_id: user.id,
         first_name: user.full_name?.split(' ')[0] || 'Guest',
         last_name: user.full_name?.split(' ').slice(1).join(' ') || '',
