@@ -141,6 +141,7 @@ export default function LeaguesClubScan() {
       const pointsEarned = 10;
       await base44.entities.Membership.update(member.id, { points: (member.points || 0) + pointsEarned });
       await base44.entities.PointsTransaction.create({
+        club_id: member.club_id,
         user_id: member.user_id,
         membership_id: member.id,
         points: pointsEarned,
