@@ -104,6 +104,7 @@ export default function Sponsors() {
       const alreadyLogged = existing.some(r => new Date(r.timestamp).getTime() >= cutoff);
       if (alreadyLogged) return;
       await base44.entities.OfferRedemption.create({
+        club_id: club.id,
         offer_id: offer.id,
         offer_title: offer.title,
         sponsor_id: sponsor.id,
