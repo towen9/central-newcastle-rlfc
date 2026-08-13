@@ -1,0 +1,149 @@
+{
+  "name": "WalletPass",
+  "type": "object",
+  "properties": {
+    "membership_id": {
+      "type": "string",
+      "description": "Reference to Membership"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User \u2014 convenience for RLS and lookups"
+    },
+    "qr_code_id": {
+      "type": "string",
+      "description": "The value encoded in the pass barcode. Always mirrors Membership.qr_code_id so GateScan/processScan work unchanged."
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "apple",
+        "google"
+      ],
+      "description": "Wallet platform this pass was issued to"
+    },
+    "serial_number": {
+      "type": "string",
+      "description": "Apple serialNumber / Google object suffix. Stable for the life of the membership."
+    },
+    "auth_token": {
+      "type": "string",
+      "description": "Apple PassKit authenticationToken \u2014 bearer secret Apple presents on web service calls"
+    },
+    "google_object_id": {
+      "type": "string",
+      "description": "Full Google Wallet object id: {issuerId}.{serial}"
+    },
+    "device_registrations": {
+      "type": "array",
+      "description": "Apple devices registered for auto-update push",
+      "items": {
+        "type": "object",
+        "properties": {
+          "device_library_identifier": {
+            "type": "string"
+          },
+          "push_token": {
+            "type": "string"
+          },
+          "registered_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "tier_at_issue": {
+      "type": "string",
+      "description": "Membership tier_name when the pass was last rendered"
+    },
+    "content_hash": {
+      "type": "string",
+      "description": "Hash of the rendered pass payload. Unchanged hash = skip the push."
+    },
+    "last_updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time the pass content changed"
+    },
+    "last_pushed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time an update push was sent to devices"
+    },
+    "added_to_wallet_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "First time a device registered \u2014 proves the member actually saved the card"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "revoked"
+      ],
+      "default": "active",
+      "description": "Pass lifecycle state. Expired/revoked render as VOID."
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "membership_id",
+    "platform",
+    "serial_number"
+  ],
+  "indexes": [
+    {
+      "fields": [
+        "serial_number",
+        "platform"
+      ],
+      "unique": true
+    }
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "gate_staff"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
