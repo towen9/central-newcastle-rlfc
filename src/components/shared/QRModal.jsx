@@ -4,6 +4,7 @@ import { X, Shield, Download, WifiOff, Camera } from 'lucide-react';
 import { format } from 'date-fns';
 import { OfflineCache } from '../offline/OfflineCache';
 import PhotoUpload from '../membership/PhotoUpload';
+import AddToWallet from '../membership/AddToWallet';
 import { base44 } from '@/api/base44Client';
 import { useClub } from '@/contexts/ClubContext';
 
@@ -200,6 +201,13 @@ export default function QRModal({ isOpen, onClose, membership, user, onPhotoUplo
               {membership?.status === 'active' ? '✓ Active Membership' : 'Membership Inactive'}
             </p>
           </div>
+
+          {/* Wallet card — only for active memberships, and only online */}
+          {membership?.status === 'active' && !isOffline && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <AddToWallet membership={membership} />
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
