@@ -453,10 +453,23 @@ Deno.serve(async (req: Request) => {
     const db = client.asServiceRole;
     const url = new URL(req.url);
 
-    // Everything after the function name, e.g. ["v1","passes",...]
+    // Apple's PassKit web service calls arrive as sub-paths of webServiceURL,
+    // e.g. /v1/passes/{passTypeId}/{serial}. Base44 resolves a function from
+    // the WHOLE path, so it 404s those before they reach us — verified:
+    //   GET .../functions/wallet-pass/v1/log
+    //   -> "Backend function 'wallet-pass/v1/log' not found or not deployed"
+    //
+    // So the PassKit path is delivered via the `ws` query param instead, set
+    // by the edge proxy in wallet-pass-proxy.js. We still parse the real path
+    // first, so this keeps working if Base44 ever routes sub-paths natively.
     const parts = url.pathname.split("/").filter(Boolean);
     const idx = parts.indexOf("wallet-pass");
-    const segments = idx >= 0 ? parts.slice(idx + 1) : [];
+    let segments = idx >= 0 ? parts.slice(idx + 1) : [];
+
+    if (!segments.length) {
+      const ws = url.searchParams.get("ws");
+      if (ws) segments = ws.split("/").filter(Boolean);
+    }
 
     if (segments.length) {
       const handled = await handleAppleWebService(db, req, segments);
