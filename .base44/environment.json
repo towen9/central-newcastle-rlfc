@@ -1,0 +1,24 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "VITE_BASE44_APP_ID",
+      "description": "Base44 app ID — found in the Base44 Builder under your app's settings or .env.local",
+      "requiredAtBoot": true,
+      "generatedForDevelopment": true
+    },
+    {
+      "name": "VITE_BASE44_APP_BASE_URL",
+      "description": "Base44 backend URL for your app (e.g. https://my-app-xxxx.base44.app) — found in the Base44 Builder",
+      "requiredAtBoot": true,
+      "generatedForDevelopment": true
+    },
+    {
+      "name": "VITE_VAPID_PUBLIC_KEY",
+      "description": "Optional VAPID public key for web push notifications",
+      "requiredAtBoot": false
+    }
+  ]
+}
