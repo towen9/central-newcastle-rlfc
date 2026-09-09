@@ -11,10 +11,14 @@ The app is served on **host port 3000** (mapped to Vite's 5173 inside the contai
 
 ## Required credentials
 Two env vars are required for the app to connect to its backend:
-- `VITE_BASE44_APP_ID` — the Base44 app ID
-- `VITE_BASE44_APP_BASE_URL` — the Base44 backend URL (e.g. `https://my-app-xxxx.base44.app`)
+- `VITE_BASE44_APP_ID` = `6966ba172da6c09d1e1650bd`
+- `VITE_BASE44_APP_BASE_URL` = `https://charlestown-rl-community-app-1e1650bd.base44.app`
 
-These are found in the Base44 Builder dashboard or the project's `.env.local`. Without them, the app boots but cannot authenticate or fetch data. The `@base44/vite-plugin` sets up a dev proxy from `/api` to `VITE_BASE44_APP_BASE_URL`; if that value is not a valid URL, the Vite dev server crashes on first request.
+Both are PUBLIC client-side identifiers (shipped in every frontend build) and are set in `.env.base44-defaults`. They were recovered from the repo itself — see `docs/wallet-pass-proxy.js` and `src/pages/StaffFAQ.jsx`, which reference the same app ID and URL. No dashboard secrets are needed.
+
+NOTE: Two secrets with these names exist in the Base44 dashboard but hold malformed 45-char values (entered by mistake). The compose does NOT reference `/run/base44/app.env` on purpose — wiring it in would let those garbage values override the correct repo-derived ones and crash the Vite proxy. If the dashboard values are ever corrected to match the ones above, the env_file entry can safely be re-added (defaults first, app.env last).
+
+The app requires authentication: on load, `AuthContext` calls `GET /api/apps/public/prod/public-settings/by-id/<appId>` and unauthenticated users get a 403 `auth_required` → redirect to Base44 login. That 403 is normal behavior, not an error.
 
 Optional: `VITE_VAPID_PUBLIC_KEY` (web push notifications), `VITE_BASE44_FUNCTIONS_VERSION`.
 

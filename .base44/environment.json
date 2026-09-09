@@ -5,15 +5,13 @@
   "secrets": [
     {
       "name": "VITE_BASE44_APP_ID",
-      "description": "Base44 app ID — found in the Base44 Builder under your app's settings or .env.local",
-      "requiredAtBoot": true,
-      "generatedForDevelopment": true
+      "description": "Not needed — the app ID is a public value provided by .env.base44-defaults in the repo (see docs/wallet-pass-proxy.js). The dashboard copy currently holds a malformed value and is intentionally not wired into compose.",
+      "requiredAtBoot": false
     },
     {
       "name": "VITE_BASE44_APP_BASE_URL",
-      "description": "Base44 backend URL for your app (e.g. https://my-app-xxxx.base44.app) — found in the Base44 Builder",
-      "requiredAtBoot": true,
-      "generatedForDevelopment": true
+      "description": "Not needed — the backend URL is a public value provided by .env.base44-defaults in the repo. The dashboard copy currently holds a malformed value and is intentionally not wired into compose.",
+      "requiredAtBoot": false
     },
     {
       "name": "VITE_VAPID_PUBLIC_KEY",
